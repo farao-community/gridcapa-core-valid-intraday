@@ -15,19 +15,40 @@ public class CoreValidIdInternalException extends AbstractCoreValidIdException {
     private static final int STATUS = 500;
     private static final String CODE = "500-InternalException";
 
+    /**
+     * Creates a new CoreValidIdInternalException with the specified detail message.
+     *
+     * @param message detailed description of the internal error
+     */
     public CoreValidIdInternalException(final String message) {
         super(message);
     }
 
+    /**
+     * Creates a CoreValidIdInternalException with the specified detail message and cause.
+     *
+     * @param message the detail message describing the internal error
+     * @param throwable the underlying cause of this exception
+     */
     public CoreValidIdInternalException(final String message, final Throwable throwable) {
         super(message, throwable);
     }
 
+    /**
+     * Get the HTTP status code associated with this exception.
+     *
+     * @return the HTTP status code for this exception (500)
+     */
     @Override
     public int getStatus() {
         return STATUS;
     }
 
+    /**
+     * Provides the standardized error code for this exception.
+     *
+     * @return the error code string identifying the exception, for example "500-InternalException"
+     */
     @Override
     public String getCode() {
         return CODE;

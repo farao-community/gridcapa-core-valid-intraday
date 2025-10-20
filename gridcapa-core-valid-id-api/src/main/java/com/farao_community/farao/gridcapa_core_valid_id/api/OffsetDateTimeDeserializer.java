@@ -19,6 +19,14 @@ import java.time.OffsetDateTime;
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 public class OffsetDateTimeDeserializer extends JsonDeserializer<OffsetDateTime> {
+    /**
+     * Deserializes the current JSON string value into an OffsetDateTime.
+     *
+     * @param jsonParser the parser positioned on a JSON string containing an ISO-8601 offset date-time
+     * @param deserializationContext provider of contextual information for deserialization (not used)
+     * @return the parsed OffsetDateTime
+     * @throws IOException if an I/O error occurs while reading from the parser
+     */
     @Override
     public OffsetDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
         return OffsetDateTime.parse(jsonParser.getText());

@@ -42,6 +42,21 @@ public class CoreValidIdRequest {
     private final CoreValidIdFileResource pra;
     private final boolean launchedAutomatically;
 
+    /**
+     * Constructs a CoreValidIdRequest with the given identifiers, timestamp, associated file resources, and launch flag.
+     *
+     * @param id unique request identifier
+     * @param currentRunId identifier of the current processing run
+     * @param timestamp ISO-8601 timestamp for the request
+     * @param cnecRam CNEC RAM file resource
+     * @param vertice Vertice file resource
+     * @param cgm CGM file resource
+     * @param glsk GLSK file resource
+     * @param mergedCnec merged CNEC file resource
+     * @param marketPoint MarketPoint file resource
+     * @param pra PRA file resource
+     * @param launchedAutomatically true if the request was launched automatically, false otherwise
+     */
     @JsonCreator
     public CoreValidIdRequest(final @JsonProperty("id") String id,
                               final @JsonProperty("currentRunId") String currentRunId,
@@ -67,6 +82,20 @@ public class CoreValidIdRequest {
         this.launchedAutomatically = launchedAutomatically;
     }
 
+    /**
+     * Creates a CoreValidIdRequest with the given identifiers, timestamp and file resources, and marks it as not launched automatically.
+     *
+     * @param id the request identifier
+     * @param currentRunId the current run identifier associated with this request
+     * @param timestamp the request timestamp in ISO-8601 offset date-time
+     * @param cnecRam the CNEC RAM file resource, may be null
+     * @param vertice the Vertice file resource, may be null
+     * @param cgm the CGM file resource, may be null
+     * @param glsk the GLSK file resource, may be null
+     * @param mergedCnec the merged CNEC file resource, may be null
+     * @param marketPoint the market point file resource, may be null
+     * @param pra the PRA file resource, may be null
+     */
     public CoreValidIdRequest(final String id,
                               final String currentRunId,
                               final OffsetDateTime timestamp,
@@ -80,50 +109,110 @@ public class CoreValidIdRequest {
         this(id, currentRunId, timestamp, cnecRam, vertice, cgm, glsk, mergedCnec, marketPoint, pra, false);
     }
 
+    /**
+     * Fetches the resource identifier.
+     *
+     * @return the resource identifier
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Gets the current run identifier for this request.
+     *
+     * @return the current run identifier
+     */
     public String getCurrentRunId() {
         return currentRunId;
     }
 
+    /**
+     * Request timestamp including its timezone offset.
+     *
+     * @return the request timestamp as an OffsetDateTime
+     */
     public OffsetDateTime getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * The CNEC-RAM file resource associated with this request.
+     *
+     * @return the CNEC-RAM CoreValidIdFileResource, or null if not present
+     */
     public CoreValidIdFileResource getCnecRam() {
         return cnecRam;
     }
 
+    /**
+     * Gets the vertice file resource associated with this request.
+     *
+     * @return the vertice CoreValidIdFileResource, or null if none was provided
+     */
     public CoreValidIdFileResource getVertice() {
         return vertice;
     }
 
+    /**
+     * The CGM file resource associated with this request.
+     *
+     * @return the CGM CoreValidIdFileResource instance, or {@code null} if not provided
+     */
     public CoreValidIdFileResource getCgm() {
         return cgm;
     }
 
+    /**
+     * Gets the GLSK file resource associated with this request.
+     *
+     * @return the GLSK {@code CoreValidIdFileResource}, or {@code null} if not provided
+     */
     public CoreValidIdFileResource getGlsk() {
         return glsk;
     }
 
+    /**
+     * Returns the merged CNEC file resource associated with this request.
+     *
+     * @return the merged CNEC CoreValidIdFileResource, or {@code null} if not present
+     */
     public CoreValidIdFileResource getMergedCnec() {
         return mergedCnec;
     }
 
+    /**
+     * Returns the market point file resource associated with this request.
+     *
+     * @return the market point {@code CoreValidIdFileResource}
+     */
     public CoreValidIdFileResource getMarketPoint() {
         return marketPoint;
     }
 
+    /**
+     * The PRA file resource associated with this request.
+     *
+     * @return the PRA file resource, or {@code null} if not present
+     */
     public CoreValidIdFileResource getPra() {
         return pra;
     }
 
+    /**
+     * Indicates whether this request was launched automatically.
+     *
+     * @return `true` if the request was launched automatically, `false` otherwise.
+     */
     public boolean getLaunchedAutomatically() {
         return launchedAutomatically;
     }
 
+    /**
+     * Provide a string representation of this object.
+     *
+     * @return a string containing the object's field names and values
+     */
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);

@@ -19,6 +19,14 @@ import java.time.OffsetDateTime;
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel at rte-france.com>}
  */
 public class OffsetDateTimeSerializer extends JsonSerializer<OffsetDateTime> {
+    /**
+     * Serializes an OffsetDateTime as its ISO-8601 string representation into the provided JSON output.
+     *
+     * @param offsetDateTime the OffsetDateTime to serialize
+     * @param jsonGenerator the JsonGenerator to write the string value to
+     * @param serializerProvider the active SerializerProvider (unused)
+     * @throws IOException if writing to the JsonGenerator fails
+     */
     @Override
     public void serialize(OffsetDateTime offsetDateTime, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
         jsonGenerator.writeString(offsetDateTime.toString());
