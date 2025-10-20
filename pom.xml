@@ -10,7 +10,7 @@
         <version>1.13.0</version>
     </parent>
 
-    <artifactId>gridcapa-core-valid-id</artifactId>
+    <artifactId>gridcapa-core-valid-intraday</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -48,9 +48,9 @@
 
 
     <modules>
-        <module>gridcapa-core-valid-id-api</module>
-        <module>gridcapa-core-valid-id-app</module>
-        <module>gridcapa-core-valid-id-spring-boot-starter</module>
+        <module>gridcapa-core-valid-intraday-api</module>
+        <module>gridcapa-core-valid-intraday-app</module>
+        <module>gridcapa-core-valid-intraday-spring-boot-starter</module>
     </modules>
 
     <properties>
