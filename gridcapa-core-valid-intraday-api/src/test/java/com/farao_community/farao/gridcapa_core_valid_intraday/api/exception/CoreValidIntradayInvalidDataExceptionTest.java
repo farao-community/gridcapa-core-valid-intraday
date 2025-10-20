@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 /**
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel at rte-france.com>}
  */
-class CoreValidIntradayInvalidIdDataExceptionTest {
+class CoreValidIntradayInvalidDataExceptionTest {
     @Test
     void checkStandardExceptionUsage() {
         AbstractCoreValidIntradayException exception = new CoreValidIntradayInvalidDataException("Exception message");

@@ -14,7 +14,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>GridCapa CORE VALID ID</name>
+    <name>GridCapa CORE VALID Intraday</name>
     <description>A full suite to perform CEP 70% intraday validation on CORE zone</description>
     <url>http://www.farao-community.com</url>
 
@@ -26,9 +26,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:https://github.com/farao-community/gridcapa-core-valid-id.git</connection>
-        <developerConnection>scm:git:https://github.com/farao-community/gridcapa-core-valid-id.git</developerConnection>
-        <url>https://github.com/farao-community/gridcapa-core-valid-id.git</url>
+        <connection>scm:git:https://github.com/farao-community/gridcapa-core-valid-intraday.git</connection>
+        <developerConnection>scm:git:https://github.com/farao-community/gridcapa-core-valid-intraday.git</developerConnection>
+        <url>https://github.com/farao-community/gridcapa-core-valid-intraday.git</url>
     </scm>
 
     <developers>
