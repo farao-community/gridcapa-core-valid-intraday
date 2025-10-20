@@ -60,9 +60,9 @@ public class JsonApiConverter {
     }
 
     private ResourceConverter createConverter() {
-        ResourceConverter converter = new ResourceConverter(objectMapper, CoreValidIntradayRequest.class);
-        converter.disableSerializationOption(SerializationFeature.INCLUDE_META);
-        return converter;
+        ResourceConverter resourceConverter = new ResourceConverter(objectMapper, CoreValidIntradayRequest.class);
+        resourceConverter.disableSerializationOption(SerializationFeature.INCLUDE_META);
+        return resourceConverter;
     }
 
     private Error convertExceptionToJsonError(AbstractCoreValidIntradayException exception) {
