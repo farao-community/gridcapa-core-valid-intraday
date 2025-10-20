@@ -28,20 +28,20 @@ import com.github.jasminb.jsonapi.models.errors.Error;
  */
 public class JsonApiConverter {
     private final ObjectMapper objectMapper;
+    private final ResourceConverter converter;
 
     public JsonApiConverter() {
         this.objectMapper = createObjectMapper();
         objectMapper.registerModule(new Jdk8Module());
         objectMapper.registerModule(new JavaTimeModule());
+        this.converter = createConverter();
     }
 
     public <T> T fromJsonMessage(byte[] jsonMessage, Class<T> tClass) {
-        ResourceConverter converter = createConverter();
         return converter.readDocument(jsonMessage, tClass).get();
     }
 
     public <T> byte[] toJsonMessage(T jsonApiObject) {
-        ResourceConverter converter = createConverter();
         JSONAPIDocument<?> jsonapiDocument = new JSONAPIDocument<>(jsonApiObject);
         try {
             return converter.writeDocument(jsonapiDocument);
@@ -51,7 +51,6 @@ public class JsonApiConverter {
     }
 
     public byte[] toJsonMessage(AbstractCoreValidIdException exception) {
-        ResourceConverter converter = createConverter();
         JSONAPIDocument<?> jsonapiDocument = new JSONAPIDocument<>(convertExceptionToJsonError(exception));
         try {
             return converter.writeDocument(jsonapiDocument);
