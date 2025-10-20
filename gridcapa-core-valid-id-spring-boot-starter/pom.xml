@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.farao-community.farao</groupId>
         <artifactId>gridcapa-core-valid-id</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>gridcapa-core-valid-id-spring-boot-starter</artifactId>
