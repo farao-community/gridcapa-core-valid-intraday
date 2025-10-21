@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
  */
 public class OffsetDateTimeSerializer extends JsonSerializer<OffsetDateTime> {
     @Override

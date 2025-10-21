@@ -38,6 +38,6 @@ jobs:
       - name: Build and publish Docker image
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
-          name: farao/gridcapa-core-valid-id
+          name: farao/gridcapa-core-valid-intraday
           username: farao
           password: ${{ secrets.DOCKERHUB_TOKEN }}

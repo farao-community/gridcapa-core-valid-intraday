@@ -1,9 +1,9 @@
-[![Actions Status](https://github.com/farao-community/gridcapa-core-valid-id/workflows/CI/badge.svg)](https://github.com/farao-community/gridcapa-core-valid-id/actions)
-[![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=farao-community_gridcapa-core-valid-id&metric=coverage)](https://sonarcloud.io/component_measures?id=farao-community_gridcapa-core-valid-id&metric=coverage)
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=farao-community_gridcapa-core-valid-id&metric=alert_status)](https://sonarcloud.io/dashboard?id=farao-community_gridcapa-core-valid-id)
+[![Actions Status](https://github.com/farao-community/gridcapa-core-valid-intraday/workflows/CI/badge.svg)](https://github.com/farao-community/gridcapa-core-valid-intraday/actions)
+[![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=farao-community_gridcapa-core-valid-intraday&metric=coverage)](https://sonarcloud.io/component_measures?id=farao-community_gridcapa-core-valid-intraday&metric=coverage)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=farao-community_gridcapa-core-valid-intraday&metric=alert_status)](https://sonarcloud.io/dashboard?id=farao-community_gridcapa-core-valid-intraday)
 [![MPL-2.0 License](https://img.shields.io/badge/license-MPL_2.0-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
 [![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/farao-community)
-# gridcapa-core-valid-id
+# gridcapa-core-valid-intraday
 It's provide a full suite to perform CEP 70% intraday validation process on CORE zone 
 
 ## Functional overview
@@ -31,5 +31,5 @@ mvn install
 Then build docker image
 
 ```bash
-docker build -t farao/gridcapa-core-valid-id .
+docker build -t farao/gridcapa-core-valid-intraday .
 ```
