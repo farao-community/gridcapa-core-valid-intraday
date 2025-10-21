@@ -2,7 +2,9 @@
   "data": {
     "type": "core-valid-intraday-request",
     "id": "id",
-    "timestamp": "2025-10-01T00:30",
+    "currentRunId": "run-123",
+    "launchedAutomatically": false,
+    "timestamp": "2025-10-01T00:30Z",
     "attributes": {
       "cnecRam": {
         "filename": "cnecRam.txt",
