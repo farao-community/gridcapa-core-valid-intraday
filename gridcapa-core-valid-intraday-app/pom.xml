@@ -10,8 +10,8 @@
     </parent>
 
     <artifactId>gridcapa-core-valid-intraday-app</artifactId>
-    <name>GridCapa Core validation runner application</name>
-    <description>Core validation runner application in GridCapa environment</description>
+    <name>GridCapa Core intraday validation runner application</name>
+    <description>Core intraday validation runner application in GridCapa environment</description>
     <packaging>jar</packaging>
     <version>1.0.0-SNAPSHOT</version>
     <build>

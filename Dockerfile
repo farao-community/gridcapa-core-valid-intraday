@@ -1,5 +1,5 @@
 FROM farao/farao-computation-base:1.9.0 AS BUILDER
-ARG JAR_FILE=gridcapa-core-valid-id-app/target/*.jar
+ARG JAR_FILE=gridcapa-core-valid-intraday-app/target/*.jar
 COPY ${JAR_FILE} app.jar
 RUN mkdir -p /tmp/app  \
     && java -Djarmode=tools  \
