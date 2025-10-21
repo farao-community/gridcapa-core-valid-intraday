@@ -10,7 +10,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
  */
 @SuppressWarnings("HideUtilityClassConstructor")
 @SpringBootApplication

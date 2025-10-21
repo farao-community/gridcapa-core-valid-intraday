@@ -12,7 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.Optional;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
  */
 @ConfigurationProperties("core-valid-intraday-runner")
 public record CoreValidIntradayClientProperties(BindingConfiguration binding) {

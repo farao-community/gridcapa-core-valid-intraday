@@ -17,7 +17,7 @@ import org.springframework.amqp.core.AmqpTemplate;
 import java.io.IOException;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
  */
 class CoreValidIntradayClientTest {
     private final JsonApiConverter jsonApiConverter = new JsonApiConverter();

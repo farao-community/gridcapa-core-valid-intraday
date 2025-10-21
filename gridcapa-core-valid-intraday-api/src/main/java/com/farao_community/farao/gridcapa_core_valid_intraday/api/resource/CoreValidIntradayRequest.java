@@ -22,7 +22,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.time.OffsetDateTime;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
  */
 @Type("core-valid-intraday-request")
 public class CoreValidIntradayRequest {

@@ -3,27 +3,27 @@
     {
       "name": "core-valid-intraday-runner.amqp.application-id",
       "type": "java.lang.String",
-      "description": "Name of the application that call core valid through starter."
+      "description": "Name of the application that call core valid intraday through starter."
     },
     {
       "name": "core-valid-intraday-runner.amqp.queue-name",
       "type": "java.lang.String",
-      "description": "AMQP queue to be used to send Core valid requests."
+      "description": "AMQP queue to be used to send Core valid intraday requests."
     },
     {
       "name": "core-valid-intraday-runner.amqp.exchange",
       "type": "java.lang.String",
-      "description": "AMQP exchange to be used to send core valid requests."
+      "description": "AMQP exchange to be used to send core valid intraday requests."
     },
     {
       "name": "core-valid-intraday-runner.amqp.routing-key",
       "type": "java.lang.String",
-      "description": "AMQP routing key to associate to core valid requests."
+      "description": "AMQP routing key to associate to core valid intraday requests."
     },
     {
       "name": "core-valid-intraday-runner.amqp.expiration",
       "type": "java.lang.String",
-      "description": "Expiration time of core valid requests."
+      "description": "Expiration time of core valid intraday requests."
     }
   ]
 }
