@@ -31,12 +31,12 @@ public class UrlValidationService {
 
     public InputStream openUrlStream(final String urlString) {
         if (urlWhitelistConfiguration.getWhitelist().stream().noneMatch(urlString::startsWith)) {
-            StringJoiner stringJoiner = new StringJoiner(", ", "Whitelist: ", ".");
+            final StringJoiner stringJoiner = new StringJoiner(", ", "Whitelist: ", ".");
             urlWhitelistConfiguration.getWhitelist().forEach(stringJoiner::add);
             throw new CoreValidIntradayInvalidDataException(String.format("URL '%s' is not part of application's whitelisted url's %s", urlString, stringJoiner));
         }
         try {
-            URL url = new URI(urlString).toURL();
+            final URL url = new URI(urlString).toURL();
             return url.openStream();
         } catch (IOException | URISyntaxException | IllegalArgumentException e) {
             throw new CoreValidIntradayInvalidDataException(String.format("Cannot download FileResource file from URL '%s'", urlString), e);
