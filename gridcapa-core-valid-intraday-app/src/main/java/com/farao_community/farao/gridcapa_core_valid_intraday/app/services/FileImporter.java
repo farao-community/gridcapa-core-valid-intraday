@@ -21,9 +21,12 @@ import java.net.URISyntaxException;
  */
 @Service
 public class FileImporter {
+    private final UrlValidationService urlValidationService;
     private static final Logger LOGGER = LoggerFactory.getLogger(FileImporter.class);
 
-    //TODO create methods for importing all input files
+    public FileImporter(UrlValidationService urlValidationService) {
+        this.urlValidationService = urlValidationService;
+    }
 
     String getFilenameFromUrl(final String url) {
         try {
