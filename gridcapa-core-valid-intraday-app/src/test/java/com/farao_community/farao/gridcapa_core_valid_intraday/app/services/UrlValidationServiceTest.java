@@ -18,14 +18,44 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @SpringBootTest
 class UrlValidationServiceTest {
+
     @Autowired
     private UrlValidationService urlValidationService;
 
     @Test
     void checkExceptionThrownWhenUrlIsNotPartOfWhitelistedUrls() {
-        Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream("url1"));
-        String expectedMessage = "is not part of application's whitelisted url's";
-        String actualMessage = exception.getMessage();
+        final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream("url1"));
+        final String expectedMessage = "is not part of application's whitelisted url's";
+        final String actualMessage = exception.getMessage();
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void checkExceptionThrownWhenUrlIsNull() {
+        final String expectedMessage = "URL cannot be null or blank";
+        final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream(null));
+        final String actualMessage = exception.getMessage();
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void checkExceptionThrownWhenUrlIsBlank() {
+        final String expectedMessage = "URL cannot be null or blank";
+        final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream("  "));
+        final String actualMessage = exception.getMessage();
+        Assertions.assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    void checkWhenUrlIsOk() {
+        Assertions.assertNotNull(urlValidationService.openUrlStream("file:/"));
+    }
+
+    @Test
+    void checkExceptionThrownWhenWhenUrlNOK() {
+        final String expectedMessage = "Cannot download FileResource file from URL";
+        final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream("file:/___DOESNT_EXIST"));
+        final String actualMessage = exception.getMessage();
         Assertions.assertTrue(actualMessage.contains(expectedMessage));
     }
 }

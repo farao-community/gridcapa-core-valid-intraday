@@ -61,7 +61,7 @@ class CoreValidIntradayListenerTest {
 
     @Test
     void checkThatCorrectMessageIsHandledCorrectly() throws URISyntaxException, IOException {
-        byte[] correctMessage = Files.readAllBytes(Paths.get(getClass().getResource("/validRequest.json").toURI()));
+        final byte[] correctMessage = Files.readAllBytes(Paths.get(getClass().getResource("/validRequest.json").toURI()));
         coreValidIntradayListener.onMessage(correctMessage);
         Mockito.verify(streamBridge, Mockito.times(2)).send(Mockito.anyString(), Mockito.any());
         Mockito.verify(coreValidHandler, Mockito.times(1)).handleCoreValidIntradayRequest(Mockito.any(CoreValidIntradayRequest.class));
@@ -69,7 +69,7 @@ class CoreValidIntradayListenerTest {
 
     @Test
     void checkThatInvalidMessageReturnsError() throws URISyntaxException, IOException {
-        byte[] invalidMessage = Files.readAllBytes(Paths.get(getClass().getResource("/invalidRequest.json").toURI()));
+        final byte[] invalidMessage = Files.readAllBytes(Paths.get(getClass().getResource("/invalidRequest.json").toURI()));
         coreValidIntradayListener.onMessage(invalidMessage);
         Mockito.verify(streamBridge, Mockito.times(0)).send(Mockito.anyString(), Mockito.any());
         Mockito.verify(coreValidHandler, Mockito.times(0)).handleCoreValidIntradayRequest(Mockito.any(CoreValidIntradayRequest.class));

@@ -30,6 +30,9 @@ public class UrlValidationService {
     }
 
     public InputStream openUrlStream(final String urlString) {
+        if (urlString == null || urlString.isBlank()) {
+            throw new CoreValidIntradayInvalidDataException("URL cannot be null or blank");
+        }
         if (urlWhitelistConfiguration.getWhitelist().stream().noneMatch(urlString::startsWith)) {
             final StringJoiner stringJoiner = new StringJoiner(", ", "Whitelist: ", ".");
             urlWhitelistConfiguration.getWhitelist().forEach(stringJoiner::add);

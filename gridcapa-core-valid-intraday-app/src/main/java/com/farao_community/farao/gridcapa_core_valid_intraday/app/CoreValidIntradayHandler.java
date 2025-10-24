@@ -39,7 +39,7 @@ public class CoreValidIntradayHandler {
     public String handleCoreValidIntradayRequest(CoreValidIntradayRequest coreValidIntradayRequest) {
         final String formattedTimestamp = setUpEventLogging(coreValidIntradayRequest);
 
-        //TODO
+        //TODO handle request
         return coreValidIntradayRequest.getId();
 
     }
