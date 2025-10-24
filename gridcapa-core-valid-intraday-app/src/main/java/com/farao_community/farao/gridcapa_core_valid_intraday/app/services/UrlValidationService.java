@@ -29,7 +29,7 @@ public class UrlValidationService {
         this.urlWhitelistConfiguration = urlWhitelistConfiguration;
     }
 
-    public InputStream openUrlStream(String urlString) {
+    public InputStream openUrlStream(final String urlString) {
         if (urlWhitelistConfiguration.getWhitelist().stream().noneMatch(urlString::startsWith)) {
             StringJoiner sj = new StringJoiner(", ", "Whitelist: ", ".");
             urlWhitelistConfiguration.getWhitelist().forEach(sj::add);
