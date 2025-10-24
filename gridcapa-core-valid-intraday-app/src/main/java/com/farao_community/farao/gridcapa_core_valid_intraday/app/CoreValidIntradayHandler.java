@@ -37,15 +37,14 @@ public class CoreValidIntradayHandler {
     }
 
     public String handleCoreValidIntradayRequest(CoreValidIntradayRequest coreValidIntradayRequest) {
-        final String formattedTimestamp = setUpEventLogging(coreValidIntradayRequest);
-
+        setUpEventLogging(coreValidIntradayRequest);
+        final String formattedTimestamp = TIMESTAMP_FORMATTER.format(coreValidIntradayRequest.getTimestamp());
         return coreValidIntradayRequest.getId();
 
     }
 
-    private static String setUpEventLogging(CoreValidIntradayRequest coreValidIntradayRequest) {
+    private static void setUpEventLogging(CoreValidIntradayRequest coreValidIntradayRequest) {
         MDC.put("gridcapa-task-id", coreValidIntradayRequest.getId());
-        return TIMESTAMP_FORMATTER.format(coreValidIntradayRequest.getTimestamp());
     }
 
 }
