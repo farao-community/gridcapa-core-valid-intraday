@@ -31,9 +31,9 @@ public class UrlValidationService {
 
     public InputStream openUrlStream(final String urlString) {
         if (urlWhitelistConfiguration.getWhitelist().stream().noneMatch(urlString::startsWith)) {
-            StringJoiner sj = new StringJoiner(", ", "Whitelist: ", ".");
-            urlWhitelistConfiguration.getWhitelist().forEach(sj::add);
-            throw new CoreValidIntradayInvalidDataException(String.format("URL '%s' is not part of application's whitelisted url's %s", urlString, sj));
+            StringJoiner stringJoiner = new StringJoiner(", ", "Whitelist: ", ".");
+            urlWhitelistConfiguration.getWhitelist().forEach(stringJoiner::add);
+            throw new CoreValidIntradayInvalidDataException(String.format("URL '%s' is not part of application's whitelisted url's %s", urlString, stringJoiner));
         }
         try {
             URL url = new URI(urlString).toURL();
