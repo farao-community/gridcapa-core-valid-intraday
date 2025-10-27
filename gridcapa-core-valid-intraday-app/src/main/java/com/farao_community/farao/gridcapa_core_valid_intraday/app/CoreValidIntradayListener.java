@@ -62,7 +62,7 @@ public class CoreValidIntradayListener {
     private void runCoreValidIntradayRequest(final CoreValidIntradayRequest coreValidIntradayRequest) {
         try {
             LOGGER.info("Core valid request received: {}", coreValidIntradayRequest);
-            streamBridge.send(TASK_STATUS_UPDATE, new TaskStatusUpdate(UUID.fromString(coreValidIntradayRequest.getId()), TaskStatus.RUNNING));
+            updateTaskStatus(coreValidIntradayRequest.getId(), coreValidIntradayRequest.getTimestamp(), TaskStatus.RUNNING);
             final String coreValidIntradayResponseId = coreValidIntradayHandler.handleCoreValidIntradayRequest(coreValidIntradayRequest);
             updateTaskStatus(coreValidIntradayResponseId, coreValidIntradayRequest.getTimestamp(), TaskStatus.SUCCESS);
         } catch (final AbstractCoreValidIntradayException e) {

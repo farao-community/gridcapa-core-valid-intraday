@@ -43,7 +43,7 @@ public class CoreValidIntradayHandler {
 
     }
 
-    private static void setUpEventLogging(CoreValidIntradayRequest coreValidIntradayRequest) {
+    private static void setUpEventLogging(final CoreValidIntradayRequest coreValidIntradayRequest) {
         MDC.put("gridcapa-task-id", coreValidIntradayRequest.getId());
     }
 
