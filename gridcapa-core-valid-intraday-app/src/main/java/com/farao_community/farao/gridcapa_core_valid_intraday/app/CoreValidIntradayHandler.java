@@ -30,13 +30,13 @@ public class CoreValidIntradayHandler {
     private final FileImporter fileImporter;
     private final MinioAdapter minioAdapter;
 
-    public CoreValidIntradayHandler(FileImporter fileImporter, MinioAdapter minioAdapter, Logger eventsLogger) {
+    public CoreValidIntradayHandler(final FileImporter fileImporter, final MinioAdapter minioAdapter, final Logger eventsLogger) {
         this.fileImporter = fileImporter;
         this.minioAdapter = minioAdapter;
         this.eventsLogger = eventsLogger;
     }
 
-    public String handleCoreValidIntradayRequest(CoreValidIntradayRequest coreValidIntradayRequest) {
+    public String handleCoreValidIntradayRequest(final CoreValidIntradayRequest coreValidIntradayRequest) {
         setUpEventLogging(coreValidIntradayRequest);
         final String formattedTimestamp = TIMESTAMP_FORMATTER.format(coreValidIntradayRequest.getTimestamp());
         return coreValidIntradayRequest.getId();

@@ -24,7 +24,7 @@ public class FileImporter {
     private final UrlValidationService urlValidationService;
     private static final Logger LOGGER = LoggerFactory.getLogger(FileImporter.class);
 
-    public FileImporter(UrlValidationService urlValidationService) {
+    public FileImporter(final UrlValidationService urlValidationService) {
         this.urlValidationService = urlValidationService;
     }
 

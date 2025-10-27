@@ -23,7 +23,7 @@ public class AmqpMessagesConfiguration {
     private long asyncTimeOut;
 
     @Bean
-    AsyncAmqpTemplate asyncTemplate(RabbitTemplate rabbitTemplate) {
+    AsyncAmqpTemplate asyncTemplate(final RabbitTemplate rabbitTemplate) {
         final AsyncRabbitTemplate asyncTemplate = new AsyncRabbitTemplate(rabbitTemplate);
         asyncTemplate.setReceiveTimeout(asyncTimeOut);
         return asyncTemplate;

@@ -25,7 +25,7 @@ import java.util.StringJoiner;
 public class UrlValidationService {
     private final UrlWhitelistConfiguration urlWhitelistConfiguration;
 
-    public UrlValidationService(UrlWhitelistConfiguration urlWhitelistConfiguration) {
+    public UrlValidationService(final UrlWhitelistConfiguration urlWhitelistConfiguration) {
         this.urlWhitelistConfiguration = urlWhitelistConfiguration;
     }
 
