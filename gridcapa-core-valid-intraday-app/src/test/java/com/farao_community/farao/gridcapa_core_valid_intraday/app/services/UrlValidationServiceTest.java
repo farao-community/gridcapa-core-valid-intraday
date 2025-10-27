@@ -27,7 +27,7 @@ class UrlValidationServiceTest {
     @Test
     void checkExceptionThrownWhenUrlIsNotPartOfWhitelistedUrls() {
         final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream("url1"));
-        final String expectedMessage = "is not part of application's whitelisted URL's";
+        final String expectedMessage = "is not part of application's whitelisted URLs";
         final String actualMessage = exception.getMessage();
         Assertions.assertTrue(actualMessage.contains(expectedMessage));
     }

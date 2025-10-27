@@ -36,7 +36,7 @@ public class UrlValidationService {
         if (urlWhitelistConfiguration.getWhitelist().stream().noneMatch(urlString::startsWith)) {
             final StringJoiner stringJoiner = new StringJoiner(", ", "Whitelist: ", ".");
             urlWhitelistConfiguration.getWhitelist().forEach(stringJoiner::add);
-            throw new CoreValidIntradayInvalidDataException(String.format("URL '%s' is not part of application's whitelisted URL's. %s", urlString, stringJoiner));
+            throw new CoreValidIntradayInvalidDataException(String.format("URL '%s' is not part of application's whitelisted URLs. %s", urlString, stringJoiner));
         }
         try {
             final URL url = new URI(urlString).toURL();
