@@ -52,7 +52,7 @@ class UrlValidationServiceTest {
     }
 
     @Test
-    void checkExceptionThrownWhenWhenUrlNOK() {
+    void checkExceptionThrownWhenUrlNOK() {
         final String expectedMessage = "Cannot download FileResource file from URL";
         final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream("file:/___DOESNT_EXIST"));
         final String actualMessage = exception.getMessage();
