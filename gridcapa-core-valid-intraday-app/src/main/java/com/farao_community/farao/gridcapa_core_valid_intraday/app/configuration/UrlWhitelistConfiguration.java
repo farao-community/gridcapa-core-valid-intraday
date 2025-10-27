@@ -7,7 +7,6 @@
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.configuration;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import java.util.List;
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 @Configuration
-@EnableConfigurationProperties
 @ConfigurationProperties("core-valid-intraday-runner")
 public class UrlWhitelistConfiguration {
     private final List<String> whitelist = new ArrayList<>();

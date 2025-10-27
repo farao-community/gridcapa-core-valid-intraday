@@ -8,11 +8,13 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 @SuppressWarnings("HideUtilityClassConstructor")
+@EnableConfigurationProperties
 @SpringBootApplication
 public class CoreValidIntradayApplication {
     public static void main(String[] args) {
