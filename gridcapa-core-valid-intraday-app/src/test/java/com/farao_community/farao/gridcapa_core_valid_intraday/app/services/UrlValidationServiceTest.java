@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.IOException;
+
 
 /**
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
@@ -48,7 +50,11 @@ class UrlValidationServiceTest {
 
     @Test
     void checkWhenUrlIsOk() {
-        Assertions.assertNotNull(urlValidationService.openUrlStream("file:/"));
+        try (var stream = urlValidationService.openUrlStream("file:/")) {
+            Assertions.assertNotNull(stream);
+        } catch (IOException e) {
+            Assertions.fail();
+        }
     }
 
     @Test
