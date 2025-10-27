@@ -24,7 +24,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 @Component
 public class CoreValidIntradayListener {

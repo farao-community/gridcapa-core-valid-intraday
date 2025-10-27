@@ -9,7 +9,7 @@
 package com.farao_community.farao.gridcapa_core_valid_intraday.api.exception;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 public class CoreValidIntradayInvalidDataException extends AbstractCoreValidIntradayException {
 
