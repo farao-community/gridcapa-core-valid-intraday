@@ -6,21 +6,18 @@
  */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.configuration;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 @Configuration
-@ConfigurationProperties("core-valid-intraday-runner")
-public class UrlWhitelistConfiguration {
-    private final List<String> whitelist = new ArrayList<>();
-
-    public List<String> getWhitelist() {
-        return whitelist;
+class EventsLogger {
+    @Bean
+    public Logger getLogger() {
+        return LoggerFactory.getLogger("BUSINESS_LOGGER");
     }
 }

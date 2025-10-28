@@ -15,7 +15,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import java.util.Objects;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 public class CoreValidIntradayFileResource {
     private final String filename;
