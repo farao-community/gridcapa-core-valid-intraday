@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -40,7 +39,7 @@ public class FileImporter {
             final OffsetDateTime timestamp) {
         try (final InputStream refProgStream = urlValidationService.openUrlStream(refProgFile.getUrl())) {
             return RefProgImporter.importRefProg(refProgStream, timestamp);
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             throw new CoreValidIntradayInvalidDataException(String.format("Cannot import reference program file from URL '%s'", refProgFile.getUrl()), e);
         }
     }

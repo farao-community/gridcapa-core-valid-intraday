@@ -6,22 +6,30 @@
  */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
+import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.net.URI;
 import java.net.URL;
 import java.time.OffsetDateTime;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 @SpringBootTest
 class FileImporterTest {
+
+    @Mock
+    private UrlValidationService urlValidationService;
 
     @Autowired
     private FileImporter fileImporter;
@@ -36,6 +44,21 @@ class FileImporterTest {
         assertEquals(-1325, referenceProgram.getGlobalNetPosition("10YCB-GERMANY--8"));
         assertEquals(225, referenceProgram.getGlobalNetPosition("10YNL----------L"));
         assertEquals(1150, referenceProgram.getGlobalNetPosition("10YBE----------2"));
+    }
+
+    @Test
+    void importReferenceProgramShouldThrowCoreValidIntradayInvalidDataException() throws Exception {
+
+        final CoreValidIntradayFileResource refProgFile = createFileResource("refprog", new URI("https://example.com/refprog.xml").toURL());
+
+        when(urlValidationService.openUrlStream(anyString())).thenThrow(new CoreValidIntradayInvalidDataException("Connection failed"));
+
+        CoreValidIntradayInvalidDataException exception = assertThrows(
+                CoreValidIntradayInvalidDataException.class,
+                () -> fileImporter.importReferenceProgram(refProgFile, TEST_DATE_TIME)
+        );
+
+        assertTrue(exception.getMessage().contains("Cannot import reference program file from URL"));
     }
 
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {
