@@ -7,17 +7,23 @@
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
+import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
+import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
+import com.powsybl.openrao.data.refprog.refprogxmlimporter.RefProgImporter;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.OffsetDateTime;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
+ * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
  */
 @Service
 public class FileImporter {
@@ -26,6 +32,16 @@ public class FileImporter {
 
     public FileImporter(final UrlValidationService urlValidationService) {
         this.urlValidationService = urlValidationService;
+    }
+
+    public ReferenceProgram importReferenceProgram(
+            final CoreValidIntradayFileResource refProgFile,
+            final OffsetDateTime timestamp) {
+        try (final InputStream refProgStream = urlValidationService.openUrlStream(refProgFile.getUrl())) {
+            return RefProgImporter.importRefProg(refProgStream, timestamp);
+        } catch (final Exception e) {
+            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import reference program file from URL '%s'", refProgFile.getUrl()), e);
+        }
     }
 
     String getFilenameFromUrl(final String url) {
