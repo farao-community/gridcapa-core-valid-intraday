@@ -20,7 +20,7 @@ import org.springframework.amqp.core.MessagePropertiesBuilder;
 import org.springframework.stereotype.Component;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 @Component
 public class CoreValidIntradayClient {

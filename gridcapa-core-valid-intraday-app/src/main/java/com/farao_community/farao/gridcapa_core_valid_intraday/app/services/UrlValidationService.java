@@ -19,21 +19,24 @@ import java.net.URL;
 import java.util.StringJoiner;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 @Component
 public class UrlValidationService {
     private final UrlWhitelistConfiguration urlWhitelistConfiguration;
 
-    public UrlValidationService(UrlWhitelistConfiguration urlWhitelistConfiguration) {
+    public UrlValidationService(final UrlWhitelistConfiguration urlWhitelistConfiguration) {
         this.urlWhitelistConfiguration = urlWhitelistConfiguration;
     }
 
     public InputStream openUrlStream(final String urlString) {
+        if (urlString == null || urlString.isBlank()) {
+            throw new CoreValidIntradayInvalidDataException("URL cannot be null or blank");
+        }
         if (urlWhitelistConfiguration.getWhitelist().stream().noneMatch(urlString::startsWith)) {
             final StringJoiner stringJoiner = new StringJoiner(", ", "Whitelist: ", ".");
             urlWhitelistConfiguration.getWhitelist().forEach(stringJoiner::add);
-            throw new CoreValidIntradayInvalidDataException(String.format("URL '%s' is not part of application's whitelisted url's %s", urlString, stringJoiner));
+            throw new CoreValidIntradayInvalidDataException(String.format("URL '%s' is not part of application's whitelisted URLs. %s", urlString, stringJoiner));
         }
         try {
             final URL url = new URI(urlString).toURL();

@@ -13,7 +13,7 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.api.JsonApiConvert
  * Any subclass may be automatically wrapped to a JSON API error message if needed
  *
  * @see JsonApiConverter
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 public abstract class AbstractCoreValidIntradayException extends RuntimeException {
 

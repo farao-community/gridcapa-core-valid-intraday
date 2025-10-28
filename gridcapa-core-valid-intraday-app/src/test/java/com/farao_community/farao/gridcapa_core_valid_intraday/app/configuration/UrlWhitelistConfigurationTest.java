@@ -14,13 +14,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 @SpringBootTest
 class UrlWhitelistConfigurationTest {
 
     @Autowired
-    UrlWhitelistConfiguration urlWhitelistConfiguration;
+    private UrlWhitelistConfiguration urlWhitelistConfiguration;
 
     @Test
     void getWhitelist() {

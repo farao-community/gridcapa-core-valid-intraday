@@ -17,14 +17,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_external at rte-france.com>}
+ * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 @Service
 public class FileImporter {
     private final UrlValidationService urlValidationService;
     private static final Logger LOGGER = LoggerFactory.getLogger(FileImporter.class);
 
-    public FileImporter(UrlValidationService urlValidationService) {
+    public FileImporter(final UrlValidationService urlValidationService) {
         this.urlValidationService = urlValidationService;
     }
 
