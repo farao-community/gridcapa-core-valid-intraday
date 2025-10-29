@@ -86,7 +86,7 @@ core-valid-intraday-runner:
       cluster-vertice-code: PL
       is-hvdc-hub: false
       coefficient: 1
-    - name: Rounmanie
+    - name: Roumanie
       ramcep2-code: RO
       flowbased-code: PTDF_RO
       forecast-code: RO-CORE
