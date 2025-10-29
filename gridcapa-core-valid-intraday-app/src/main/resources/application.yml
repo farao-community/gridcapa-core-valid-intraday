@@ -2,3 +2,104 @@ spring:
   cloud:
     function:
       definition: request
+
+core-valid-intraday-runner:
+  core-hubs:
+    - name: Autriche
+      ramcep2-code: AT
+      flowbased-code: PTDF_AT
+      forecast-code: AT-CORE
+      cluster-vertice-code: AT
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Belgique
+      ramcep2-code: BE
+      flowbased-code: PTDF_BE
+      forecast-code: BE-CORE
+      cluster-vertice-code: BE
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: République Tchéque
+      ramcep2-code: CZ
+      flowbased-code: PTDF_CZ
+      forecast-code: CZ-CORE
+      cluster-vertice-code: CZ
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Allemagne
+      ramcep2-code: DE
+      flowbased-code: PTDF_DE
+      forecast-code: DE-CORE
+      cluster-vertice-code: DE
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: France
+      ramcep2-code: FR
+      flowbased-code: PTDF_FR
+      forecast-code: FR-CORE
+      cluster-vertice-code: FR
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Croatie
+      ramcep2-code: HR
+      flowbased-code: PTDF_HR
+      forecast-code: HR-CORE
+      cluster-vertice-code: HR
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Hongrie
+      ramcep2-code: HU
+      flowbased-code: PTDF_HU
+      forecast-code: HU-CORE
+      cluster-vertice-code: HU
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Pays-Bas
+      ramcep2-code: NL
+      flowbased-code: PTDF_NL
+      forecast-code: NL-CORE
+      cluster-vertice-code: NL
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Pologne
+      ramcep2-code: PL
+      flowbased-code: PTDF_PL
+      forecast-code: PL-CORE
+      cluster-vertice-code: PL
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Roumanie
+      ramcep2-code: RO
+      flowbased-code: PTDF_RO
+      forecast-code: RO-CORE
+      cluster-vertice-code: RO
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Slovénie
+      ramcep2-code: SI
+      flowbased-code: PTDF_SI
+      forecast-code: SI-CORE
+      cluster-vertice-code: SI
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Slovaquie
+      ramcep2-code: SK
+      flowbased-code: PTDF_SK
+      forecast-code: SK-CORE
+      cluster-vertice-code: SK
+      is-hvdc-hub: false
+      coefficient: 1
+    - name: Hub Belgique AleGro
+      ramcep2-code: BE_ALEGrO
+      flowbased-code: PTDF_BE_AL
+      forecast-code: ALBE-CORE
+      cluster-vertice-code: BE_AL
+      is-hvdc-hub: true
+      coefficient: 1
+    - name: Hub Allemagne AleGro
+      ramcep2-code: DE_ALEGrO
+      flowbased-code: PTDF_DE_AL
+      forecast-code: ALDE-CORE
+      cluster-vertice-code: DE_AL
+      is-hvdc-hub: true
+      coefficient: 1
