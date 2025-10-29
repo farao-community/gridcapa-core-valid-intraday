@@ -23,11 +23,11 @@ class CoreHubsConfigurationTest {
     @Test
     void getCoreHubs() {
         Assertions.assertThat(coreHubsConfiguration).isNotNull();
-        Assertions.assertThat(coreHubsConfiguration.getCoreHubs()).isNotNull();
-        Assertions.assertThat(coreHubsConfiguration.getCoreHubs()).hasSize(14);
+        Assertions.assertThat(coreHubsConfiguration.getCoreHubs())
+                .isNotNull()
+                .hasSize(14);
         final CoreHub coreHubFrance = new CoreHub("France", "FR", "PTDF_FR", "FR-CORE", "FR", false, 1);
-        Assertions.assertThat(coreHubsConfiguration.getCoreHubs()).contains(coreHubFrance);
         final CoreHub coreHubHvdc = new CoreHub("Hub Allemagne AleGro", "DE_ALEGrO", "PTDF_DE_AL", "ALDE-CORE", "DE_AL", true, 1);
-        Assertions.assertThat(coreHubsConfiguration.getCoreHubs()).contains(coreHubHvdc);
+        Assertions.assertThat(coreHubsConfiguration.getCoreHubs()).contains(coreHubFrance, coreHubHvdc);
     }
 }
