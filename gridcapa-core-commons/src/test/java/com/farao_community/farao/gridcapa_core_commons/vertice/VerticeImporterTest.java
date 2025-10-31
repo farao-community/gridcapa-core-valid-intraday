@@ -12,6 +12,7 @@ import com.farao_community.farao.gridcapa_core_commons.exception.CoreValidCommon
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.test.util.AopTestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -60,7 +61,7 @@ class VerticeImporterTest {
     void importVerticesWithException() {
         InputStream inputStream = Mockito.mock(InputStream.class);
         Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
-                .isThrownBy(() -> VerticeImporter.importVertices(inputStream, null))
+                .isThrownBy(() -> VerticeImporter.importVertices(inputStream, coreHubs))
                 .withMessage("Exception occurred during parsing vertice file");
     }
 
@@ -73,11 +74,11 @@ class VerticeImporterTest {
     }
 
     private List<CoreHub> getTestCoreHubs() {
-        final List<CoreHub> coreHubs = new ArrayList<>();
-        coreHubs.add(new CoreHub("Test1", "ram1", "fb1", "fc1", "AA", false, 1));
-        coreHubs.add(new CoreHub("Test2", "ram2", "fb2", "fc2", "BB", false, 1));
-        coreHubs.add(new CoreHub("Test3", "ram3", "fb3", "fc3", "CC", false, 1));
-        coreHubs.add(new CoreHub("Test4", "ram4", "fb4", "fc4", "D_D", true, 1));
-        return coreHubs;
+        final List<CoreHub> hubs = new ArrayList<>();
+        hubs.add(new CoreHub("Test1", "ram1", "fb1", "fc1", "AA", false, 1));
+        hubs.add(new CoreHub("Test2", "ram2", "fb2", "fc2", "BB", false, 1));
+        hubs.add(new CoreHub("Test3", "ram3", "fb3", "fc3", "CC", false, 1));
+        hubs.add(new CoreHub("Test4", "ram4", "fb4", "fc4", "D_D", true, 1));
+        return hubs;
     }
 }
