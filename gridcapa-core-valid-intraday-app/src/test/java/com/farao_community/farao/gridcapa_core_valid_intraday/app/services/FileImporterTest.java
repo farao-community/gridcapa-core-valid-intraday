@@ -6,9 +6,11 @@
  */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
+import com.farao_community.farao.gridcapa_core_commons.vertice.Vertice;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.net.URI;
 import java.net.URL;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -59,6 +64,39 @@ class FileImporterTest {
         );
 
         assertTrue(exception.getMessage().contains("Cannot import reference program file from URL"));
+    }
+
+    @Test
+    void shouldImportVerticesFromCoreHubSettings() {
+        final CoreValidIntradayFileResource verticeFile = createFileResource("vertice",  getClass().getResource("/fake-vertice.csv"));
+        final List<Vertice> vertices = fileImporter.importVertices(verticeFile);
+        Assertions.assertThat(vertices)
+                .isNotNull()
+                .hasSize(4);
+        final Vertice vertice = vertices.getFirst();
+        Assertions.assertThat(vertice.getVerticeId()).isEqualTo(1);
+        final HashMap<String, Integer> entries = new HashMap<>();
+        entries.put("FR", 11);
+        entries.put("BE", 111);
+        entries.put("BE_AL", 0);
+        entries.put("DE", 1111);
+        entries.put("DE_AL", 0);
+        final Map<String, Integer> positions = vertice.getPositions();
+        Assertions.assertThat(positions)
+                .hasSize(5)
+                .containsExactlyInAnyOrderEntriesOf(entries);
+    }
+
+    @Test
+    void importVerticeShouldThrowCoreValidIntradayInvalidDataException() throws Exception {
+
+        final CoreValidIntradayFileResource verticeFile = createFileResource("vertice", new URI("https://example.com/vertice.csv").toURL());
+
+        when(urlValidationService.openUrlStream(anyString())).thenThrow(new CoreValidIntradayInvalidDataException("Connection failed"));
+
+        Assertions.assertThatExceptionOfType(CoreValidIntradayInvalidDataException.class)
+                .isThrownBy(() -> fileImporter.importVertices(verticeFile))
+                .withMessage("Cannot import vertice file from URL 'https://example.com/vertice.csv'");
     }
 
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {

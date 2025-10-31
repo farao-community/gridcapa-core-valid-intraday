@@ -51,6 +51,7 @@
         <module>gridcapa-core-valid-intraday-api</module>
         <module>gridcapa-core-valid-intraday-app</module>
         <module>gridcapa-core-valid-intraday-spring-boot-starter</module>
+        <module>gridcapa-core-commons</module>
     </modules>
 
     <properties>

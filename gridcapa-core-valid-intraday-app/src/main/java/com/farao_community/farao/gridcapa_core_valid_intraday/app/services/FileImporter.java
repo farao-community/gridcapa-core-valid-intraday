@@ -6,6 +6,10 @@
  */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
+import com.farao_community.farao.gridcapa_core_commons.core_hub.CoreHub;
+import com.farao_community.farao.gridcapa_core_commons.core_hub.CoreHubsConfiguration;
+import com.farao_community.farao.gridcapa_core_commons.vertice.Vertice;
+import com.farao_community.farao.gridcapa_core_commons.vertice.VerticeImporter;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
@@ -20,6 +24,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
@@ -27,10 +33,13 @@ import java.time.OffsetDateTime;
  */
 @Service
 public class FileImporter {
+    private final List<CoreHub> coreHubs;
     private final UrlValidationService urlValidationService;
     private static final Logger LOGGER = LoggerFactory.getLogger(FileImporter.class);
 
-    public FileImporter(final UrlValidationService urlValidationService) {
+    public FileImporter(final UrlValidationService urlValidationService,
+                        final CoreHubsConfiguration coreHubsConfiguration) {
+        this.coreHubs = Collections.unmodifiableList(coreHubsConfiguration.getCoreHubs());
         this.urlValidationService = urlValidationService;
     }
 
@@ -41,6 +50,14 @@ public class FileImporter {
             return RefProgImporter.importRefProg(refProgStream, timestamp);
         } catch (final Exception e) {
             throw new CoreValidIntradayInvalidDataException(String.format("Cannot import reference program file from URL '%s'", refProgFile.getUrl()), e);
+        }
+    }
+
+    public List<Vertice> importVertices(final CoreValidIntradayFileResource verticeFile) {
+        try (final InputStream verticefileInputStream = urlValidationService.openUrlStream(verticeFile.getUrl())) {
+            return VerticeImporter.importVertices(verticefileInputStream, coreHubs);
+        } catch (final Exception e) {
+            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import vertice file from URL '%s'", verticeFile.getUrl()), e);
         }
     }
 

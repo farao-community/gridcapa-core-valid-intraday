@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.gridcapa_core_valid_intraday.app.configuration;
+package com.farao_community.farao.gridcapa_core_commons.core_hub;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +16,7 @@ import java.util.List;
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
  */
 @Configuration
-@ConfigurationProperties("core-valid-intraday-runner")
+@ConfigurationProperties("core-valid-commons")
 public class CoreHubsConfiguration {
     private final List<CoreHub> coreHubs = new ArrayList<>();
 

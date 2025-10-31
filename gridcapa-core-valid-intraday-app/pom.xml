@@ -55,8 +55,13 @@
     <dependencies>
         <!-- COMPILE DEPENDENCIES -->
         <dependency>
-            <groupId>com.farao-community.farao</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>gridcapa-core-valid-intraday-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>gridcapa-core-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
