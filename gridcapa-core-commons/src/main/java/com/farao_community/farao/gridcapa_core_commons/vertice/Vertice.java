@@ -7,6 +7,7 @@
  */
 package com.farao_community.farao.gridcapa_core_commons.vertice;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class Vertice {
@@ -24,6 +25,6 @@ public class Vertice {
     }
 
     public Map<String, Integer> getPositions() {
-        return positions;
+        return Collections.unmodifiableMap(positions);
     }
 }

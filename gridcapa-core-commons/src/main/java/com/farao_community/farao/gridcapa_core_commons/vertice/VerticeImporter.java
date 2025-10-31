@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ public final class VerticeImporter {
     }
 
     public static List<Vertice> importVertices(final InputStream verticesStream, final List<CoreHub> coreHubs) {
-        return importVertices(new InputStreamReader(verticesStream), coreHubs);
+        return importVertices(new InputStreamReader(verticesStream, StandardCharsets.UTF_8), coreHubs);
     }
 
     private static List<Vertice> importVertices(final Reader reader, final List<CoreHub> coreHubs) {
@@ -43,14 +44,14 @@ public final class VerticeImporter {
                     .parse(reader);
             csvRecords.forEach(csvRecord -> {
                 final Map<String, Integer> positions = new HashMap<>();
-                coreHubs.forEach(corehub -> {
+                coreHubs.forEach(corehub ->
                     positions.put(corehub.clusterVerticeCode(),
-                        getPosition(csvRecord, corehub));
-                });
+                        getPosition(csvRecord, corehub))
+                );
                 vertices.add(new Vertice(Integer.parseInt(csvRecord.get("Vertex ID")), positions));
             });
             return vertices;
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException | NullPointerException  e) {
             throw new CoreValidCommonsInvalidDataException("Exception occurred during parsing vertice file", e);
         }
     }

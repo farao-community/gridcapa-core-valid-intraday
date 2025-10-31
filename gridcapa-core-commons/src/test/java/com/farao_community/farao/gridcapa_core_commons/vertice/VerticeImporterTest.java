@@ -42,15 +42,15 @@ class VerticeImporterTest {
                 .containsAllEntriesOf(entries);
         final Vertice vertice3 = vertices.get(3);
         Assertions.assertThat(vertice3.getVerticeId()).isEqualTo(4);
-        final HashMap<String, Integer> entries2 = new HashMap<>();
-        entries2.put("AA", 66);
-        entries2.put("BB", 666);
-        entries2.put("CC", 6666);
-        entries2.put("D_D", 0);
+        final HashMap<String, Integer> entries3 = new HashMap<>();
+        entries3.put("AA", 66);
+        entries3.put("BB", 666);
+        entries3.put("CC", 6666);
+        entries3.put("D_D", 0);
         final Map<String, Integer> positions3 = vertice3.getPositions();
-        Assertions.assertThat(positions)
+        Assertions.assertThat(positions3)
                 .hasSize(4)
-                .containsAllEntriesOf(entries);
+                .containsAllEntriesOf(entries3);
 
     }
 
@@ -59,6 +59,14 @@ class VerticeImporterTest {
         InputStream inputStream = Mockito.mock(InputStream.class);
         Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
                 .isThrownBy(() -> VerticeImporter.importVertices(inputStream, null))
+                .withMessage("Exception occurred during parsing vertice file");
+    }
+
+    @Test
+    void importEmptyNonHvdcVerticesWithException() throws IOException {
+        InputStream inputStream = getClass().getResource("bad-vertice.csv").openStream();
+        Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
+                .isThrownBy(() -> VerticeImporter.importVertices(inputStream, getTestCoreHubs()))
                 .withMessage("Exception occurred during parsing vertice file");
     }
 
