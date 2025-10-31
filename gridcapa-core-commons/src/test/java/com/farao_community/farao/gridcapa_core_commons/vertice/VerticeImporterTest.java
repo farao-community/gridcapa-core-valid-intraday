@@ -12,7 +12,6 @@ import com.farao_community.farao.gridcapa_core_commons.exception.CoreValidCommon
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.test.util.AopTestUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
