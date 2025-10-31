@@ -25,6 +25,8 @@ import java.util.Map;
 
 public final class VerticeImporter {
 
+    public static final String VERTEX_ID_HEADER = "Vertex ID";
+
     private VerticeImporter() {
         throw new IllegalStateException("Utility class");
     }
@@ -48,7 +50,7 @@ public final class VerticeImporter {
                     positions.put(corehub.clusterVerticeCode(),
                         getPosition(csvRecord, corehub))
                 );
-                vertices.add(new Vertice(Integer.parseInt(csvRecord.get("Vertex ID")), positions));
+                vertices.add(new Vertice(Integer.parseInt(csvRecord.get(VERTEX_ID_HEADER)), positions));
             });
             return vertices;
         } catch (IOException | IllegalArgumentException | NullPointerException  e) {
