@@ -5,7 +5,7 @@
  *  file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
  */
-package com.farao_community.farao.gridcapa_core_valid_commons.vertice;
+package com.farao_community.farao.gridcapa_core_valid_commons.vertex;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
 import com.farao_community.farao.gridcapa_core_valid_commons.exception.CoreValidCommonsInvalidDataException;
@@ -19,47 +19,45 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-public final class VerticeImporter {
+public final class VerticesImporter {
 
     public static final String VERTEX_ID_HEADER = "Vertex ID";
 
-    private VerticeImporter() {
+    private VerticesImporter() {
         throw new IllegalStateException("Utility class");
     }
 
-    public static List<Vertice> importVertices(final InputStream verticesStream, final List<CoreHub> coreHubs) {
+    public static List<Vertex> importVertices(final InputStream verticesStream, final List<CoreHub> coreHubs) {
         return importVertices(new InputStreamReader(verticesStream, StandardCharsets.UTF_8), coreHubs);
     }
 
-    private static List<Vertice> importVertices(final Reader reader, final List<CoreHub> coreHubs) {
+    private static List<Vertex> importVertices(final Reader reader, final List<CoreHub> coreHubs) {
 
         try {
-            final List<Vertice> vertices = new ArrayList<>();
+            final List<Vertex> vertices = new ArrayList<>();
             final Iterable<CSVRecord> csvRecords = CSVFormat.RFC4180.builder()
                     .setHeader()
                     .setSkipHeaderRecord(true)
                     .build()
                     .parse(reader);
             csvRecords.forEach(csvRecord -> {
-                final Map<String, Integer> positions = new HashMap<>();
-                coreHubs.forEach(corehub ->
-                    positions.put(corehub.clusterVerticeCode(),
-                        getPosition(csvRecord, corehub))
-                );
-                vertices.add(new Vertice(Integer.parseInt(csvRecord.get(VERTEX_ID_HEADER)), positions));
+                final Map<String, Integer> positions = coreHubs.stream().collect(Collectors.toMap(
+                        CoreHub::clusterVerticeCode,
+                        coreHub -> getPosition(csvRecord, coreHub)));
+                vertices.add(new Vertex(Integer.parseInt(csvRecord.get(VERTEX_ID_HEADER)), positions));
             });
             return vertices;
         } catch (IOException | IllegalArgumentException | NullPointerException  e) {
-            throw new CoreValidCommonsInvalidDataException("Exception occurred during parsing vertice file", e);
+            throw new CoreValidCommonsInvalidDataException("Exception occurred during parsing vertex file", e);
         }
     }
 
     private static Integer getPosition(final CSVRecord csvRecord,
-                                      final CoreHub corehub) {
+                                       final CoreHub corehub) {
         final String positionString = csvRecord.get(corehub.clusterVerticeCode());
         if (corehub.isHvdcHub() && StringUtils.isBlank(positionString)) {
             return 0;

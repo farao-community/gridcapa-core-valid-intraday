@@ -35,7 +35,7 @@ class CoreValidIntradayRequestTest {
     @BeforeEach
     void setUp() {
         cnecRam = new CoreValidIntradayFileResource("cnecRam.txt", "http://path/to/cnecRam/file");
-        vertice = new CoreValidIntradayFileResource("vertice.txt", "http://path/to/vertice/file");
+        vertice = new CoreValidIntradayFileResource("vertex.txt", "http://path/to/vertice/file");
         cgm = new CoreValidIntradayFileResource("network.txt", "http://path/to/cgm/file");
         glsk = new CoreValidIntradayFileResource("glsk.txt", "http://path/to/glsk/file");
         mergedCnec = new CoreValidIntradayFileResource("mergedCnec.txt", "http://path/to/mergedCnec/file");
@@ -52,7 +52,7 @@ class CoreValidIntradayRequestTest {
         assertEquals("runId", coreValidIntradayRequest.getCurrentRunId());
         assertEquals("2025-10-01T00:30Z", coreValidIntradayRequest.getTimestamp().toString());
         assertEquals("cnecRam.txt", coreValidIntradayRequest.getCnecRam().getFilename());
-        assertEquals("vertice.txt", coreValidIntradayRequest.getVertice().getFilename());
+        assertEquals("vertex.txt", coreValidIntradayRequest.getVertices().getFilename());
         assertEquals("network.txt", coreValidIntradayRequest.getCgm().getFilename());
         assertEquals("glsk.txt", coreValidIntradayRequest.getGlsk().getFilename());
         assertEquals("mergedCnec.txt", coreValidIntradayRequest.getMergedCnec().getFilename());

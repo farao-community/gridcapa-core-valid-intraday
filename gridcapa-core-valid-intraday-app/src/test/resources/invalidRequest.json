@@ -9,7 +9,7 @@
       "cnecRam": {
         "filename": "cnecRam.txt"
       },
-      "vertice": {
+      "vertices": {
         "filename": "vertice.txt",
         "url": "https://vertice/file/url"
       },

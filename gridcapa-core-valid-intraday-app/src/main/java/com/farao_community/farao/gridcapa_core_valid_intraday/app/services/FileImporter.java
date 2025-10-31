@@ -8,8 +8,8 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
-import com.farao_community.farao.gridcapa_core_valid_commons.vertice.Vertice;
-import com.farao_community.farao.gridcapa_core_valid_commons.vertice.VerticeImporter;
+import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
+import com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesImporter;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
@@ -53,11 +53,11 @@ public class FileImporter {
         }
     }
 
-    public List<Vertice> importVertices(final CoreValidIntradayFileResource verticeFile) {
+    public List<Vertex> importVertices(final CoreValidIntradayFileResource verticeFile) {
         try (final InputStream verticefileInputStream = urlValidationService.openUrlStream(verticeFile.getUrl())) {
-            return VerticeImporter.importVertices(verticefileInputStream, coreHubs);
+            return VerticesImporter.importVertices(verticefileInputStream, coreHubs);
         } catch (final Exception e) {
-            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import vertice file from URL '%s'", verticeFile.getUrl()), e);
+            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import vertex file from URL '%s'", verticeFile.getUrl()), e);
         }
     }
 
