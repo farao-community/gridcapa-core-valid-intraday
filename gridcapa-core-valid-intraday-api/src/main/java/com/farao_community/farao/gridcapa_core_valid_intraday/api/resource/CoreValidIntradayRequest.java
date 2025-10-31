@@ -34,7 +34,7 @@ public class CoreValidIntradayRequest {
     @JsonDeserialize(using = OffsetDateTimeDeserializer.class)
     private final OffsetDateTime timestamp;
     private final CoreValidIntradayFileResource cnecRam;
-    private final CoreValidIntradayFileResource vertice;
+    private final CoreValidIntradayFileResource vertices;
     private final CoreValidIntradayFileResource cgm;
     private final CoreValidIntradayFileResource glsk;
     private final CoreValidIntradayFileResource mergedCnec;
@@ -47,7 +47,7 @@ public class CoreValidIntradayRequest {
                                     final @JsonProperty("currentRunId") String currentRunId,
                                     final @JsonProperty("timestamp") OffsetDateTime timestamp,
                                     final @JsonProperty("cnecRam") CoreValidIntradayFileResource cnecRam,
-                                    final @JsonProperty("vertice") CoreValidIntradayFileResource vertice,
+                                    final @JsonProperty("vertices") CoreValidIntradayFileResource vertices,
                                     final @JsonProperty("cgm") CoreValidIntradayFileResource cgm,
                                     final @JsonProperty("glsk") CoreValidIntradayFileResource glsk,
                                     final @JsonProperty("mergedCnec") CoreValidIntradayFileResource mergedCnec,
@@ -58,7 +58,7 @@ public class CoreValidIntradayRequest {
         this.currentRunId = currentRunId;
         this.timestamp = timestamp;
         this.cnecRam = cnecRam;
-        this.vertice = vertice;
+        this.vertices = vertices;
         this.cgm = cgm;
         this.glsk = glsk;
         this.mergedCnec = mergedCnec;
@@ -71,13 +71,13 @@ public class CoreValidIntradayRequest {
                                     final String currentRunId,
                                     final OffsetDateTime timestamp,
                                     final CoreValidIntradayFileResource cnecRam,
-                                    final CoreValidIntradayFileResource vertice,
+                                    final CoreValidIntradayFileResource vertices,
                                     final CoreValidIntradayFileResource cgm,
                                     final CoreValidIntradayFileResource glsk,
                                     final CoreValidIntradayFileResource mergedCnec,
                                     final CoreValidIntradayFileResource marketPoint,
                                     final CoreValidIntradayFileResource pra) {
-        this(id, currentRunId, timestamp, cnecRam, vertice, cgm, glsk, mergedCnec, marketPoint, pra, false);
+        this(id, currentRunId, timestamp, cnecRam, vertices, cgm, glsk, mergedCnec, marketPoint, pra, false);
     }
 
     public String getId() {
@@ -96,8 +96,8 @@ public class CoreValidIntradayRequest {
         return cnecRam;
     }
 
-    public CoreValidIntradayFileResource getVertice() {
-        return vertice;
+    public CoreValidIntradayFileResource getVertices() {
+        return vertices;
     }
 
     public CoreValidIntradayFileResource getCgm() {

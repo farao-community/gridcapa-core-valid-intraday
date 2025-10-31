@@ -1,8 +1,3 @@
-spring:
-  cloud:
-    function:
-      definition: request
-
 core-valid-commons:
   core-hubs:
     - name: Autriche
@@ -103,3 +98,4 @@ core-valid-commons:
       cluster-vertice-code: DE_AL
       is-hvdc-hub: true
       coefficient: 1
+

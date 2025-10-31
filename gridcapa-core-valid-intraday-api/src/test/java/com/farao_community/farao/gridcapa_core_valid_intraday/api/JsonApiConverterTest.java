@@ -32,8 +32,8 @@ class JsonApiConverterTest {
         assertEquals("id", coreValidIntradayRequest.getId());
         assertEquals("cnecRam.txt", coreValidIntradayRequest.getCnecRam().getFilename());
         assertEquals("https://cnecRam/file/url", coreValidIntradayRequest.getCnecRam().getUrl());
-        assertEquals("vertice.txt", coreValidIntradayRequest.getVertice().getFilename());
-        assertEquals("https://vertice/file/url", coreValidIntradayRequest.getVertice().getUrl());
+        assertEquals("vertices.txt", coreValidIntradayRequest.getVertices().getFilename());
+        assertEquals("https://vertice/file/url", coreValidIntradayRequest.getVertices().getUrl());
         assertEquals("cgm.txt", coreValidIntradayRequest.getCgm().getFilename());
         assertEquals("https://cgm/file/url", coreValidIntradayRequest.getCgm().getUrl());
         assertEquals("glsk.txt", coreValidIntradayRequest.getGlsk().getFilename());

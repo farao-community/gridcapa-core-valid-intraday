@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class CoreValidIntradayRequestTest {
 
     private CoreValidIntradayFileResource cnecRam;
-    private CoreValidIntradayFileResource vertice;
+    private CoreValidIntradayFileResource vertices;
     private CoreValidIntradayFileResource cgm;
     private CoreValidIntradayFileResource glsk;
     private CoreValidIntradayFileResource mergedCnec;
@@ -35,7 +35,7 @@ class CoreValidIntradayRequestTest {
     @BeforeEach
     void setUp() {
         cnecRam = new CoreValidIntradayFileResource("cnecRam.txt", "http://path/to/cnecRam/file");
-        vertice = new CoreValidIntradayFileResource("vertice.txt", "http://path/to/vertice/file");
+        vertices = new CoreValidIntradayFileResource("vertices.txt", "http://path/to/vertice/file");
         cgm = new CoreValidIntradayFileResource("network.txt", "http://path/to/cgm/file");
         glsk = new CoreValidIntradayFileResource("glsk.txt", "http://path/to/glsk/file");
         mergedCnec = new CoreValidIntradayFileResource("mergedCnec.txt", "http://path/to/mergedCnec/file");
@@ -46,13 +46,13 @@ class CoreValidIntradayRequestTest {
 
     @Test
     void checkManualCoreValidRequest() {
-        CoreValidIntradayRequest coreValidIntradayRequest = new CoreValidIntradayRequest("id", "runId", dateTime, cnecRam, vertice, cgm, glsk, mergedCnec, marketPoint, pra);
+        CoreValidIntradayRequest coreValidIntradayRequest = new CoreValidIntradayRequest("id", "runId", dateTime, cnecRam, vertices, cgm, glsk, mergedCnec, marketPoint, pra);
         assertNotNull(coreValidIntradayRequest);
         assertEquals("id", coreValidIntradayRequest.getId());
         assertEquals("runId", coreValidIntradayRequest.getCurrentRunId());
         assertEquals("2025-10-01T00:30Z", coreValidIntradayRequest.getTimestamp().toString());
         assertEquals("cnecRam.txt", coreValidIntradayRequest.getCnecRam().getFilename());
-        assertEquals("vertice.txt", coreValidIntradayRequest.getVertice().getFilename());
+        assertEquals("vertices.txt", coreValidIntradayRequest.getVertices().getFilename());
         assertEquals("network.txt", coreValidIntradayRequest.getCgm().getFilename());
         assertEquals("glsk.txt", coreValidIntradayRequest.getGlsk().getFilename());
         assertEquals("mergedCnec.txt", coreValidIntradayRequest.getMergedCnec().getFilename());
@@ -64,7 +64,7 @@ class CoreValidIntradayRequestTest {
 
     @Test
     void checkAutoCoreValidRequest() {
-        CoreValidIntradayRequest coreValidIntradayRequest = new CoreValidIntradayRequest("id", "runId", dateTime, cnecRam, vertice, cgm, glsk, mergedCnec, marketPoint, pra, true);
+        CoreValidIntradayRequest coreValidIntradayRequest = new CoreValidIntradayRequest("id", "runId", dateTime, cnecRam, vertices, cgm, glsk, mergedCnec, marketPoint, pra, true);
         assertTrue(coreValidIntradayRequest.getLaunchedAutomatically());
     }
 
