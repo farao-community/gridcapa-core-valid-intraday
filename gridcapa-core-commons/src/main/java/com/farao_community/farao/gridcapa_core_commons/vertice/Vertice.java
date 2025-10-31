@@ -8,6 +8,7 @@
 package com.farao_community.farao.gridcapa_core_commons.vertice;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Vertice {
@@ -17,7 +18,7 @@ public class Vertice {
 
     public Vertice(final int verticeId, final Map<String, Integer> positions) {
         this.verticeId = verticeId;
-        this.positions = positions;
+        this.positions = new HashMap<>(positions);
     }
 
     public int getVerticeId() {

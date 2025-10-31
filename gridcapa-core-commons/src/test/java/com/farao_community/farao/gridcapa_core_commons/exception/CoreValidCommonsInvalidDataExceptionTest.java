@@ -10,8 +10,6 @@ package com.farao_community.farao.gridcapa_core_commons.exception;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class CoreValidCommonsInvalidDataExceptionTest {
 
     @Test

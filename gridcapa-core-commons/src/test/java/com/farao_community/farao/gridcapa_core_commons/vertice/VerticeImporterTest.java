@@ -22,10 +22,12 @@ import java.util.Map;
 
 class VerticeImporterTest {
 
+    private final List<CoreHub> coreHubs = getTestCoreHubs();
+
     @Test
     void importVertices() throws IOException {
         InputStream inputStream = getClass().getResource("vertice.csv").openStream();
-        final List<Vertice> vertices = VerticeImporter.importVertices(inputStream, getTestCoreHubs());
+        final List<Vertice> vertices = VerticeImporter.importVertices(inputStream, coreHubs);
         Assertions.assertThat(vertices)
                 .isNotNull()
                 .hasSize(4);
@@ -35,7 +37,7 @@ class VerticeImporterTest {
         entries.put("AA", 11);
         entries.put("BB", 111);
         entries.put("CC", 1111);
-        entries.put("D_D", 0);
+        entries.put("D_D", 1);
         final Map<String, Integer> positions = vertice.getPositions();
         Assertions.assertThat(positions)
                 .hasSize(4)
@@ -66,7 +68,7 @@ class VerticeImporterTest {
     void importEmptyNonHvdcVerticesWithException() throws IOException {
         InputStream inputStream = getClass().getResource("bad-vertice.csv").openStream();
         Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
-                .isThrownBy(() -> VerticeImporter.importVertices(inputStream, getTestCoreHubs()))
+                .isThrownBy(() -> VerticeImporter.importVertices(inputStream, coreHubs))
                 .withMessage("Exception occurred during parsing vertice file");
     }
 
