@@ -6,10 +6,10 @@
  */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
-import com.farao_community.farao.gridcapa_core_commons.core_hub.CoreHub;
-import com.farao_community.farao.gridcapa_core_commons.core_hub.CoreHubsConfiguration;
-import com.farao_community.farao.gridcapa_core_commons.vertice.Vertice;
-import com.farao_community.farao.gridcapa_core_commons.vertice.VerticeImporter;
+import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
+import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
+import com.farao_community.farao.gridcapa_core_valid_commons.vertice.Vertice;
+import com.farao_community.farao.gridcapa_core_valid_commons.vertice.VerticeImporter;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;

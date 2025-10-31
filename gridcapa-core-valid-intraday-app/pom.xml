@@ -61,7 +61,7 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>gridcapa-core-commons</artifactId>
+            <artifactId>gridcapa-core-valid-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
