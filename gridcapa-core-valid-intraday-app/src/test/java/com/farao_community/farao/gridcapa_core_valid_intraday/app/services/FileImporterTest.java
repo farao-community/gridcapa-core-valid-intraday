@@ -19,7 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.net.URI;
 import java.net.URL;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,19 +67,20 @@ class FileImporterTest {
 
     @Test
     void shouldImportVerticesFromCoreHubSettings() {
-        final CoreValidIntradayFileResource verticeFile = createFileResource("vertex",  getClass().getResource("/fake-vertice.csv"));
-        final List<Vertex> vertices = fileImporter.importVertices(verticeFile);
+        final CoreValidIntradayFileResource verticesFile = createFileResource("vertex",  getClass().getResource("/fake-vertice.csv"));
+        final List<Vertex> vertices = fileImporter.importVertices(verticesFile);
         Assertions.assertThat(vertices)
                 .isNotNull()
                 .hasSize(4);
         final Vertex vertex = vertices.getFirst();
         Assertions.assertThat(vertex.vertexId()).isEqualTo(1);
-        final HashMap<String, Integer> entries = new HashMap<>();
-        entries.put("FR", 11);
-        entries.put("BE", 111);
-        entries.put("BE_AL", 0);
-        entries.put("DE", 1111);
-        entries.put("DE_AL", 0);
+        final Map<String, Integer> entries = Map.of(
+            "FR", 11,
+            "BE", 111,
+            "BE_AL", 0,
+            "DE", 1111,
+            "DE_AL", 0
+        );
         final Map<String, Integer> positions = vertex.positions();
         Assertions.assertThat(positions)
                 .hasSize(5)
@@ -90,12 +90,12 @@ class FileImporterTest {
     @Test
     void importVerticeShouldThrowCoreValidIntradayInvalidDataException() throws Exception {
 
-        final CoreValidIntradayFileResource verticeFile = createFileResource("vertex", new URI("https://example.com/vertice.csv").toURL());
+        final CoreValidIntradayFileResource verticesFile = createFileResource("vertex", new URI("https://example.com/vertice.csv").toURL());
 
         when(urlValidationService.openUrlStream(anyString())).thenThrow(new CoreValidIntradayInvalidDataException("Connection failed"));
 
         Assertions.assertThatExceptionOfType(CoreValidIntradayInvalidDataException.class)
-                .isThrownBy(() -> fileImporter.importVertices(verticeFile))
+                .isThrownBy(() -> fileImporter.importVertices(verticesFile))
                 .withMessage("Cannot import vertex file from URL 'https://example.com/vertice.csv'");
     }
 

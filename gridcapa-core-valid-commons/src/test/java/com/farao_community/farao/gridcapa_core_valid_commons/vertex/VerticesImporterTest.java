@@ -15,7 +15,6 @@ import org.mockito.Mockito;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,22 +31,24 @@ class VerticesImporterTest {
                 .hasSize(4)
                 .first()
                 .hasFieldOrPropertyWithValue("vertexId", 1);
-        final HashMap<String, Integer> entries = new HashMap<>();
-        entries.put("AA", 11);
-        entries.put("BB", 111);
-        entries.put("CC", 1111);
-        entries.put("D_D", 1);
+        final Map<String, Integer> entries = Map.of(
+            "AA", 11,
+            "BB", 111,
+            "CC", 1111,
+            "D_D", 1
+        );
         final Map<String, Integer> positions = vertices.getFirst().positions();
         Assertions.assertThat(positions)
                 .hasSize(4)
                 .containsAllEntriesOf(entries);
         final Vertex vertex3 = vertices.get(3);
         Assertions.assertThat(vertex3.vertexId()).isEqualTo(4);
-        final HashMap<String, Integer> entries3 = new HashMap<>();
-        entries3.put("AA", 66);
-        entries3.put("BB", 666);
-        entries3.put("CC", 6666);
-        entries3.put("D_D", 0);
+        final Map<String, Integer> entries3 = Map.of(
+            "AA", 66,
+            "BB", 666,
+            "CC", 6666,
+            "D_D", 0
+        );
         final Map<String, Integer> positions3 = vertex3.positions();
         Assertions.assertThat(positions3)
                 .hasSize(4)

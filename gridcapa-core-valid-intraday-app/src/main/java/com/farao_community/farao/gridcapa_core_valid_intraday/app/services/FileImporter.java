@@ -53,11 +53,11 @@ public class FileImporter {
         }
     }
 
-    public List<Vertex> importVertices(final CoreValidIntradayFileResource verticeFile) {
-        try (final InputStream verticefileInputStream = urlValidationService.openUrlStream(verticeFile.getUrl())) {
+    public List<Vertex> importVertices(final CoreValidIntradayFileResource verticesFile) {
+        try (final InputStream verticefileInputStream = urlValidationService.openUrlStream(verticesFile.getUrl())) {
             return VerticesImporter.importVertices(verticefileInputStream, coreHubs);
         } catch (final Exception e) {
-            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import vertex file from URL '%s'", verticeFile.getUrl()), e);
+            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import vertex file from URL '%s'", verticesFile.getUrl()), e);
         }
     }
 
