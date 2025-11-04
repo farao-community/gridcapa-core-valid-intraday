@@ -81,7 +81,7 @@ class FileImporterTest {
             "DE", 1111,
             "DE_AL", 0
         );
-        final Map<String, Integer> positions = vertex.positions();
+        final Map<String, Integer> positions = vertex.coordinates();
         Assertions.assertThat(positions)
                 .hasSize(5)
                 .containsExactlyInAnyOrderEntriesOf(entries);

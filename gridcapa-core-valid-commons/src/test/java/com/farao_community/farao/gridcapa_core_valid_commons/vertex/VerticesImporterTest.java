@@ -37,7 +37,7 @@ class VerticesImporterTest {
             "CC", 1111,
             "D_D", 1
         );
-        final Map<String, Integer> positions = vertices.getFirst().positions();
+        final Map<String, Integer> positions = vertices.getFirst().coordinates();
         Assertions.assertThat(positions)
                 .hasSize(4)
                 .containsAllEntriesOf(entries);
@@ -49,7 +49,7 @@ class VerticesImporterTest {
             "CC", 6666,
             "D_D", 0
         );
-        final Map<String, Integer> positions3 = vertex3.positions();
+        final Map<String, Integer> positions3 = vertex3.coordinates();
         Assertions.assertThat(positions3)
                 .hasSize(4)
                 .containsAllEntriesOf(entries3);
@@ -61,7 +61,7 @@ class VerticesImporterTest {
         InputStream inputStream = Mockito.mock(InputStream.class);
         Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
                 .isThrownBy(() -> VerticesImporter.importVertices(inputStream, coreHubs))
-                .withMessage("Exception occurred during parsing vertex file");
+                .withMessage("Exception occurred during parsing vertices file");
     }
 
     @Test
@@ -69,7 +69,7 @@ class VerticesImporterTest {
         InputStream inputStream = getClass().getResource("bad-vertices.csv").openStream();
         Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
                 .isThrownBy(() -> VerticesImporter.importVertices(inputStream, coreHubs))
-                .withMessage("Exception occurred during parsing vertex file");
+                .withMessage("Exception occurred during parsing vertices file");
     }
 
     private List<CoreHub> getTestCoreHubs() {

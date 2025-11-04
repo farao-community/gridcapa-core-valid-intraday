@@ -9,5 +9,5 @@ package com.farao_community.farao.gridcapa_core_valid_commons.vertex;
 
 import java.util.Map;
 
-public record Vertex(int vertexId, Map<String, Integer> positions)  {
+public record Vertex(int vertexId, Map<String, Integer> coordinates)  {
 }

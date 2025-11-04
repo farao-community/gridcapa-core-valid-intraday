@@ -14,14 +14,14 @@ import java.util.Map;
 
 class VertexTest {
 
-    public static final Map<String, Integer> POSITIONS = Map.of(
+    public static final Map<String, Integer> COORDINATES = Map.of(
             "AA", 1234,
             "BB", 2345,
             "CC", 3456
     );
 
     private Vertex getTestVertex(final int verticeId) {
-        return new Vertex(verticeId, POSITIONS);
+        return new Vertex(verticeId, COORDINATES);
     }
 
     @Test
@@ -38,8 +38,8 @@ class VertexTest {
     void getPositions() {
         final Vertex test = getTestVertex(5);
         Assertions.assertThat(test.vertexId()).isEqualTo(5);
-        Assertions.assertThat(test.positions())
+        Assertions.assertThat(test.coordinates())
                 .hasSize(3)
-                .containsExactlyInAnyOrderEntriesOf(POSITIONS);
+                .containsExactlyInAnyOrderEntriesOf(COORDINATES);
     }
 }

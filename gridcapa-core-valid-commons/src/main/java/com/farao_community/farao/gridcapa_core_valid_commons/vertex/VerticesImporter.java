@@ -47,21 +47,26 @@ public final class VerticesImporter {
             csvRecords.forEach(csvRecord -> {
                 final Map<String, Integer> positions = coreHubs.stream().collect(Collectors.toMap(
                         CoreHub::clusterVerticeCode,
-                        coreHub -> getPosition(csvRecord, coreHub)));
+                        coreHub -> getCoordinate(csvRecord, coreHub)));
                 vertices.add(new Vertex(Integer.parseInt(csvRecord.get(VERTEX_ID_HEADER)), positions));
             });
             return vertices;
-        } catch (IOException | IllegalArgumentException | NullPointerException  e) {
-            throw new CoreValidCommonsInvalidDataException("Exception occurred during parsing vertex file", e);
+        } catch (final IOException | IllegalArgumentException | NullPointerException  e) {
+            throw new CoreValidCommonsInvalidDataException("Exception occurred during parsing vertices file", e);
         }
     }
 
-    private static Integer getPosition(final CSVRecord csvRecord,
-                                       final CoreHub corehub) {
-        final String positionString = csvRecord.get(corehub.clusterVerticeCode());
-        if (corehub.isHvdcHub() && StringUtils.isBlank(positionString)) {
+    /**
+     * Set a coordinate to zero only if it is an empty HVDC coordinate.
+     * This is the only case where a coordinate should be empty or blank.
+     * Otherwise, should launch an exception.
+     */
+    private static Integer getCoordinate(final CSVRecord csvRecord,
+                                         final CoreHub corehub) {
+        final String coordinateString = csvRecord.get(corehub.clusterVerticeCode());
+        if (corehub.isHvdcHub() && StringUtils.isBlank(coordinateString)) {
             return 0;
         }
-        return Integer.parseInt(positionString);
+        return Integer.parseInt(coordinateString);
     }
 }
