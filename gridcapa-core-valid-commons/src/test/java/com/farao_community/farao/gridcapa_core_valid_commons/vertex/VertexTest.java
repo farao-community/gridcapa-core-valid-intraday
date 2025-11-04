@@ -35,7 +35,7 @@ class VertexTest {
     }
 
     @Test
-    void getPositions() {
+    void getCoordinates() {
         final Vertex test = getTestVertex(5);
         Assertions.assertThat(test.vertexId()).isEqualTo(5);
         Assertions.assertThat(test.coordinates())

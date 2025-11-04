@@ -24,52 +24,54 @@ class VerticesImporterTest {
 
     @Test
     void importVertices() throws IOException {
-        InputStream inputStream = getClass().getResource("vertices.csv").openStream();
-        final List<Vertex> vertices = VerticesImporter.importVertices(inputStream, coreHubs);
-        Assertions.assertThat(vertices)
-                .isNotNull()
-                .hasSize(4)
-                .first()
-                .hasFieldOrPropertyWithValue("vertexId", 1);
-        final Map<String, Integer> entries = Map.of(
-            "AA", 11,
-            "BB", 111,
-            "CC", 1111,
-            "D_D", 1
-        );
-        final Map<String, Integer> positions = vertices.getFirst().coordinates();
-        Assertions.assertThat(positions)
-                .hasSize(4)
-                .containsAllEntriesOf(entries);
-        final Vertex vertex3 = vertices.get(3);
-        Assertions.assertThat(vertex3.vertexId()).isEqualTo(4);
-        final Map<String, Integer> entries3 = Map.of(
-            "AA", 66,
-            "BB", 666,
-            "CC", 6666,
-            "D_D", 0
-        );
-        final Map<String, Integer> positions3 = vertex3.coordinates();
-        Assertions.assertThat(positions3)
-                .hasSize(4)
-                .containsAllEntriesOf(entries3);
-
+        try (final InputStream inputStream = getClass().getResource("vertices.csv").openStream();) {
+            final List<Vertex> vertices = VerticesImporter.importVertices(inputStream, coreHubs);
+            Assertions.assertThat(vertices)
+                    .isNotNull()
+                    .hasSize(4)
+                    .first()
+                    .hasFieldOrPropertyWithValue("vertexId", 1);
+            final Map<String, Integer> entries = Map.of(
+                    "AA", 11,
+                    "BB", 111,
+                    "CC", 1111,
+                    "D_D", 1
+            );
+            final Map<String, Integer> coordinates = vertices.getFirst().coordinates();
+            Assertions.assertThat(coordinates)
+                    .hasSize(4)
+                    .containsAllEntriesOf(entries);
+            final Vertex vertex3 = vertices.get(3);
+            Assertions.assertThat(vertex3.vertexId()).isEqualTo(4);
+            final Map<String, Integer> entries3 = Map.of(
+                    "AA", 66,
+                    "BB", 666,
+                    "CC", 6666,
+                    "D_D", 0
+            );
+            final Map<String, Integer> coordinates3 = vertex3.coordinates();
+            Assertions.assertThat(coordinates3)
+                    .hasSize(4)
+                    .containsAllEntriesOf(entries3);
+        }
     }
 
     @Test
-    void importVerticesWithException() {
-        InputStream inputStream = Mockito.mock(InputStream.class);
-        Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
-                .isThrownBy(() -> VerticesImporter.importVertices(inputStream, coreHubs))
-                .withMessage("Exception occurred during parsing vertices file");
+    void importVerticesWithException() throws IOException {
+        try (final InputStream inputStream = Mockito.mock(InputStream.class);) {
+            Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
+                    .isThrownBy(() -> VerticesImporter.importVertices(inputStream, coreHubs))
+                    .withMessage("Exception occurred during parsing vertices file");
+        }
     }
 
     @Test
     void importEmptyNonHvdcVerticesWithException() throws IOException {
-        InputStream inputStream = getClass().getResource("bad-vertices.csv").openStream();
-        Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
-                .isThrownBy(() -> VerticesImporter.importVertices(inputStream, coreHubs))
-                .withMessage("Exception occurred during parsing vertices file");
+        try (final InputStream inputStream = getClass().getResource("bad-vertices.csv").openStream();) {
+            Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
+                    .isThrownBy(() -> VerticesImporter.importVertices(inputStream, coreHubs))
+                    .withMessage("Exception occurred during parsing vertices file");
+        }
     }
 
     private List<CoreHub> getTestCoreHubs() {
