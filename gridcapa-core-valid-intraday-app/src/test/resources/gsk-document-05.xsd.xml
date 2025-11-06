@@ -1,0 +1,65 @@
+<GSKDocument DtdRelease="string" DtdVersion="string">
+  <DocumentIdentification v="string"/>
+  <DocumentVersion v="100"/>
+  <DocumentType v="A32"/>
+  <ProcessType v="A50"/>
+  <SenderIdentification v="string" codingScheme="NAZ"/>
+  <SenderRole v="A45"/>
+  <ReceiverIdentification v="string" codingScheme="NCS"/>
+  <ReceiverRole v="A38"/>
+  <!--Optional:-->
+  <ReceiverCategory v="str"/>
+  <CreationDateTime v="2009-04-06T16:36:21+02:00"/>
+  <GSKTimeInterval v="2021-07-22T22:00Z/2021-07-23T22:00Z"/>
+  <Domain v="string" codingScheme="A02"/>
+  <!--Zero or more repetitions:-->
+  <GSKSeries>
+    <TimeSeriesIdentification v="1"/>
+    <BusinessType v="Z02" share="100"/>
+    <Area v="aaaaa" codingScheme="A01"/>
+    <!--Zero or more repetitions:-->
+    <ManualGSK_Block>
+      <GSK_Name v="a"/>
+      <TimeInterval v="2021-07-22T22:00Z/2021-07-23T22:00Z"/>
+      <!--1 or more repetitions:-->
+      <ManualNodes>
+        <NodeName v="string"/>
+        <Factor v="1000.00"/>
+        <!--Optional:-->
+        <Status v="OK"/>
+        <!--Optional:-->
+        <ActiveGen v="1000.00"/>
+        <!--Optional:-->
+        <ReactiveGen v="1000.00"/>
+        <!--Optional:-->
+        <InitActiveLoad v="1000.00"/>
+        <!--Optional:-->
+        <ReactiveLoad v="1000.00"/>
+        <!--Optional:-->
+        <EstimatedLoss v="1000.00"/>
+        <!--Optional:-->
+        <OriginalFactor v="1000.00"/>
+      </ManualNodes>
+    </ManualGSK_Block>
+    <!--Zero or more repetitions:-->
+    <CountryGSK_Block>
+      <GSK_Name v="a"/>
+      <TimeInterval v="2021-07-22T22:00Z/2021-07-23T22:00Z"/>
+    </CountryGSK_Block>
+    <!--Zero or more repetitions:-->
+    <AutoGSK_Block>
+      <GSK_Name v="a"/>
+      <TimeInterval v="2021-07-22T22:00Z/2021-07-23T22:00Z"/>
+      <!--1 or more repetitions:-->
+      <AutoNodes>
+        <NodeName v="string"/>
+      </AutoNodes>
+    </AutoGSK_Block>
+  </GSKSeries>
+  <!--Zero or more repetitions:-->
+  <Reason>
+    <ReasonCode v="B28"/>
+    <!--Zero or more repetitions:-->
+    <ReasonText v="string"/>
+  </Reason>
+</GSKDocument>

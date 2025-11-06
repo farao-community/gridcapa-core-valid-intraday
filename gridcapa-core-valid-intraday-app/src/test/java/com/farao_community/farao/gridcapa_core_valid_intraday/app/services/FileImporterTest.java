@@ -9,6 +9,8 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
+import com.powsybl.glsk.api.GlskDocument;
+import com.powsybl.glsk.ucte.UcteGlskDocument;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -98,6 +100,14 @@ class FileImporterTest {
         Assertions.assertThatExceptionOfType(CoreValidIntradayInvalidDataException.class)
                 .isThrownBy(() -> fileImporter.importVertices(verticesFile))
                 .withMessage("Cannot import vertices file from URL 'https://example.com/vertice.csv'");
+    }
+
+    @Test
+    void importGlskTest() {
+        final CoreValidIntradayFileResource glskFile = createFileResource("glsk", getClass().getResource("/gsk-document-05.xsd.xml"));
+        GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
+        assertEquals(1, ((UcteGlskDocument) glskDocument).getListGlskSeries().size());
+        assertEquals(1, glskDocument.getGlskPoints("aaaaa").size());
     }
 
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {
