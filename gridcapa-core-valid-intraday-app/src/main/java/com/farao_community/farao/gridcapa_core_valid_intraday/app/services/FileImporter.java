@@ -50,25 +50,26 @@ public class FileImporter {
     }
 
     public Network importNetwork(final CoreValidIntradayFileResource cgmFile) {
-        return importFile(cgmFile, is->Network.read(getFilenameFromUrl(cgmFile.getUrl()), is));
+        return importFile(cgmFile, is -> Network.read(getFilenameFromUrl(cgmFile.getUrl()), is));
     }
 
     public List<Vertex> importVertices(final CoreValidIntradayFileResource verticesFile) {
-        return importFile(verticesFile, is->VerticesImporter.importVertices(is, coreHubs));
+        return importFile(verticesFile, is -> VerticesImporter.importVertices(is, coreHubs));
     }
 
     public GlskDocument importGlskFile(final CoreValidIntradayFileResource glskFile) {
         return importFile(glskFile, GlskDocumentImporters::importGlsk);
     }
 
-    public <T> T importFile(final CoreValidIntradayFileResource file, Function<InputStream, T> inputStreamMapper){
+    public <T> T importFile(final CoreValidIntradayFileResource file,
+                            Function<InputStream, T> inputStreamMapper) {
         try (final InputStream fileContentStream = urlValidationService.openUrlStream(file.getUrl())) {
             return inputStreamMapper.apply(fileContentStream);
         } catch (final Exception e) {
             throw new CoreValidIntradayInvalidDataException(String.format("Cannot import %s file from URL '%s'", file.getFilename(), file.getUrl()), e);
         }
     }
-    
+
     String getFilenameFromUrl(final String url) {
         try {
             return FilenameUtils.getName(new URI(url).toURL().getPath());
