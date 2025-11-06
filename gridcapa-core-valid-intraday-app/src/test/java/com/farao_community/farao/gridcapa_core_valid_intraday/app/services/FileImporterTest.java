@@ -9,6 +9,8 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
+import com.powsybl.glsk.api.GlskDocument;
+import com.powsybl.glsk.ucte.UcteGlskDocument;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,6 +40,7 @@ class FileImporterTest {
     @Autowired
     private FileImporter fileImporter;
 
+    private static final String TEST_DIRECTORY = "/20251103";
     private static final OffsetDateTime TEST_DATE_TIME = OffsetDateTime.parse("2021-07-22T22:30Z");
 
     @Test
@@ -62,7 +65,7 @@ class FileImporterTest {
                 () -> fileImporter.importReferenceProgram(refProgFile, TEST_DATE_TIME)
         );
 
-        assertTrue(exception.getMessage().contains("Cannot import reference program file from URL"));
+        assertTrue(exception.getMessage().contains("Cannot import refprog file from URL"));
     }
 
     @Test
@@ -90,13 +93,21 @@ class FileImporterTest {
     @Test
     void importVerticeShouldThrowCoreValidIntradayInvalidDataException() throws Exception {
 
-        final CoreValidIntradayFileResource verticesFile = createFileResource("vertex", new URI("https://example.com/vertice.csv").toURL());
+        final CoreValidIntradayFileResource verticesFile = createFileResource("vertices", new URI("https://example.com/vertice.csv").toURL());
 
         when(urlValidationService.openUrlStream(anyString())).thenThrow(new CoreValidIntradayInvalidDataException("Connection failed"));
 
         Assertions.assertThatExceptionOfType(CoreValidIntradayInvalidDataException.class)
                 .isThrownBy(() -> fileImporter.importVertices(verticesFile))
-                .withMessage("Cannot import vertex file from URL 'https://example.com/vertice.csv'");
+                .withMessage("Cannot import vertices file from URL 'https://example.com/vertice.csv'");
+    }
+
+    @Test
+    void importGlskTest() {
+        final CoreValidIntradayFileResource glskFile = createFileResource("glsk", getClass().getResource(TEST_DIRECTORY + "/20251103-FID2-657-v1-10V1001C--00264T-to-10V1001C--00085T.xml"));
+        final GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
+        assertEquals(29, ((UcteGlskDocument) glskDocument).getListGlskSeries().size());
+        assertEquals(24, glskDocument.getGlskPoints("10YFR-RTE------C").size());
     }
 
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {
