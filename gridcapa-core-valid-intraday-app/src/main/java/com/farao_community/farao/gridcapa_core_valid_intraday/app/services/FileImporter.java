@@ -20,7 +20,6 @@ import com.powsybl.openrao.data.refprog.refprogxmlimporter.RefProgImporter;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -28,6 +27,7 @@ import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
@@ -46,34 +46,26 @@ public class FileImporter {
 
     public ReferenceProgram importReferenceProgram(final CoreValidIntradayFileResource refProgFile,
                                                    final OffsetDateTime timestamp) {
-        try (final InputStream refProgStream = urlValidationService.openUrlStream(refProgFile.getUrl())) {
-            return RefProgImporter.importRefProg(refProgStream, timestamp);
-        } catch (final Exception e) {
-            throw getImportException(refProgFile, e);
-        }
+        return importFile(refProgFile, is -> RefProgImporter.importRefProg(is, timestamp));
     }
 
     public Network importNetwork(final CoreValidIntradayFileResource cgmFile) {
-        try (final InputStream networkInputStream = urlValidationService.openUrlStream(cgmFile.getUrl())) {
-            return Network.read(getFilenameFromUrl(cgmFile.getUrl()), networkInputStream);
-        } catch (final Exception e) {
-            throw getImportException(cgmFile, e);
-        }
+        return importFile(cgmFile, is->Network.read(getFilenameFromUrl(cgmFile.getUrl()), is));
     }
 
     public List<Vertex> importVertices(final CoreValidIntradayFileResource verticesFile) {
-        try (final InputStream verticefileInputStream = urlValidationService.openUrlStream(verticesFile.getUrl())) {
-            return VerticesImporter.importVertices(verticefileInputStream, coreHubs);
-        } catch (final Exception e) {
-            throw getImportException(verticesFile, e);
-        }
+        return importFile(verticesFile, is->VerticesImporter.importVertices(is, coreHubs));
     }
 
     public GlskDocument importGlskFile(final CoreValidIntradayFileResource glskFile) {
-        try (final InputStream glskStream = urlValidationService.openUrlStream(glskFile.getUrl())) {
-            return GlskDocumentImporters.importGlsk(glskStream);
-        } catch (final IOException e) {
-            throw getImportException(glskFile, e);
+        return importFile(glskFile, GlskDocumentImporters::importGlsk);
+    }
+
+    public <T> T importFile(final CoreValidIntradayFileResource file, Function<InputStream, T> inputStreamMapper){
+        try (final InputStream fileContentStream = urlValidationService.openUrlStream(file.getUrl())) {
+            return inputStreamMapper.apply(fileContentStream);
+        } catch (final Exception e) {
+            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import %s file from URL '%s'", file.getFilename(), file.getUrl()), e);
         }
     }
 

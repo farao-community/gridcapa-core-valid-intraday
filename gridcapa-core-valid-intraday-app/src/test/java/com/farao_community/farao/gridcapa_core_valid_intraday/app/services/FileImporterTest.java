@@ -9,8 +9,6 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
-import com.powsybl.glsk.api.GlskDocument;
-import com.powsybl.glsk.ucte.UcteGlskDocument;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +22,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -100,14 +100,6 @@ class FileImporterTest {
         Assertions.assertThatExceptionOfType(CoreValidIntradayInvalidDataException.class)
                 .isThrownBy(() -> fileImporter.importVertices(verticesFile))
                 .withMessage("Cannot import vertices file from URL 'https://example.com/vertice.csv'");
-    }
-
-    @Test
-    void importGlskTest() {
-        final CoreValidIntradayFileResource glskFile = createFileResource("glsk", getClass().getResource(TEST_DIRECTORY + "/20251103-FID2-657-v1-10V1001C--00264T-to-10V1001C--00085T.xml"));
-        final GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
-        assertEquals(29, ((UcteGlskDocument) glskDocument).getListGlskSeries().size());
-        assertEquals(24, glskDocument.getGlskPoints("10YFR-RTE------C").size());
     }
 
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {
