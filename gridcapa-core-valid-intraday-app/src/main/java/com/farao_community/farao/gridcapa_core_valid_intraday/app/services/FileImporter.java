@@ -68,13 +68,7 @@ public class FileImporter {
             throw new CoreValidIntradayInvalidDataException(String.format("Cannot import %s file from URL '%s'", file.getFilename(), file.getUrl()), e);
         }
     }
-
-    private CoreValidIntradayInvalidDataException getImportException(final CoreValidIntradayFileResource resource,
-                                                                     final Throwable exception) {
-        return new CoreValidIntradayInvalidDataException(String.format("Cannot import %s file from URL '%s'", resource.getFilename(), resource.getUrl()),
-                                                         exception);
-    }
-
+    
     String getFilenameFromUrl(final String url) {
         try {
             return FilenameUtils.getName(new URI(url).toURL().getPath());
