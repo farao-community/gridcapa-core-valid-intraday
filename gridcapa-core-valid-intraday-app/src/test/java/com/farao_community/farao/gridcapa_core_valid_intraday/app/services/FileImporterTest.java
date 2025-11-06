@@ -22,7 +22,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +40,7 @@ class FileImporterTest {
     @Autowired
     private FileImporter fileImporter;
 
+    private static final String TEST_DIRECTORY = "/20251103";
     private static final OffsetDateTime TEST_DATE_TIME = OffsetDateTime.parse("2021-07-22T22:30Z");
 
     @Test
@@ -62,7 +65,7 @@ class FileImporterTest {
                 () -> fileImporter.importReferenceProgram(refProgFile, TEST_DATE_TIME)
         );
 
-        assertTrue(exception.getMessage().contains("Cannot import reference program file from URL"));
+        assertTrue(exception.getMessage().contains("Cannot import refprog file from URL"));
     }
 
     @Test
@@ -90,13 +93,13 @@ class FileImporterTest {
     @Test
     void importVerticeShouldThrowCoreValidIntradayInvalidDataException() throws Exception {
 
-        final CoreValidIntradayFileResource verticesFile = createFileResource("vertex", new URI("https://example.com/vertice.csv").toURL());
+        final CoreValidIntradayFileResource verticesFile = createFileResource("vertices", new URI("https://example.com/vertice.csv").toURL());
 
         when(urlValidationService.openUrlStream(anyString())).thenThrow(new CoreValidIntradayInvalidDataException("Connection failed"));
 
         Assertions.assertThatExceptionOfType(CoreValidIntradayInvalidDataException.class)
                 .isThrownBy(() -> fileImporter.importVertices(verticesFile))
-                .withMessage("Cannot import vertex file from URL 'https://example.com/vertice.csv'");
+                .withMessage("Cannot import vertices file from URL 'https://example.com/vertice.csv'");
     }
 
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {

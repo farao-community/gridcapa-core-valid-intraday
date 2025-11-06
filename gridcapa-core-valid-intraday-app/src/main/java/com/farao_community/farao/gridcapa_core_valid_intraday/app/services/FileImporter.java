@@ -12,12 +12,12 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesImporter;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
+import com.powsybl.glsk.api.GlskDocument;
+import com.powsybl.glsk.api.io.GlskDocumentImporters;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import com.powsybl.openrao.data.refprog.refprogxmlimporter.RefProgImporter;
 import org.apache.commons.io.FilenameUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -27,6 +27,7 @@ import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
@@ -36,7 +37,6 @@ import java.util.List;
 public class FileImporter {
     private final List<CoreHub> coreHubs;
     private final UrlValidationService urlValidationService;
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileImporter.class);
 
     public FileImporter(final UrlValidationService urlValidationService,
                         final CoreHubsConfiguration coreHubsConfiguration) {
@@ -44,29 +44,29 @@ public class FileImporter {
         this.urlValidationService = urlValidationService;
     }
 
-    public ReferenceProgram importReferenceProgram(
-            final CoreValidIntradayFileResource refProgFile,
-            final OffsetDateTime timestamp) {
-        try (final InputStream refProgStream = urlValidationService.openUrlStream(refProgFile.getUrl())) {
-            return RefProgImporter.importRefProg(refProgStream, timestamp);
-        } catch (final Exception e) {
-            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import reference program file from URL '%s'", refProgFile.getUrl()), e);
-        }
+    public ReferenceProgram importReferenceProgram(final CoreValidIntradayFileResource refProgFile,
+                                                   final OffsetDateTime timestamp) {
+        return importFile(refProgFile, is -> RefProgImporter.importRefProg(is, timestamp));
     }
 
     public Network importNetwork(final CoreValidIntradayFileResource cgmFile) {
-        try (final InputStream networkInputStream = urlValidationService.openUrlStream(cgmFile.getUrl())) {
-            return Network.read(getFilenameFromUrl(cgmFile.getUrl()), networkInputStream);
-        } catch (final Exception e) {
-            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import cgm file from URL '%s'", cgmFile.getUrl()), e);
-        }
+        return importFile(cgmFile, is -> Network.read(getFilenameFromUrl(cgmFile.getUrl()), is));
     }
 
     public List<Vertex> importVertices(final CoreValidIntradayFileResource verticesFile) {
-        try (final InputStream verticefileInputStream = urlValidationService.openUrlStream(verticesFile.getUrl())) {
-            return VerticesImporter.importVertices(verticefileInputStream, coreHubs);
+        return importFile(verticesFile, is -> VerticesImporter.importVertices(is, coreHubs));
+    }
+
+    public GlskDocument importGlskFile(final CoreValidIntradayFileResource glskFile) {
+        return importFile(glskFile, GlskDocumentImporters::importGlsk);
+    }
+
+    public <T> T importFile(final CoreValidIntradayFileResource file,
+                            Function<InputStream, T> inputStreamMapper) {
+        try (final InputStream fileContentStream = urlValidationService.openUrlStream(file.getUrl())) {
+            return inputStreamMapper.apply(fileContentStream);
         } catch (final Exception e) {
-            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import vertex file from URL '%s'", verticesFile.getUrl()), e);
+            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import %s file from URL '%s'", file.getFilename(), file.getUrl()), e);
         }
     }
 

@@ -49,6 +49,25 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jvnet.jaxb</groupId>
+                <artifactId>jaxb-maven-plugin</artifactId>
+                <version>${maven.jaxb.version}</version>
+                <executions>
+                    <execution>
+                        <id>glsk-f657-xsd</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaDirectory>src/main/resources/xsd</schemaDirectory>
+                    <generatePackage>com.farao_community.farao.core_valid_intraday.app.xsd</generatePackage>
+                    <generateDirectory>${project.build.directory}/generated-sources/xjc-glsk-f657-xsd</generateDirectory>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
