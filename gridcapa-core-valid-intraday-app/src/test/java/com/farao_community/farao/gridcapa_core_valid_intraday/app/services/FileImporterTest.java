@@ -39,8 +39,6 @@ class FileImporterTest {
 
     @Autowired
     private FileImporter fileImporter;
-
-    private static final String TEST_DIRECTORY = "/20251103";
     private static final OffsetDateTime TEST_DATE_TIME = OffsetDateTime.parse("2021-07-22T22:30Z");
 
     @Test
