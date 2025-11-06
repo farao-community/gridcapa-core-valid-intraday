@@ -62,7 +62,7 @@ public class FileImporter {
     }
 
     public <T> T importFile(final CoreValidIntradayFileResource file,
-                            Function<InputStream, T> inputStreamMapper) {
+                            final Function<InputStream, T> inputStreamMapper) {
         try (final InputStream fileContentStream = urlValidationService.openUrlStream(file.getUrl())) {
             return inputStreamMapper.apply(fileContentStream);
         } catch (final Exception e) {
