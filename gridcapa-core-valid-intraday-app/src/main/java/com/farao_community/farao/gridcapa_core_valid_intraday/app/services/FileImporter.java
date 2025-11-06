@@ -12,6 +12,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesImporter;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import com.powsybl.openrao.data.refprog.refprogxmlimporter.RefProgImporter;
 import org.apache.commons.io.FilenameUtils;
@@ -50,6 +51,14 @@ public class FileImporter {
             return RefProgImporter.importRefProg(refProgStream, timestamp);
         } catch (final Exception e) {
             throw new CoreValidIntradayInvalidDataException(String.format("Cannot import reference program file from URL '%s'", refProgFile.getUrl()), e);
+        }
+    }
+
+    public Network importNetwork(final CoreValidIntradayFileResource cgmFile) {
+        try (final InputStream networkInputStream = urlValidationService.openUrlStream(cgmFile.getUrl())) {
+            return Network.read(getFilenameFromUrl(cgmFile.getUrl()), networkInputStream);
+        } catch (final Exception e) {
+            throw new CoreValidIntradayInvalidDataException(String.format("Cannot import cgm file from URL '%s'", cgmFile.getUrl()), e);
         }
     }
 
