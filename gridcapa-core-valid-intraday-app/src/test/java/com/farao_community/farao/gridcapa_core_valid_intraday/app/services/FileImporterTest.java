@@ -104,7 +104,7 @@ class FileImporterTest {
 
     @Test
     void importGlskTest() {
-        final CoreValidIntradayFileResource glskFile = createFileResource("glsk", getClass().getResource("/gsk-document-05.xsd.xml"));
+        final CoreValidIntradayFileResource glskFile = createFileResource("glsk", getClass().getResource("/gsk-document-05.xml"));
         GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
         assertEquals(1, ((UcteGlskDocument) glskDocument).getListGlskSeries().size());
         assertEquals(1, glskDocument.getGlskPoints("aaaaa").size());
