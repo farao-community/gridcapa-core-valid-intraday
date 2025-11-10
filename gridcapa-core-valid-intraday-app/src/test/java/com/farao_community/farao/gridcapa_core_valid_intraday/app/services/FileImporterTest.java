@@ -115,9 +115,9 @@ class FileImporterTest {
 
     @Test
     void importMergedCnec() {
-        Network network = Network.read("20210723_0030.uct", getClass().getResourceAsStream("/20210723_0030.uct"));
+        final Network network = Network.read("20210723_0030.uct", getClass().getResourceAsStream("/20210723_0030.uct"));
         final CoreValidIntradayFileResource crac = createFileResource("mergedCnec", getClass().getResource("/20210723-F666.xml"));
-        FbConstraintCreationContext fbConstraintCreationContext = fileImporter.importMergedCnec(crac, network, TEST_DATE_TIME);
+        final FbConstraintCreationContext fbConstraintCreationContext = fileImporter.importMergedCnec(crac, network, TEST_DATE_TIME);
         assertNotNull(fbConstraintCreationContext.getCrac());
     }
 

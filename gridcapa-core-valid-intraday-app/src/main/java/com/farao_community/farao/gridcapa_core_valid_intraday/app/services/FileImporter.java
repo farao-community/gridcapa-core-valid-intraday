@@ -65,8 +65,8 @@ public class FileImporter {
         return importFile(glskFile, GlskDocumentImporters::importGlsk);
     }
 
-    public FbConstraintCreationContext importMergedCnec(final CoreValidIntradayFileResource mergedCnecFile,  Network network, OffsetDateTime targetProcessDateTime) {
-        CracCreationParameters cracCreationParameters = new CracCreationParameters();
+    public FbConstraintCreationContext importMergedCnec(final CoreValidIntradayFileResource mergedCnecFile,  final Network network, final OffsetDateTime targetProcessDateTime) {
+        final CracCreationParameters cracCreationParameters = new CracCreationParameters();
         cracCreationParameters.addExtension(FbConstraintCracCreationParameters.class, new FbConstraintCracCreationParameters());
         cracCreationParameters.getExtension(FbConstraintCracCreationParameters.class).setTimestamp(targetProcessDateTime);
         return importFile(mergedCnecFile, is -> (FbConstraintCreationContext) new FbConstraintImporter().importData(is, cracCreationParameters, network));
