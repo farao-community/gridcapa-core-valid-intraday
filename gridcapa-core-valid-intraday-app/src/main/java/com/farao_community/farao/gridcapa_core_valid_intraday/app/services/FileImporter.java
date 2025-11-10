@@ -15,6 +15,10 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreV
 import com.powsybl.glsk.api.GlskDocument;
 import com.powsybl.glsk.api.io.GlskDocumentImporters;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.crac.api.parameters.CracCreationParameters;
+import com.powsybl.openrao.data.crac.io.fbconstraint.FbConstraintCreationContext;
+import com.powsybl.openrao.data.crac.io.fbconstraint.FbConstraintImporter;
+import com.powsybl.openrao.data.crac.io.fbconstraint.parameters.FbConstraintCracCreationParameters;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import com.powsybl.openrao.data.refprog.refprogxmlimporter.RefProgImporter;
 import org.apache.commons.io.FilenameUtils;
@@ -59,6 +63,13 @@ public class FileImporter {
 
     public GlskDocument importGlskFile(final CoreValidIntradayFileResource glskFile) {
         return importFile(glskFile, GlskDocumentImporters::importGlsk);
+    }
+
+    public FbConstraintCreationContext importMergedCnec(final CoreValidIntradayFileResource mergedCnecFile,  final Network network, final OffsetDateTime targetProcessDateTime) {
+        final CracCreationParameters cracCreationParameters = new CracCreationParameters();
+        cracCreationParameters.addExtension(FbConstraintCracCreationParameters.class, new FbConstraintCracCreationParameters());
+        cracCreationParameters.getExtension(FbConstraintCracCreationParameters.class).setTimestamp(targetProcessDateTime);
+        return importFile(mergedCnecFile, is -> (FbConstraintCreationContext) new FbConstraintImporter().importData(is, cracCreationParameters, network));
     }
 
     public <T> T importFile(final CoreValidIntradayFileResource file,
