@@ -11,6 +11,8 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.Core
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.powsybl.glsk.api.GlskDocument;
 import com.powsybl.glsk.ucte.UcteGlskDocument;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.crac.io.fbconstraint.FbConstraintCreationContext;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,9 +26,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -108,6 +108,14 @@ class FileImporterTest {
         GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
         assertEquals(1, ((UcteGlskDocument) glskDocument).getListGlskSeries().size());
         assertEquals(1, glskDocument.getGlskPoints("aaaaa").size());
+    }
+
+    @Test
+    void importMergedCnec() {
+        Network network = Network.read("20210723_0030.uct", getClass().getResourceAsStream("/20210723_0030.uct"));
+        final CoreValidIntradayFileResource crac = createFileResource("mergedCnec", getClass().getResource("/20210723-F666.xml"));
+        FbConstraintCreationContext fbConstraintCreationContext = fileImporter.importMergedCnec(crac, network, TEST_DATE_TIME);
+        assertNotNull(fbConstraintCreationContext.getCrac());
     }
 
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {
