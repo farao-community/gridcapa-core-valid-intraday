@@ -87,9 +87,10 @@ class VerticesUtilsTest {
         //      => delta = 2/3
         final List<Vertex> projected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex1), branches);
         vertex1.coordinates()
-                .forEach((countryCode, value) ->
+                .forEach((countryCode, baseValue) ->
                                  Assertions.assertThat(projected.getFirst().coordinates())
-                                         .containsEntry(countryCode, BigDecimal.valueOf(2.0 / 3.0).multiply(BigDecimal.valueOf(value)).intValue()));
+                                         .containsEntry(countryCode, BigDecimal.valueOf(2.0 / 3.0)
+                                                 .multiply(BigDecimal.valueOf(baseValue)).intValue()));
 
         //fcore v2 = 0.1*1000+0.2*-1000+0.3*500 = 50
         //      => delta = 3 or 2 => no change
