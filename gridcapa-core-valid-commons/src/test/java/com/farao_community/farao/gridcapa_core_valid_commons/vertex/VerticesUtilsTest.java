@@ -130,17 +130,17 @@ class VerticesUtilsTest {
     }
 
     private class TestBranch implements IFlowBasedDomainBranchData {
-        final Integer ram0Core;
-        final Integer amr;
+        final int ram0Core;
+        final int amr;
         final Map<String, BigDecimal> ptdfValues;
 
         @Override
-        public Integer getRam0Core() {
+        public int getRam0Core() {
             return ram0Core;
         }
 
         @Override
-        public Integer getAmr() {
+        public int getAmr() {
             return amr;
         }
 
