@@ -150,12 +150,12 @@ class VerticesUtilsTest {
     private record TestBranch(int ram0Core, int amr,
                               Map<String, BigDecimal> ptdfValues) implements IFlowBasedDomainBranchData {
 
-             TestBranch( int ram0Core,
-                                int amr,
-                                Map<String, BigDecimal> ptdfValues) {
-                this.ram0Core = ram0Core;
-                this.amr = amr;
-                this.ptdfValues = ptdfValues;
-            }
+        TestBranch(int ram0Core,
+                   int amr,
+                   Map<String, BigDecimal> ptdfValues) {
+            this.ram0Core = ram0Core;
+            this.amr = amr;
+            this.ptdfValues = ptdfValues;
         }
+    }
 }
