@@ -45,28 +45,30 @@ public final class VerticesUtils {
         return importVertices(new InputStreamReader(verticesStream, StandardCharsets.UTF_8), coreHubs);
     }
 
-    public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> vertices,
+    public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> baseVertices,
                                                             final List<? extends IFlowBasedDomainBranchData> fbDomainData,
                                                             final List<CoreHub> coreHubs) {
 
         final Map<String, String> flowBasedToVertexCodeMap = CoreHubUtils.getFlowBasedToVertexCodeMap(coreHubs);
-        final List<Vertex> projectedVertices = new ArrayList<>();
-        for (final Vertex vertex : vertices) {
+        final List<Vertex> newVertices = new ArrayList<>();
+
+        for (final Vertex vertex : baseVertices) {
             final Optional<BigDecimal> deltaMinOpt = fbDomainData.stream()
-                    .map(b -> delta(vertex, b, flowBasedToVertexCodeMap))
+                    .map(branch -> delta(vertex, branch, flowBasedToVertexCodeMap))
                     .filter(delta -> delta.compareTo(ONE) < 0)
                     .min(BigDecimal::compareTo);
 
-            // given that vertex is a record class, it's immutable
-            deltaMinOpt.ifPresentOrElse(deltaMin -> {
-                final Map<String, Integer> coordinates = new HashMap<>(vertex.coordinates());
-                coordinates.replaceAll((k, v) -> toProjectedPosition(v, deltaMin));
-                projectedVertices.add(new Vertex(vertex.vertexId(), coordinates));
-            }, () -> projectedVertices.add(vertex));
-
+            newVertices.add(deltaMinOpt.map(delta -> projectedVertex(vertex, delta)).orElse(vertex));
         }
 
-        return projectedVertices;
+        return newVertices;
+    }
+
+    private static Vertex projectedVertex(final Vertex vertex, final BigDecimal delta) {
+        // given that vertex is a record class, it's immutable
+        final Map<String, Integer> coordinates = new HashMap<>(vertex.coordinates());
+        coordinates.replaceAll((k, v) -> toProjectedPosition(v, delta));
+        return new Vertex(vertex.vertexId(), coordinates);
     }
 
     private static List<Vertex> importVertices(final Reader reader,
@@ -122,8 +124,8 @@ public final class VerticesUtils {
             return TWO;
         }
 
-        return BigDecimal.valueOf(branchData.getAmr())
-                .add(BigDecimal.valueOf(branchData.getRam0Core())
+        return BigDecimal.valueOf(branchData.amr())
+                .add(BigDecimal.valueOf(branchData.ram0Core())
                              .divide(f0Core, 15, FLOOR));
     }
 
@@ -131,7 +133,7 @@ public final class VerticesUtils {
                                      final IFlowBasedDomainBranchData branchData,
                                      final Map<String, String> fbToVertexCode) {
         //f0Core = ∑_over_hubs(PTDF*NP)
-        return branchData.getPtdfValues()
+        return branchData.ptdfValues()
                 .entrySet()
                 .stream()
                 .map(ptdf -> getFlowOnHub(ptdf, vertex, fbToVertexCode))

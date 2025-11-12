@@ -98,6 +98,12 @@ class VerticesUtilsTest {
         unprojected.getFirst().coordinates()
                 .forEach((countryCode, value) ->
                                  Assertions.assertThat(vertex2.coordinates()).containsEntry(countryCode, value));
+
+        //fcore = 0 => still no change
+        final List<Vertex> unprojected2 = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), getTestBranchWithZeros(), getTestCoreHubs());
+        unprojected2.getFirst().coordinates()
+                .forEach((countryCode, value) ->
+                                 Assertions.assertThat(vertex2.coordinates()).containsEntry(countryCode, value));
     }
 
     private List<CoreHub> getTestCoreHubs() {
@@ -129,32 +135,27 @@ class VerticesUtilsTest {
         );
     }
 
-    private class TestBranch implements IFlowBasedDomainBranchData {
-        final int ram0Core;
-        final int amr;
-        final Map<String, BigDecimal> ptdfValues;
-
-        @Override
-        public int getRam0Core() {
-            return ram0Core;
-        }
-
-        @Override
-        public int getAmr() {
-            return amr;
-        }
-
-        @Override
-        public Map<String, BigDecimal> getPtdfValues() {
-            return ptdfValues;
-        }
-
-        public TestBranch(final Integer ram0Core,
-                          final Integer amr,
-                          final Map<String, BigDecimal> ptdfValues) {
-            this.ram0Core = ram0Core;
-            this.amr = amr;
-            this.ptdfValues = ptdfValues;
-        }
+    private List<TestBranch> getTestBranchWithZeros() {
+        final Map<String, BigDecimal> ptdfs = Map.of(
+                "fb1", BigDecimal.valueOf(0),
+                "fb2", BigDecimal.valueOf(0),
+                "fb3", BigDecimal.valueOf(0)
+        );
+        return List.of(
+                new TestBranch(100, 50, ptdfs),
+                new TestBranch(100, 0, ptdfs)
+        );
     }
+
+    private record TestBranch(int ram0Core, int amr,
+                              Map<String, BigDecimal> ptdfValues) implements IFlowBasedDomainBranchData {
+
+             TestBranch( int ram0Core,
+                                int amr,
+                                Map<String, BigDecimal> ptdfValues) {
+                this.ram0Core = ram0Core;
+                this.amr = amr;
+                this.ptdfValues = ptdfValues;
+            }
+        }
 }

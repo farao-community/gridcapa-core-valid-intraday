@@ -4,9 +4,9 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public interface IFlowBasedDomainBranchData {
-    int getRam0Core();
+    int ram0Core();
 
-    int getAmr();
+    int amr();
 
-    Map<String, BigDecimal> getPtdfValues();
+    Map<String, BigDecimal> ptdfValues();
 }
