@@ -147,15 +147,32 @@ class VerticesUtilsTest {
         );
     }
 
-    private record TestBranch(int ram0Core, int amr,
-                              Map<String, BigDecimal> ptdfValues) implements IFlowBasedDomainBranchData {
+    private static final class TestBranch implements IFlowBasedDomainBranchData {
+        private final int ram0Core;
+        private final int amr;
+        private final Map<String, BigDecimal> ptdfValues;
 
-        TestBranch(int ram0Core,
-                   int amr,
-                   Map<String, BigDecimal> ptdfValues) {
+        TestBranch(final int ram0Core,
+                   final int amr,
+                   final Map<String, BigDecimal> ptdfValues) {
             this.ram0Core = ram0Core;
             this.amr = amr;
             this.ptdfValues = ptdfValues;
+        }
+
+        @Override
+        public int getRam0Core() {
+            return ram0Core;
+        }
+
+        @Override
+        public int getAmr() {
+            return amr;
+        }
+
+        @Override
+        public Map<String, BigDecimal> getPtdfValues() {
+            return ptdfValues;
         }
     }
 }

@@ -124,8 +124,8 @@ public final class VerticesUtils {
             return TWO;
         }
 
-        return BigDecimal.valueOf(branchData.amr())
-                .add(BigDecimal.valueOf(branchData.ram0Core())
+        return BigDecimal.valueOf(branchData.getAmr())
+                .add(BigDecimal.valueOf(branchData.getRam0Core())
                              .divide(f0Core, 15, FLOOR));
     }
 
@@ -133,7 +133,7 @@ public final class VerticesUtils {
                                      final IFlowBasedDomainBranchData branchData,
                                      final Map<String, String> fbToVertexCode) {
         //f0Core = ∑_over_hubs(PTDF*NP)
-        return branchData.ptdfValues()
+        return branchData.getPtdfValues()
                 .entrySet()
                 .stream()
                 .map(ptdf -> getFlowOnHub(ptdf, vertex, fbToVertexCode))
