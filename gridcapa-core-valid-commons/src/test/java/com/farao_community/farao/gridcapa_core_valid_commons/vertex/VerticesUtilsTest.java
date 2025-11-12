@@ -85,7 +85,7 @@ class VerticesUtilsTest {
         //      => delta = 1
         //fcore v1, b2  = fcore v1, b1 = 150
         //      => delta = 2/3
-        final List<Vertex> projected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex1), branches);
+        final List<Vertex> projected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex1), branches, getTestCoreHubs());
         vertex1.coordinates()
                 .forEach((countryCode, baseValue) ->
                                  Assertions.assertThat(projected.getFirst().coordinates())
@@ -94,7 +94,7 @@ class VerticesUtilsTest {
 
         //fcore v2 = 0.1*1000+0.2*-1000+0.3*500 = 50
         //      => delta = 3 or 2 => no change
-        final List<Vertex> unprojected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), branches);
+        final List<Vertex> unprojected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), branches, getTestCoreHubs());
         unprojected.getFirst().coordinates()
                 .forEach((countryCode, value) ->
                                  Assertions.assertThat(vertex2.coordinates()).containsEntry(countryCode, value));
@@ -119,9 +119,9 @@ class VerticesUtilsTest {
 
     private List<TestBranch> getTestBranches() {
         final Map<String, BigDecimal> ptdfs = Map.of(
-                "PTDF_AA", BigDecimal.valueOf(0.1),
-                "PTDF_BB", BigDecimal.valueOf(0.2),
-                "PTDF_CC", BigDecimal.valueOf(0.3)
+                "fb1", BigDecimal.valueOf(0.1),
+                "fb2", BigDecimal.valueOf(0.2),
+                "fb3", BigDecimal.valueOf(0.3)
         );
         return List.of(
                 new TestBranch(100, 50, ptdfs),

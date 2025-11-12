@@ -8,6 +8,7 @@
 package com.farao_community.farao.gridcapa_core_valid_commons.vertex;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
+import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubUtils;
 import com.farao_community.farao.gridcapa_core_valid_commons.exception.CoreValidCommonsInvalidDataException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -18,7 +19,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,22 +27,46 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.math.BigDecimal.ONE;
+import static java.math.BigDecimal.TWO;
+import static java.math.BigDecimal.ZERO;
+import static java.math.RoundingMode.FLOOR;
+
 public final class VerticesUtils {
 
-    public static final String PTDF_PREFIX = "PTDF_";
     public static final String VERTEX_ID_HEADER = "Vertex ID";
 
     private VerticesUtils() {
         throw new IllegalStateException("Utility class");
     }
 
-    /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                VERTICES IMPORT
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-
     public static List<Vertex> importVertices(final InputStream verticesStream,
                                               final List<CoreHub> coreHubs) {
         return importVertices(new InputStreamReader(verticesStream, StandardCharsets.UTF_8), coreHubs);
+    }
+
+    public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> vertices,
+                                                            final List<? extends IFlowBasedDomainBranchData> fbDomainData,
+                                                            final List<CoreHub> coreHubs) {
+
+        final Map<String, String> flowBasedToVertexCodeMap = CoreHubUtils.getFlowBasedToVertexCodeMap(coreHubs);
+        final List<Vertex> projectedVertices = new ArrayList<>();
+        for (final Vertex vertex : vertices) {
+            final Optional<BigDecimal> deltaMinOpt = fbDomainData.stream()
+                    .map(b -> delta(vertex, b, flowBasedToVertexCodeMap))
+                    .filter(delta -> delta.compareTo(ONE) < 0)
+                    .min(BigDecimal::compareTo);
+
+            // given that vertex is a record class, it's immutable
+            deltaMinOpt.ifPresentOrElse(deltaMin -> {
+                final Map<String, Integer> coordinates = new HashMap<>(vertex.coordinates());
+                coordinates.replaceAll((k, v) -> toProjectedPosition(v, deltaMin));
+                projectedVertices.add(new Vertex(vertex.vertexId(), coordinates));
+            }, () -> projectedVertices.add(vertex));
+
+        }
+
+        return projectedVertices;
     }
 
     private static List<Vertex> importVertices(final Reader reader,
@@ -81,56 +105,49 @@ public final class VerticesUtils {
         return Integer.parseInt(coordinateString);
     }
 
-    /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                VERTICES PROJECTION
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-
-    public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> vertices,
-                                                            final List<? extends IFlowBasedDomainBranchData> fbDomainData) {
-
-        final List<Vertex> projectedVertices = new ArrayList<>();
-        for (final Vertex vertex : vertices) {
-            final Optional<BigDecimal> deltaMinOpt = fbDomainData.stream()
-                    .map(b -> delta(vertex, b))
-                    .filter(delta -> delta.compareTo(BigDecimal.ONE) < 0)
-                    .min(BigDecimal::compareTo);
-
-            // given that vertex is a record class, it's immutable
-            deltaMinOpt.ifPresentOrElse(deltaMin -> {
-                final Map<String, Integer> coordinates = new HashMap<>(vertex.coordinates());
-                coordinates.replaceAll((k, v) -> toProjectedPosition(v, deltaMin));
-                projectedVertices.add(new Vertex(vertex.vertexId(), coordinates));
-            }, () -> projectedVertices.add(vertex));
-
-        }
-
-        return projectedVertices;
-    }
-
     private static int toProjectedPosition(final Integer netPosition,
                                            final BigDecimal delta) {
         return BigDecimal.valueOf(netPosition).multiply(delta).intValue();
     }
 
-    public static BigDecimal delta(final Vertex vertex,
-                                   final IFlowBasedDomainBranchData branchData) {
-        return BigDecimal.valueOf(branchData.getAmr() + branchData.getRam0Core())
-                .divide(f0Core(vertex, branchData), 15, RoundingMode.FLOOR);
+    private static BigDecimal delta(final Vertex vertex,
+                                    final IFlowBasedDomainBranchData branchData,
+                                    final Map<String, String> fbToVertexCode) {
+
+        final BigDecimal f0Core = f0Core(vertex, branchData, fbToVertexCode);
+
+        if (f0Core.equals(ZERO)) {
+            // f0Core = 0 => delta '=' ∞
+            // so we just have to return something > 1 as to do nothing here
+            return TWO;
+        }
+
+        return BigDecimal.valueOf(branchData.getAmr())
+                .add(BigDecimal.valueOf(branchData.getRam0Core())
+                             .divide(f0Core, 15, FLOOR));
     }
 
-    public static BigDecimal f0Core(final Vertex vertex,
-                                    final IFlowBasedDomainBranchData branchData) {
+    private static BigDecimal f0Core(final Vertex vertex,
+                                     final IFlowBasedDomainBranchData branchData,
+                                     final Map<String, String> fbToVertexCode) {
         //f0Core = ∑_over_hubs(PTDF*NP)
         return branchData.getPtdfValues()
                 .entrySet()
                 .stream()
-                .map(ptdf -> ptdf.getValue().multiply(getNetPosition(ptdf.getKey(), vertex)))
+                .map(ptdf -> getFlowOnHub(ptdf, vertex, fbToVertexCode))
                 .reduce(BigDecimal::add)
                 .orElseThrow();
     }
 
-    private static BigDecimal getNetPosition(final String ptdfKey,
+    private static BigDecimal getFlowOnHub(final Map.Entry<String, BigDecimal> ptdf,
+                                           final Vertex vertex,
+                                           final Map<String, String> fbToVertexCode) {
+        final String countryCode = fbToVertexCode.get(ptdf.getKey());
+        return ptdf.getValue().multiply(getNetPosition(countryCode, vertex));
+    }
+
+    private static BigDecimal getNetPosition(final String countryCode,
                                              final Vertex vertex) {
-        return BigDecimal.valueOf(vertex.coordinates().get(ptdfKey.replace(PTDF_PREFIX, "")));
+        return BigDecimal.valueOf(vertex.coordinates().getOrDefault(countryCode, 0));
     }
 }
