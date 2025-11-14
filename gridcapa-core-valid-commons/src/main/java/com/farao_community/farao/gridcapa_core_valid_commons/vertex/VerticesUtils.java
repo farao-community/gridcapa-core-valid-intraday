@@ -64,7 +64,8 @@ public final class VerticesUtils {
         return newVertices;
     }
 
-    private static Vertex projectedVertex(final Vertex vertex, final BigDecimal delta) {
+    private static Vertex projectedVertex(final Vertex vertex,
+                                          final BigDecimal delta) {
         // given that vertex is a record class, it's immutable
         final Map<String, Integer> coordinates = new HashMap<>(vertex.coordinates());
         coordinates.replaceAll((k, v) -> toProjectedPosition(v, delta));
@@ -125,8 +126,8 @@ public final class VerticesUtils {
         }
 
         return BigDecimal.valueOf(branchData.getAmr())
-                .add(BigDecimal.valueOf(branchData.getRam0Core())
-                             .divide(f0Core, 15, FLOOR));
+                .add(BigDecimal.valueOf(branchData.getRam0Core()))
+                .divide(f0Core, 15, FLOOR);
     }
 
     private static BigDecimal f0Core(final Vertex vertex,
