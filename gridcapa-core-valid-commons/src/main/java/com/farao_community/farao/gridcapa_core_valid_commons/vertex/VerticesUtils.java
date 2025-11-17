@@ -133,12 +133,15 @@ public final class VerticesUtils {
                                      final FlowBasedDomainBranchData branchData,
                                      final Map<String, String> fbToVertexCode) {
         //f0Core = ∑_over_hubs(PTDF*NP)
-        return branchData.getPtdfValues()
+        return branchData
+                .getPtdfValues()
                 .entrySet()
                 .stream()
                 .map(ptdf -> getFlowOnHub(ptdf, vertex, fbToVertexCode))
                 .reduce(BigDecimal::add)
-                .orElseThrow();
+                .orElseThrow(() -> new CoreValidCommonsInvalidDataException(
+                        String.format("Cannot compute f0Core: no PTDF values provided for vertex %d",
+                                      vertex.vertexId())));
     }
 
     private static BigDecimal getFlowOnHub(final Map.Entry<String, BigDecimal> ptdf,
