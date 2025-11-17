@@ -147,7 +147,7 @@ class VerticesUtilsTest {
         );
     }
 
-    private static final class TestBranch implements IFlowBasedDomainBranchData {
+    private static final class TestBranch implements FlowBasedDomainBranchData {
         private final int ram0Core;
         private final int amr;
         private final Map<String, BigDecimal> ptdfValues;

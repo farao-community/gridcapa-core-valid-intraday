@@ -46,7 +46,7 @@ public final class VerticesUtils {
     }
 
     public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> baseVertices,
-                                                            final List<? extends IFlowBasedDomainBranchData> fbDomainData,
+                                                            final List<? extends FlowBasedDomainBranchData> fbDomainData,
                                                             final List<CoreHub> coreHubs) {
 
         final Map<String, String> flowBasedToVertexCodeMap = CoreHubUtils.getFlowBasedToVertexCodeMap(coreHubs);
@@ -114,7 +114,7 @@ public final class VerticesUtils {
     }
 
     private static BigDecimal delta(final Vertex vertex,
-                                    final IFlowBasedDomainBranchData branchData,
+                                    final FlowBasedDomainBranchData branchData,
                                     final Map<String, String> fbToVertexCode) {
 
         final BigDecimal f0Core = f0Core(vertex, branchData, fbToVertexCode);
@@ -131,7 +131,7 @@ public final class VerticesUtils {
     }
 
     private static BigDecimal f0Core(final Vertex vertex,
-                                     final IFlowBasedDomainBranchData branchData,
+                                     final FlowBasedDomainBranchData branchData,
                                      final Map<String, String> fbToVertexCode) {
         //f0Core = ∑_over_hubs(PTDF*NP)
         return branchData.getPtdfValues()
