@@ -8,9 +8,9 @@ package com.farao_community.farao.gridcapa_core_valid_commons.core_hub;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.ObjectUtils.allNotNull;
 
 public final class CoreHubUtils {
     private CoreHubUtils() {
@@ -22,8 +22,7 @@ public final class CoreHubUtils {
             return Map.of();
         }
         return coreHubs.stream()
-                .filter(Objects::nonNull)
-                .filter(h -> h.flowbasedCode() != null && h.clusterVerticeCode() != null)
+                .filter(h -> allNotNull(h, h.flowbasedCode(), h.clusterVerticeCode()))
                 .collect(toMap(CoreHub::flowbasedCode,
                                CoreHub::clusterVerticeCode,
                                (a, b) -> b));

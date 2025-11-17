@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ONE;
@@ -53,12 +52,13 @@ public final class VerticesUtils {
         final List<Vertex> newVertices = new ArrayList<>();
 
         for (final Vertex vertex : baseVertices) {
-            final Optional<BigDecimal> deltaMinOpt = fbDomainData.stream()
+            final Vertex projectedVertex = fbDomainData.stream()
                     .map(branch -> delta(vertex, branch, flowBasedToVertexCodeMap))
                     .filter(delta -> delta.compareTo(ONE) < 0)
-                    .min(BigDecimal::compareTo);
+                    .min(BigDecimal::compareTo)
+                    .map(delta -> projectedVertex(vertex, delta)).orElse(vertex);
 
-            newVertices.add(deltaMinOpt.map(delta -> projectedVertex(vertex, delta)).orElse(vertex));
+            newVertices.add(projectedVertex);
         }
 
         return newVertices;
@@ -66,7 +66,6 @@ public final class VerticesUtils {
 
     private static Vertex projectedVertex(final Vertex vertex,
                                           final BigDecimal delta) {
-        // given that vertex is a record class, it's immutable
         final Map<String, Integer> coordinates = new HashMap<>(vertex.coordinates());
         coordinates.replaceAll((k, v) -> toProjectedPosition(v, delta));
         return new Vertex(vertex.vertexId(), coordinates);
