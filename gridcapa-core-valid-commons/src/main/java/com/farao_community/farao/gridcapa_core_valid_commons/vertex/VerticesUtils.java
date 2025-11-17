@@ -112,7 +112,7 @@ public final class VerticesUtils {
         try {
             return Integer.parseInt(coordinateString);
         } catch (final NumberFormatException nfe) {
-            throw new CoreValidCommonsInvalidDataException("Could not parse %s".formatted(coordinateString), nfe);
+            throw new CoreValidCommonsInvalidDataException("Could not parse %s as an integer".formatted(coordinateString), nfe);
         }
     }
 
