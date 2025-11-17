@@ -18,14 +18,14 @@ public final class CoreHubUtils {
     }
 
     public static Map<String, String> getFlowBasedToVertexCodeMap(final List<CoreHub> coreHubs) {
-        if (coreHubs == null || coreHubs.isEmpty()){
+        if (coreHubs == null || coreHubs.isEmpty()) {
             return Map.of();
         }
         return coreHubs.stream()
                 .filter(Objects::nonNull)
-                .filter(h->h.flowbasedCode() != null && h.clusterVerticeCode() != null)
+                .filter(h -> h.flowbasedCode() != null && h.clusterVerticeCode() != null)
                 .collect(toMap(CoreHub::flowbasedCode,
                                CoreHub::clusterVerticeCode,
-                               (a,b)->b));
+                               (a, b) -> b));
     }
 }
