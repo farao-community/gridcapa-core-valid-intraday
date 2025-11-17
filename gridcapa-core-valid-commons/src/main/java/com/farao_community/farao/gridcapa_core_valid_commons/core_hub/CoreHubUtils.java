@@ -22,7 +22,7 @@ public final class CoreHubUtils {
             return Map.of();
         }
         return coreHubs.stream()
-                .filter(h -> allNotNull(h, h.flowbasedCode(), h.clusterVerticeCode()))
+                .filter(h -> h != null && allNotNull(h.flowbasedCode(), h.clusterVerticeCode()))
                 .collect(toMap(CoreHub::flowbasedCode,
                                CoreHub::clusterVerticeCode,
                                (a, b) -> b));

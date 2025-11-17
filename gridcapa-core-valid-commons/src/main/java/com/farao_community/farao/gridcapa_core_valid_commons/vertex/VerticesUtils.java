@@ -14,7 +14,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -27,7 +26,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ONE;
-import static java.math.BigDecimal.TWO;
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.FLOOR;
 
@@ -54,9 +52,10 @@ public final class VerticesUtils {
         for (final Vertex vertex : baseVertices) {
             final Vertex projectedVertex = fbDomainData.stream()
                     .map(branch -> delta(vertex, branch, flowBasedToVertexCodeMap))
-                    .filter(delta -> delta.compareTo(ONE) < 0)
+                    .filter(delta -> delta != null && delta.compareTo(ONE) < 0)
                     .min(BigDecimal::compareTo)
-                    .map(delta -> projectedVertex(vertex, delta)).orElse(vertex);
+                    .map(delta -> projectedVertex(vertex, delta))
+                    .orElse(vertex);
 
             newVertices.add(projectedVertex);
         }
@@ -88,8 +87,8 @@ public final class VerticesUtils {
                 vertices.add(new Vertex(Integer.parseInt(csvRecord.get(VERTEX_ID_HEADER)), positions));
             });
             return vertices;
-        } catch (final IOException | IllegalArgumentException | NullPointerException e) {
-            throw new CoreValidCommonsInvalidDataException("Exception occurred during parsing vertices file", e);
+        } catch (final Exception e) {
+            throw new CoreValidCommonsInvalidDataException("Exception occurred while parsing vertices file", e);
         }
     }
 
@@ -104,7 +103,11 @@ public final class VerticesUtils {
         if (corehub.isHvdcHub() && StringUtils.isBlank(coordinateString)) {
             return 0;
         }
-        return Integer.parseInt(coordinateString);
+        try {
+            return Integer.parseInt(coordinateString);
+        } catch (final NumberFormatException nfe) {
+            throw new CoreValidCommonsInvalidDataException("Could not parse %s".formatted(coordinateString), nfe);
+        }
     }
 
     private static int toProjectedPosition(final Integer netPosition,
@@ -120,8 +123,7 @@ public final class VerticesUtils {
 
         if (f0Core.equals(ZERO)) {
             // f0Core = 0 => delta '=' ∞
-            // so we just have to return something > 1 as to do nothing here
-            return TWO;
+            return null;
         }
 
         return BigDecimal.valueOf(branchData.getAmr())

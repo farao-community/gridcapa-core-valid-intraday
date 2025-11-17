@@ -62,7 +62,7 @@ class VerticesUtilsTest {
         try (final InputStream inputStream = Mockito.mock(InputStream.class);) {
             Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
                     .isThrownBy(() -> VerticesUtils.importVertices(inputStream, coreHubs))
-                    .withMessage("Exception occurred during parsing vertices file");
+                    .withMessage("Exception occurred while parsing vertices file");
         }
     }
 
@@ -71,7 +71,7 @@ class VerticesUtilsTest {
         try (final InputStream inputStream = getClass().getResource("bad-vertices.csv").openStream();) {
             Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
                     .isThrownBy(() -> VerticesUtils.importVertices(inputStream, coreHubs))
-                    .withMessage("Exception occurred during parsing vertices file");
+                    .withMessage("Exception occurred while parsing vertices file");
         }
     }
 
@@ -147,32 +147,7 @@ class VerticesUtilsTest {
         );
     }
 
-    private static final class TestBranch implements FlowBasedDomainBranchData {
-        private final int ram0Core;
-        private final int amr;
-        private final Map<String, BigDecimal> ptdfValues;
-
-        TestBranch(final int ram0Core,
-                   final int amr,
-                   final Map<String, BigDecimal> ptdfValues) {
-            this.ram0Core = ram0Core;
-            this.amr = amr;
-            this.ptdfValues = ptdfValues;
-        }
-
-        @Override
-        public int getRam0Core() {
-            return ram0Core;
-        }
-
-        @Override
-        public int getAmr() {
-            return amr;
-        }
-
-        @Override
-        public Map<String, BigDecimal> getPtdfValues() {
-            return ptdfValues;
-        }
+    private record TestBranch(int getRam0Core, int getAmr,
+                              Map<String, BigDecimal> getPtdfValues) implements FlowBasedDomainBranchData {
     }
 }
