@@ -13,6 +13,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.exception.CoreValid
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -51,7 +52,12 @@ public final class VerticesUtils {
 
         for (final Vertex vertex : baseVertices) {
             final Vertex projectedVertex = fbDomainData.stream()
-                    .map(branch -> delta(vertex, branch, flowBasedToVertexCodeMap))
+                    .map(branch ->
+                                 Pair.of(branch,
+                                         f0Core(vertex, branch, flowBasedToVertexCodeMap))
+                    )
+                    .filter(p -> !p.getRight().equals(ZERO))
+                    .map(p -> delta(p.getLeft(), p.getRight()))
                     .filter(delta -> delta != null && delta.compareTo(ONE) < 0)
                     .min(BigDecimal::compareTo)
                     .map(delta -> projectedVertex(vertex, delta))
@@ -115,14 +121,10 @@ public final class VerticesUtils {
         return BigDecimal.valueOf(netPosition).multiply(delta).intValue();
     }
 
-    private static BigDecimal delta(final Vertex vertex,
-                                    final FlowBasedDomainBranchData branchData,
-                                    final Map<String, String> fbToVertexCode) {
+    private static BigDecimal delta(final FlowBasedDomainBranchData branchData,
+                                    final BigDecimal f0Core) {
 
-        final BigDecimal f0Core = f0Core(vertex, branchData, fbToVertexCode);
-
-        if (f0Core.equals(ZERO)) {
-            // f0Core = 0 => delta '=' ∞
+        if (ZERO.equals(f0Core)) {
             return null;
         }
 

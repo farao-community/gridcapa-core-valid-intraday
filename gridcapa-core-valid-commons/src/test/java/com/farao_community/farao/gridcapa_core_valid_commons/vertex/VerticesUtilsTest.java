@@ -95,13 +95,10 @@ class VerticesUtilsTest {
         //fcore v2 = 0.1*1000+0.2*-1000+0.3*500 = 50
         //      => delta = 3 or 2 => no change
         final List<Vertex> unprojected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), branches, getTestCoreHubs());
-
-        //fcore = 0 => still no change
-        final List<Vertex> unprojected2 = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), getTestBranchWithZeros(), getTestCoreHubs());
-
         Assertions.assertThat(unprojected.getFirst().coordinates())
                 .containsExactlyInAnyOrderEntriesOf(vertex2.coordinates());
-
+        //fcore = 0 => still no change
+        final List<Vertex> unprojected2 = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), getTestBranchWithZeros(), getTestCoreHubs());
         Assertions.assertThat(unprojected2.getFirst().coordinates())
                 .containsExactlyInAnyOrderEntriesOf(vertex2.coordinates());
     }
