@@ -19,20 +19,21 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.FLOOR;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.stream.Collectors.toMap;
 
 public final class VerticesUtils {
 
     public static final String VERTEX_ID_HEADER = "Vertex ID";
+    private static final int DELTA_SCALE = 15;
 
     private VerticesUtils() {
         throw new IllegalStateException("Utility class");
@@ -40,7 +41,7 @@ public final class VerticesUtils {
 
     public static List<Vertex> importVertices(final InputStream verticesStream,
                                               final List<CoreHub> coreHubs) {
-        return importVertices(new InputStreamReader(verticesStream, StandardCharsets.UTF_8), coreHubs);
+        return importVertices(new InputStreamReader(verticesStream, UTF_8), coreHubs);
     }
 
     public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> baseVertices,
@@ -86,12 +87,15 @@ public final class VerticesUtils {
                     .setSkipHeaderRecord(true)
                     .build()
                     .parse(reader);
+
             csvRecords.forEach(csvRecord -> {
-                final Map<String, Integer> positions = coreHubs.stream().collect(Collectors.toMap(
-                        CoreHub::clusterVerticeCode,
-                        coreHub -> getCoordinate(csvRecord, coreHub)));
-                vertices.add(new Vertex(Integer.parseInt(csvRecord.get(VERTEX_ID_HEADER)), positions));
+                final Map<String, Integer> positions = coreHubs.stream()
+                        .collect(toMap(CoreHub::clusterVerticeCode,
+                                       coreHub -> getCoordinate(csvRecord, coreHub)));
+                final int vertexId = Integer.parseInt(csvRecord.get(VERTEX_ID_HEADER));
+                vertices.add(new Vertex(vertexId, positions));
             });
+
             return vertices;
         } catch (final Exception e) {
             throw new CoreValidCommonsInvalidDataException("Exception occurred while parsing vertices file", e);
@@ -130,7 +134,7 @@ public final class VerticesUtils {
 
         return BigDecimal.valueOf(branchData.getAmr())
                 .add(BigDecimal.valueOf(branchData.getRam0Core()))
-                .divide(f0Core, 15, FLOOR);
+                .divide(f0Core, DELTA_SCALE, FLOOR);
     }
 
     private static BigDecimal f0Core(final Vertex vertex,
