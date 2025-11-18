@@ -13,7 +13,6 @@ import com.farao_community.farao.gridcapa_core_valid_commons.exception.CoreValid
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -33,7 +32,7 @@ import static java.util.stream.Collectors.toMap;
 public final class VerticesUtils {
 
     public static final String VERTEX_ID_HEADER = "Vertex ID";
-    private static final int DELTA_SCALE = 15;
+    private static int DELTA_SCALE = 15;
 
     private VerticesUtils() {
         throw new IllegalStateException("Utility class");
@@ -45,26 +44,24 @@ public final class VerticesUtils {
     }
 
     public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> baseVertices,
-                                                            final List<? extends FlowBasedDomainBranchData> fbDomainData,
+                                                            final List<? extends FlowBasedDomainBranchData> branchesData,
                                                             final List<CoreHub> coreHubs) {
 
         final Map<String, String> flowBasedToVertexCodeMap = CoreHubUtils.getFlowBasedToVertexCodeMap(coreHubs);
         final List<Vertex> newVertices = new ArrayList<>();
 
         for (final Vertex vertex : baseVertices) {
-            final Vertex projectedVertex = fbDomainData.stream()
-                    .map(branch ->
-                                 Pair.of(branch,
-                                         f0Core(vertex, branch, flowBasedToVertexCodeMap))
-                    )
-                    .filter(p -> !p.getRight().equals(ZERO))
-                    .map(p -> delta(p.getLeft(), p.getRight()))
-                    .filter(delta -> delta != null && delta.compareTo(ONE) < 0)
-                    .min(BigDecimal::compareTo)
-                    .map(delta -> projectedVertex(vertex, delta))
-                    .orElse(vertex);
-
-            newVertices.add(projectedVertex);
+            BigDecimal deltaMin = ONE;
+            boolean shouldProject = false;
+            for (final FlowBasedDomainBranchData branch : branchesData) {
+                final BigDecimal f0Core = f0Core(vertex, branch, flowBasedToVertexCodeMap);
+                final BigDecimal delta = delta(branch, f0Core);
+                if (delta != null && delta.compareTo(deltaMin) < 0) {
+                    shouldProject = true;
+                    deltaMin = delta;
+                }
+            }
+            newVertices.add(shouldProject ? projectedVertex(vertex, deltaMin) : vertex);
         }
 
         return newVertices;
