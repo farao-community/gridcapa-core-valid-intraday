@@ -2,7 +2,6 @@
 [![Coverage Status](https://sonarcloud.io/api/project_badges/measure?project=farao-community_gridcapa-core-valid-id&metric=coverage)](https://sonarcloud.io/component_measures?id=farao-community_gridcapa-core-valid-id&metric=coverage)
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=farao-community_gridcapa-core-valid-id&metric=alert_status)](https://sonarcloud.io/dashboard?id=farao-community_gridcapa-core-valid-id)
 [![MPL-2.0 License](https://img.shields.io/badge/license-MPL_2.0-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
-[![Join the community on Spectrum](https://withspectrum.github.io/badge/badge.svg)](https://spectrum.chat/farao-community)
 # gridcapa-core-valid-intraday
 It's provide a full suite to perform CEP 70% intraday validation process on CORE zone 
 
