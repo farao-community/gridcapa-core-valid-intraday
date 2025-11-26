@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><FlowBasedDomain xmlns="flowbased" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="flowbaseddomaindocument-25.xsd" DtdVersion="0" DtdRelease="0">
+  <DocumentIdentification v="ID2CCCt-20250921FID2-645v1"/>
+  <DocumentVersion v="1"/>
+  <DocumentType v="B08"/>
+  <ProcessType v="A02"/>
+  <SenderIdentification codingScheme="A01" v="XXXXXXXXXXXXXXXX"/>
+  <SenderRole v="A36"/>
+  <ReceiverIdentification codingScheme="A01" v="XXXXXXXXXXXXXXXX"/>
+  <ReceiverRole v="A04"/>
+  <CreationDateTime v="2025-09-20T18:34:05Z"/>
+  <FlowBasedDomainTimeInterval v="2025-09-20T22:00Z/2025-09-20T23:00Z"/>
+  <Domain codingScheme="A01" v="XXXXXXXXXXXXXXXX"/>
+ </FlowBasedDomain>
+                           

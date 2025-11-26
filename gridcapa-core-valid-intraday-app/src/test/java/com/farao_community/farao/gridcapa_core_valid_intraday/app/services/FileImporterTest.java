@@ -129,6 +129,17 @@ class FileImporterTest {
         assertNotNull(flowBasedDomainDocument);
     }
 
+    @Test
+    void importCnecRamFileThrowCoreValidIntradayInvalidDataExceptionWhenInvalidXmlFile() {
+        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", getClass().getResource("/cnecRam-invalid.xml"));
+        CoreValidIntradayInvalidDataException exception = assertThrows(
+                CoreValidIntradayInvalidDataException.class,
+                () -> fileImporter.importCnecRamFile(cnecRamFile)
+        );
+        assertTrue(exception.getMessage().contains("Cannot import cnecRam file"));
+
+    }
+
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {
         return new CoreValidIntradayFileResource(filename, resource.toExternalForm());
     }
