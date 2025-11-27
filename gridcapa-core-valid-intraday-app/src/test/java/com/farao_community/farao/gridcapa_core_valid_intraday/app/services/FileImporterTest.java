@@ -109,7 +109,7 @@ class FileImporterTest {
     @Test
     void importGlskTest() {
         final CoreValidIntradayFileResource glskFile = createFileResource("glsk", getClass().getResource("/gsk-document-05.xml"));
-        GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
+        final GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
         assertEquals(1, ((UcteGlskDocument) glskDocument).getListGlskSeries().size());
         assertEquals(1, glskDocument.getGlskPoints("aaaaa").size());
     }
@@ -125,14 +125,16 @@ class FileImporterTest {
     @Test
     void importCnecRamFileTest() {
         final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", getClass().getResource("/20250921-0000-FID2-645-INIT_VIRG_REFBAL_PRES_FBPARAMS-v3.xml"));
-        FlowBasedDomainDocument flowBasedDomainDocument = fileImporter.importCnecRamFile(cnecRamFile);
+        final FlowBasedDomainDocument flowBasedDomainDocument = fileImporter.importCnecRamFile(cnecRamFile);
         assertNotNull(flowBasedDomainDocument);
+        assertEquals(1, flowBasedDomainDocument.getFlowBasedDomainTimeSeries().size());
+        assertEquals("2025-09-20T22:00Z/2025-09-20T23:00Z", flowBasedDomainDocument.getFlowBasedDomainTimeInterval().getV());
     }
 
     @Test
-    void importCnecRamFileThrowCoreValidIntradayInvalidDataExceptionWhenInvalidXmlFile() {
+    void importCnecRamFileThrowExceptionWhenInvalidXmlFile() {
         final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", getClass().getResource("/cnecRam-invalid.xml"));
-        CoreValidIntradayInvalidDataException exception = assertThrows(
+        final CoreValidIntradayInvalidDataException exception = assertThrows(
                 CoreValidIntradayInvalidDataException.class,
                 () -> fileImporter.importCnecRamFile(cnecRamFile)
         );
