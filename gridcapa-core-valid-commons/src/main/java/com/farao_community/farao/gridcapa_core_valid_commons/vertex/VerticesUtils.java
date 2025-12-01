@@ -44,7 +44,7 @@ public final class VerticesUtils {
         return importVertices(new InputStreamReader(verticesStream, UTF_8), coreHubs);
     }
 
-    public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> baseVertices,
+    public static List<Vertex> getSelectedProjectedVertices(final List<Vertex> baseVertices,
                                                             final List<? extends FlowBasedDomainBranchData> branchesData,
                                                             final List<CoreHub> coreHubs,
                                                             final Predicate<Vertex> selector) {
