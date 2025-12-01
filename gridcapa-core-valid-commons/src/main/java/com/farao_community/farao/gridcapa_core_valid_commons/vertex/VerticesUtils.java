@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
@@ -45,7 +46,8 @@ public final class VerticesUtils {
 
     public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> baseVertices,
                                                             final List<? extends FlowBasedDomainBranchData> branchesData,
-                                                            final List<CoreHub> coreHubs) {
+                                                            final List<CoreHub> coreHubs,
+                                                            final Predicate<Vertex> selector) {
 
         final Map<String, String> flowBasedToVertexCodeMap = CoreHubUtils.getFlowBasedToVertexCodeMap(coreHubs);
         final List<Vertex> newVertices = new ArrayList<>();
@@ -61,7 +63,12 @@ public final class VerticesUtils {
                     deltaMin = delta;
                 }
             }
-            newVertices.add(shouldProject ? projectedVertex(vertex, deltaMin) : vertex);
+
+            final Vertex vertexOnDomain = shouldProject ? projectedVertex(vertex, deltaMin) : vertex;
+
+            if (selector.test(vertexOnDomain)) {
+                newVertices.add(vertexOnDomain);
+            }
         }
 
         return newVertices;

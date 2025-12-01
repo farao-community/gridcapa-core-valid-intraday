@@ -85,7 +85,7 @@ class VerticesUtilsTest {
         //      => delta = 1
         //fcore v1, b2  = fcore v1, b1 = 150
         //      => delta = 2/3
-        final List<Vertex> projected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex1), branches, getTestCoreHubs());
+        final List<Vertex> projected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex1), branches, getTestCoreHubs(), x -> true);
         vertex1.coordinates()
                 .forEach((countryCode, baseValue) ->
                                  Assertions.assertThat(projected.getFirst().coordinates())
@@ -94,11 +94,11 @@ class VerticesUtilsTest {
 
         //fcore v2 = 0.1*1000+0.2*-1000+0.3*500 = 50
         //      => delta = 3 or 2 => no change
-        final List<Vertex> unprojected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), branches, getTestCoreHubs());
+        final List<Vertex> unprojected = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), branches, getTestCoreHubs(), x -> true);
         Assertions.assertThat(unprojected.getFirst().coordinates())
                 .containsExactlyInAnyOrderEntriesOf(vertex2.coordinates());
         //fcore = 0 => still no change
-        final List<Vertex> unprojected2 = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), getTestBranchWithZeros(), getTestCoreHubs());
+        final List<Vertex> unprojected2 = VerticesUtils.getVerticesProjectedOnDomain(List.of(vertex2), getTestBranchWithZeros(), getTestCoreHubs(), x -> true);
         Assertions.assertThat(unprojected2.getFirst().coordinates())
                 .containsExactlyInAnyOrderEntriesOf(vertex2.coordinates());
     }
