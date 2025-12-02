@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
@@ -32,7 +33,7 @@ import static java.util.stream.Collectors.toMap;
 public final class VerticesUtils {
 
     public static final String VERTEX_ID_HEADER = "Vertex ID";
-    private static int DELTA_SCALE = 15;
+    private static final int DELTA_SCALE = 15;
 
     private VerticesUtils() {
         throw new IllegalStateException("Utility class");
@@ -46,6 +47,13 @@ public final class VerticesUtils {
     public static List<Vertex> getVerticesProjectedOnDomain(final List<Vertex> baseVertices,
                                                             final List<? extends FlowBasedDomainBranchData> branchesData,
                                                             final List<CoreHub> coreHubs) {
+        return getSelectedProjectedVertices(baseVertices, branchesData, coreHubs, x -> true);
+    }
+
+    public static List<Vertex> getSelectedProjectedVertices(final List<Vertex> baseVertices,
+                                                            final List<? extends FlowBasedDomainBranchData> branchesData,
+                                                            final List<CoreHub> coreHubs,
+                                                            final Predicate<Vertex> selector) {
 
         final Map<String, String> flowBasedToVertexCodeMap = CoreHubUtils.getFlowBasedToVertexCodeMap(coreHubs);
         final List<Vertex> newVertices = new ArrayList<>();
@@ -61,7 +69,12 @@ public final class VerticesUtils {
                     deltaMin = delta;
                 }
             }
-            newVertices.add(shouldProject ? projectedVertex(vertex, deltaMin) : vertex);
+
+            final Vertex vertexOnDomain = shouldProject ? projectedVertex(vertex, deltaMin) : vertex;
+
+            if (selector.test(vertexOnDomain)) {
+                newVertices.add(vertexOnDomain);
+            }
         }
 
         return newVertices;
