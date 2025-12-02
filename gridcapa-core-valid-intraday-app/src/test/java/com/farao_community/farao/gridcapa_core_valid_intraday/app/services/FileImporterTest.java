@@ -9,6 +9,7 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
+import com.farao_community.gridcapa_core_valid_intraday.xsd.f645.FlowBasedDomainDocument;
 import com.powsybl.glsk.api.GlskDocument;
 import com.powsybl.glsk.ucte.UcteGlskDocument;
 import com.powsybl.iidm.network.Network;
@@ -108,7 +109,7 @@ class FileImporterTest {
     @Test
     void importGlskTest() {
         final CoreValidIntradayFileResource glskFile = createFileResource("glsk", getClass().getResource("/gsk-document-05.xml"));
-        GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
+        final GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
         assertEquals(1, ((UcteGlskDocument) glskDocument).getListGlskSeries().size());
         assertEquals(1, glskDocument.getGlskPoints("aaaaa").size());
     }
@@ -119,6 +120,26 @@ class FileImporterTest {
         final CoreValidIntradayFileResource crac = createFileResource("mergedCnec", getClass().getResource("/20210723-F666.xml"));
         final FbConstraintCreationContext fbConstraintCreationContext = fileImporter.importMergedCnec(crac, network, TEST_DATE_TIME);
         assertNotNull(fbConstraintCreationContext.getCrac());
+    }
+
+    @Test
+    void importCnecRamFileTest() {
+        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", getClass().getResource("/20250921-0000-FID2-645-INIT_VIRG_REFBAL_PRES_FBPARAMS-v3.xml"));
+        final FlowBasedDomainDocument flowBasedDomainDocument = fileImporter.importCnecRamFile(cnecRamFile);
+        assertNotNull(flowBasedDomainDocument);
+        assertEquals(1, flowBasedDomainDocument.getFlowBasedDomainTimeSeries().size());
+        assertEquals("2025-09-20T22:00Z/2025-09-20T23:00Z", flowBasedDomainDocument.getFlowBasedDomainTimeInterval().getV());
+    }
+
+    @Test
+    void importCnecRamFileThrowExceptionWhenInvalidXmlFile() {
+        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", getClass().getResource("/cnecRam-invalid.xml"));
+        final CoreValidIntradayInvalidDataException exception = assertThrows(
+                CoreValidIntradayInvalidDataException.class,
+                () -> fileImporter.importCnecRamFile(cnecRamFile)
+        );
+        assertTrue(exception.getMessage().contains("Cannot import cnecRam file"));
+
     }
 
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {

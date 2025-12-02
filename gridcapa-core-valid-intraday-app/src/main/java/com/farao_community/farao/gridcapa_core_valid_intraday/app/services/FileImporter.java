@@ -12,6 +12,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesUtils;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
+import com.farao_community.gridcapa_core_valid_intraday.xsd.f645.FlowBasedDomainDocument;
 import com.powsybl.glsk.api.GlskDocument;
 import com.powsybl.glsk.api.io.GlskDocumentImporters;
 import com.powsybl.iidm.network.Network;
@@ -63,6 +64,10 @@ public class FileImporter {
 
     public GlskDocument importGlskFile(final CoreValidIntradayFileResource glskFile) {
         return importFile(glskFile, GlskDocumentImporters::importGlsk);
+    }
+
+    public FlowBasedDomainDocument importCnecRamFile(final CoreValidIntradayFileResource cnecRamFile) {
+        return importFile(cnecRamFile, CnecRamImporter::importCnecRam);
     }
 
     public FbConstraintCreationContext importMergedCnec(final CoreValidIntradayFileResource mergedCnecFile,  final Network network, final OffsetDateTime targetProcessDateTime) {
