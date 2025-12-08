@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
@@ -6,22 +12,22 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.FlowBasedDom
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
-import static com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesUtils.getSelectedProjectedVertices;
 import static com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesUtils.getVerticesProjectedOnDomain;
-import static java.util.stream.Collectors.toMap;
+import static java.util.Comparator.comparingDouble;
 
-public class VertexService {
+public class VerticesSelector {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(VerticesSelector.class);
     private final List<CoreHub> coreHubs;
 
-    public VertexService(final CoreHubsConfiguration coreHubsConfiguration) {
+    public VerticesSelector(final CoreHubsConfiguration coreHubsConfiguration) {
         this.coreHubs = Collections.unmodifiableList(coreHubsConfiguration.getCoreHubs());
     }
 
@@ -29,27 +35,27 @@ public class VertexService {
                                                       final List<? extends FlowBasedDomainBranchData> branchesData,
                                                       final ReferenceProgram referenceProgram,
                                                       final Double radius,
-                                                      final int nbOfVerticesToSelect) {
+                                                      final int nbOfVerticesToSelect,
+                                                      final boolean fallBackOnClosest) {
 
         if (baseVertices.size() < nbOfVerticesToSelect) {
             return baseVertices;
         }
 
-        double r = radius;
-        List<Vertex> selectedProjected;
+        final List<Vertex> selectedProjected = getVerticesProjectedOnDomain(baseVertices, branchesData, coreHubs)
+            .stream()
+            .filter(vertex -> isInControlZone(vertex, referenceProgram, radius))
+            .toList();
 
-        do {
-            // at some point it would cover all vertices,
-            // but then it would have returned earlier,
-            // so no endless loop
-            selectedProjected = getSelectedProjectedVertices(baseVertices,
-                                                             branchesData,
-                                                             coreHubs,
-                                                             controlZoneSelector(referenceProgram, r));
-            r += radius;
-        } while (selectedProjected.size() < nbOfVerticesToSelect);
-
-        return selectedProjected;
+        if (!fallBackOnClosest || selectedProjected.size() == nbOfVerticesToSelect) {
+            return selectedProjected;
+        } else {
+            return selectVerticesByDistance(selectedProjected.size() < nbOfVerticesToSelect ?
+                                                baseVertices : selectedProjected,
+                                            branchesData,
+                                            referenceProgram,
+                                            nbOfVerticesToSelect);
+        }
 
     }
 
@@ -71,28 +77,15 @@ public class VertexService {
     }
 
     /**
+     * @param vertex           the considered vertex
      * @param referenceProgram contains the market positions
      * @param radius           n-dimension sphere radius, input by user
-     * @return a Predicate that checks if a vertex is within a sphere centered on market positions
+     * @return if a vertex is within an n-sphere centered on market positions
      */
-    private Predicate<Vertex> controlZoneSelector(final ReferenceProgram referenceProgram,
-                                                  final Double radius) {
-        return vertex -> {
-            final Map<String, Integer> coordinates = vertex.coordinates();
-            final Map<String, Double> marketPositions = getMarketPositionsByAreaCode(referenceProgram);
-
-            for (final CoreHub coreHub : coreHubs) {
-                final double marketPos = marketPositions.get(coreHub.forecastCode());
-                final double vertexPos = coordinates.get(coreHub.clusterVerticeCode());
-
-                // if any coordinate is not in the nth-dimensional circle, we don't take the vertex
-                if (vertexPos < marketPos - radius || vertexPos > marketPos + radius) {
-                    return false;
-                }
-            }
-
-            return true;
-        };
+    private boolean isInControlZone(final Vertex vertex,
+                                    final ReferenceProgram referenceProgram,
+                                    final Double radius) {
+        return vertexAndMarketDistance(referenceProgram, vertex).getRight() <= radius;
     }
 
     /**
@@ -105,11 +98,9 @@ public class VertexService {
                                                final ReferenceProgram referenceProgram,
                                                final int n) {
 
-        final Map<String, Double> marketPositions = getMarketPositionsByAreaCode(referenceProgram);
-
         return allVertices.stream()
-            .map(v -> vertexAndMarketDistance(marketPositions, v))
-            .sorted(Comparator.comparingDouble(Pair::getRight))
+            .map(v -> vertexAndMarketDistance(referenceProgram, v))
+            .sorted(comparingDouble(Pair::getRight))
             .limit(n)
             .map(Pair::getLeft)
             .toList();
@@ -119,34 +110,33 @@ public class VertexService {
     /**
      * we return a pair because we want to be able to sort by distance but still keep the vertex data
      *
-     * @param marketPositions the global net positions of the market
-     * @param vertex          the considered vertex
+     * @param referenceProgram contains the market positions
+     * @param vertex           the considered vertex
      * @return the vertex and its distance from the market
      */
-    private Pair<Vertex, Double> vertexAndMarketDistance(final Map<String, Double> marketPositions,
+    private Pair<Vertex, Double> vertexAndMarketDistance(final ReferenceProgram referenceProgram,
                                                          final Vertex vertex) {
 
         final Map<String, Integer> vertexPositions = vertex.coordinates();
 
         // global distance² = sum_over_hub(k_hub * [1D distance]²)
-        final Double sumOfWeightedSquared = coreHubs.stream()
-            .map(coreHub -> {
-                final double vertexPos = vertexPositions.get(coreHub.clusterVerticeCode());
-                final double diff = marketPositions.get(coreHub.forecastCode()) - vertexPos;
-                return coreHub.coefficient() * diff * diff;
-            })
-            .reduce(Double::sum)
-            .orElseThrow();
+        double sumOfWeightedSquared = 0.0;
+        for (final CoreHub hub : coreHubs) {
+            final Double marketPos = referenceProgram.getGlobalNetPosition(hub.forecastCode());
+            final Integer vertexPos = vertexPositions.get(hub.clusterVerticeCode());
+
+            if (vertexPos == null) {
+                LOGGER.warn("Cannot find hub {} / {} in input file",
+                            hub.forecastCode(), hub.clusterVerticeCode());
+                continue;
+            }
+
+            final double distanceIn1D = marketPos - vertexPos;
+            final double weightedDistance = hub.coefficient() * distanceIn1D * distanceIn1D;
+            sumOfWeightedSquared = sumOfWeightedSquared + weightedDistance;
+        }
 
         return Pair.of(vertex, Math.sqrt(sumOfWeightedSquared));
-    }
-
-    private Map<String, Double> getMarketPositionsByAreaCode(final ReferenceProgram referenceProgram) {
-        return referenceProgram.getAllGlobalNetPositions()
-            .entrySet()
-            .stream()
-            .map(e -> Map.entry(e.getKey().getAreaCode(), e.getValue()))
-            .collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 }
