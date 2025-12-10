@@ -126,9 +126,9 @@ public class VerticesSelector {
             final Integer vertexPos = vertexPositions.get(hub.clusterVerticeCode());
 
             if (vertexPos == null) {
-                LOGGER.warn("Cannot find hub {} / {} in input file",
-                            hub.forecastCode(), hub.clusterVerticeCode());
-                continue;
+                throw new IllegalStateException(
+                    String.format("Vertex %d missing required coordinate for hub %s / %s",
+                                  vertex.vertexId(), hub.forecastCode(), hub.clusterVerticeCode()));
             }
 
             final double distanceIn1D = marketPos - vertexPos;
