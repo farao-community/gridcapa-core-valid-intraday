@@ -12,8 +12,6 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.FlowBasedDom
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,8 +21,6 @@ import static com.farao_community.farao.gridcapa_core_valid_commons.vertex.Verti
 import static java.util.Comparator.comparingDouble;
 
 public class VerticesSelector {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(VerticesSelector.class);
     private final List<CoreHub> coreHubs;
 
     public VerticesSelector(final CoreHubsConfiguration coreHubsConfiguration) {
