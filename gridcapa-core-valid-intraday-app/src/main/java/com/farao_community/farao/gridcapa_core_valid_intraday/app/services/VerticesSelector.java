@@ -49,7 +49,7 @@ public class VerticesSelector {
 
         if (!fallBackOnClosest || selectedProjected.size() == nbOfVerticesToSelect) {
             return selectedProjected;
-        } else if (selectedProjected.size() < nbOfVerticesToSelect) {
+        } else if (selectedProjected.size() > nbOfVerticesToSelect) {
             return selectClosestVertices(selectedProjected, referenceProgram, nbOfVerticesToSelect);
         } else {
             return selectVerticesByDistance(baseVertices, branchesData, referenceProgram, nbOfVerticesToSelect);
@@ -82,7 +82,7 @@ public class VerticesSelector {
      */
     private boolean isInControlZone(final Vertex vertex,
                                     final ReferenceProgram referenceProgram,
-                                    final Double radius) {
+                                    final double radius) {
         return vertexAndMarketDistance(referenceProgram, vertex).getRight() <= radius;
     }
 
