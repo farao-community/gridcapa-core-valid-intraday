@@ -49,12 +49,10 @@ public class VerticesSelector {
 
         if (!fallBackOnClosest || selectedProjected.size() == nbOfVerticesToSelect) {
             return selectedProjected;
+        } else if (selectedProjected.size() < nbOfVerticesToSelect) {
+            return selectClosestVertices(selectedProjected, referenceProgram, nbOfVerticesToSelect);
         } else {
-            return selectVerticesByDistance(selectedProjected.size() < nbOfVerticesToSelect ?
-                                                baseVertices : selectedProjected,
-                                            branchesData,
-                                            referenceProgram,
-                                            nbOfVerticesToSelect);
+            return selectVerticesByDistance(baseVertices, branchesData, referenceProgram, nbOfVerticesToSelect);
         }
 
     }
