@@ -9,6 +9,8 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -32,18 +34,14 @@ class UrlValidationServiceTest {
         Assertions.assertTrue(actualMessage.contains(expectedMessage));
     }
 
-    @Test
-    void checkExceptionThrownWhenUrlIsNull() {
-        final String expectedMessage = "URL cannot be null or blank";
-        final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream(null));
-        final String actualMessage = exception.getMessage();
-        Assertions.assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    @Test
-    void checkExceptionThrownWhenUrlIsBlank() {
-        final String expectedMessage = "URL cannot be null or blank";
-        final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream("  "));
+    @ParameterizedTest
+    @CsvSource({
+        ",URL cannot be null or blank",
+        "  ,URL cannot be null or blank",
+        "file:/___DOESNT_EXIST,Cannot download FileResource file from URL"
+    })
+    void checkExceptionThrown(String url, String expectedMessage) {
+        final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream(url));
         final String actualMessage = exception.getMessage();
         Assertions.assertTrue(actualMessage.contains(expectedMessage));
     }
@@ -57,11 +55,4 @@ class UrlValidationServiceTest {
         }
     }
 
-    @Test
-    void checkExceptionThrownWhenUrlNOK() {
-        final String expectedMessage = "Cannot download FileResource file from URL";
-        final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream("file:/___DOESNT_EXIST"));
-        final String actualMessage = exception.getMessage();
-        Assertions.assertTrue(actualMessage.contains(expectedMessage));
-    }
 }
