@@ -40,7 +40,7 @@ class UrlValidationServiceTest {
         "  ,URL cannot be null or blank",
         "file:/___DOESNT_EXIST,Cannot download FileResource file from URL"
     })
-    void checkExceptionThrownWhenUrlIsNull(String url, String expectedMessage) {
+    void checkExceptionThrown(String url, String expectedMessage) {
         final Exception exception = Assertions.assertThrows(CoreValidIntradayInvalidDataException.class, () -> urlValidationService.openUrlStream(url));
         final String actualMessage = exception.getMessage();
         Assertions.assertTrue(actualMessage.contains(expectedMessage));
