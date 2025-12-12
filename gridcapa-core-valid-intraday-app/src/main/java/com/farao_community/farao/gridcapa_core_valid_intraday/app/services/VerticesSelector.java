@@ -8,7 +8,6 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
-import com.farao_community.farao.gridcapa_core_valid_commons.vertex.FlowBasedDomainBranchData;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.apache.commons.lang3.tuple.Pair;
@@ -17,7 +16,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesUtils.getVerticesProjectedOnDomain;
 import static java.util.Comparator.comparingDouble;
 
 public class VerticesSelector {
@@ -27,47 +25,61 @@ public class VerticesSelector {
         this.coreHubs = Collections.unmodifiableList(coreHubsConfiguration.getCoreHubs());
     }
 
-    public List<Vertex> selectVerticesWithControlZone(final List<Vertex> baseVertices,
-                                                      final List<? extends FlowBasedDomainBranchData> branchesData,
-                                                      final ReferenceProgram referenceProgram,
-                                                      final Double radius,
-                                                      final int nbOfVerticesToSelect,
-                                                      final boolean fallBackOnClosest) {
+    /**
+     *
+     * @param projectedVertices    all considered vertices
+     * @param referenceProgram     contains the market positions
+     * @param radius               the n-sphere radius
+     * @param nbOfVerticesToSelect how many vertices do we want
+     * @param fallBackOnClosest    if we don't have the expected number, do we switch to closest or leave it as is
+     * @return selected vertices with n-sphere method
+     */
+    public List<Vertex> selectVerticesWithinNSphere(final List<Vertex> projectedVertices,
+                                                    final ReferenceProgram referenceProgram,
+                                                    final Double radius,
+                                                    final int nbOfVerticesToSelect,
+                                                    final boolean fallBackOnClosest) {
 
-        if (baseVertices.size() < nbOfVerticesToSelect) {
-            return baseVertices;
+        if (projectedVertices.size() < nbOfVerticesToSelect) {
+            return projectedVertices;
         }
 
-        final List<Vertex> selectedProjected = getVerticesProjectedOnDomain(baseVertices, branchesData, coreHubs)
+        final List<Vertex> selectedProjected = projectedVertices
             .stream()
-            .filter(vertex -> isInControlZone(vertex, referenceProgram, radius))
+            .filter(vertex -> isInNSphere(vertex, referenceProgram, radius))
             .toList();
 
-        if (!fallBackOnClosest || selectedProjected.size() == nbOfVerticesToSelect) {
+        if (!fallBackOnClosest) {
             return selectedProjected;
-        } else if (selectedProjected.size() > nbOfVerticesToSelect) {
-            return selectClosestVertices(selectedProjected, referenceProgram, nbOfVerticesToSelect);
         } else {
-            return selectVerticesByDistance(baseVertices, branchesData, referenceProgram, nbOfVerticesToSelect);
+            final List<Vertex> verticesToConsider = selectedProjected.size() > nbOfVerticesToSelect ?
+                selectedProjected : projectedVertices;
+            return selectClosestVertices(verticesToConsider, referenceProgram, nbOfVerticesToSelect);
         }
 
     }
 
-    public List<Vertex> selectVerticesByDistance(final List<Vertex> baseVertices,
-                                                 final List<? extends FlowBasedDomainBranchData> branchesData,
-                                                 final ReferenceProgram referenceProgram,
-                                                 final int nbOfVerticesToSelect) {
+    /**
+     * @param projectedVertices all considered vertices
+     * @param referenceProgram  contains the market positions
+     * @param n                 is how many vertices we want to select
+     * @return the nth vertices closest to the global market position
+     */
+    public List<Vertex> selectClosestVertices(final List<Vertex> projectedVertices,
+                                              final ReferenceProgram referenceProgram,
+                                              final int n) {
 
-        if (baseVertices.size() < nbOfVerticesToSelect) {
-            return baseVertices;
+        if (projectedVertices.size() < n) {
+            return projectedVertices;
         }
 
-        final List<Vertex> projectedVertices = getVerticesProjectedOnDomain(baseVertices,
-                                                                            branchesData,
-                                                                            coreHubs);
-        return selectClosestVertices(projectedVertices,
-                                     referenceProgram,
-                                     nbOfVerticesToSelect);
+        return projectedVertices.stream()
+            .map(v -> vertexAndMarketDistance(referenceProgram, v))
+            .sorted(comparingDouble(Pair::getRight))
+            .limit(n)
+            .map(Pair::getLeft)
+            .toList();
+
     }
 
     /**
@@ -76,29 +88,10 @@ public class VerticesSelector {
      * @param radius           n-dimension sphere radius, input by user
      * @return if a vertex is within an n-sphere centered on market positions
      */
-    private boolean isInControlZone(final Vertex vertex,
-                                    final ReferenceProgram referenceProgram,
-                                    final double radius) {
+    private boolean isInNSphere(final Vertex vertex,
+                                final ReferenceProgram referenceProgram,
+                                final double radius) {
         return vertexAndMarketDistance(referenceProgram, vertex).getRight() <= radius;
-    }
-
-    /**
-     * @param allVertices      all considered vertices
-     * @param referenceProgram contains the market positions
-     * @param n                is how many vertices we want to select
-     * @return the nth vertices closest to the global market position
-     */
-    private List<Vertex> selectClosestVertices(final List<Vertex> allVertices,
-                                               final ReferenceProgram referenceProgram,
-                                               final int n) {
-
-        return allVertices.stream()
-            .map(v -> vertexAndMarketDistance(referenceProgram, v))
-            .sorted(comparingDouble(Pair::getRight))
-            .limit(n)
-            .map(Pair::getLeft)
-            .toList();
-
     }
 
     /**
