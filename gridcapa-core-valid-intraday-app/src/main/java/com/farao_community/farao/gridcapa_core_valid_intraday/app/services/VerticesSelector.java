@@ -36,7 +36,7 @@ public class VerticesSelector {
      */
     public List<Vertex> selectVerticesWithinNSphere(final List<Vertex> projectedVertices,
                                                     final ReferenceProgram referenceProgram,
-                                                    final Double radius,
+                                                    final double radius,
                                                     final int nbOfVerticesToSelect,
                                                     final boolean fallBackOnClosest) {
 
@@ -49,7 +49,8 @@ public class VerticesSelector {
             .filter(vertex -> isInNSphere(vertex, referenceProgram, radius))
             .toList();
 
-        if (!fallBackOnClosest) {
+        if (!fallBackOnClosest || selectedProjected.size() == nbOfVerticesToSelect) {
+            // if we selected the right amount, or do not want to re-select using the closest method
             return selectedProjected;
         } else {
             final List<Vertex> verticesToConsider = selectedProjected.size() > nbOfVerticesToSelect ?
