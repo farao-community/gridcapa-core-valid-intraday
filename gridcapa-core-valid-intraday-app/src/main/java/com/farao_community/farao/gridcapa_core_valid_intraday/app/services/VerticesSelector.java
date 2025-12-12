@@ -27,35 +27,34 @@ public class VerticesSelector {
 
     /**
      *
-     * @param projectedVertices    all considered vertices
-     * @param referenceProgram     contains the market positions
-     * @param radius               the n-sphere radius
-     * @param nbOfVerticesToSelect how many vertices do we want
-     * @param fallBackOnClosest    if we don't have the expected number, do we switch to closest or leave it as is
+     * @param projectedVertices all considered vertices
+     * @param referenceProgram  contains the market positions
+     * @param radius            the n-sphere radius
+     * @param nbVertices        how many vertices do we want
+     * @param fallBackOnClosest if we don't have the expected number, do we switch to closest or leave it as is
      * @return selected vertices with n-sphere method
      */
     public List<Vertex> selectVerticesWithinNSphere(final List<Vertex> projectedVertices,
                                                     final ReferenceProgram referenceProgram,
                                                     final double radius,
-                                                    final int nbOfVerticesToSelect,
+                                                    final int nbVertices,
                                                     final boolean fallBackOnClosest) {
 
-        if (projectedVertices.size() < nbOfVerticesToSelect) {
+        if (projectedVertices.size() <= nbVertices) {
             return projectedVertices;
         }
 
-        final List<Vertex> selectedProjected = projectedVertices
+        final List<Vertex> selected = projectedVertices
             .stream()
             .filter(vertex -> isInNSphere(vertex, referenceProgram, radius))
             .toList();
 
-        if (!fallBackOnClosest || selectedProjected.size() == nbOfVerticesToSelect) {
+        if (!fallBackOnClosest || selected.size() == nbVertices) {
             // if we selected the right amount, or do not want to re-select using the closest method
-            return selectedProjected;
+            return selected;
         } else {
-            final List<Vertex> verticesToConsider = selectedProjected.size() > nbOfVerticesToSelect ?
-                selectedProjected : projectedVertices;
-            return selectClosestVertices(verticesToConsider, referenceProgram, nbOfVerticesToSelect);
+            final List<Vertex> verticesToConsider = selected.size() > nbVertices ? selected : projectedVertices;
+            return selectClosestVertices(verticesToConsider, referenceProgram, nbVertices);
         }
 
     }
@@ -70,7 +69,7 @@ public class VerticesSelector {
                                               final ReferenceProgram referenceProgram,
                                               final int n) {
 
-        if (projectedVertices.size() < n) {
+        if (projectedVertices.size() <= n) {
             return projectedVertices;
         }
 
