@@ -11,12 +11,13 @@ import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsCo
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceExchangeData;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class VerticesSelectorTest {
     private final VerticesSelector selector = new VerticesSelector(new TestCoreHubConf());
@@ -24,66 +25,35 @@ class VerticesSelectorTest {
     @Test
     void shouldSelectWithNSphere() {
 
-        final List<Vertex> selectedVertices2for3 = selector.selectVerticesWithinNSphere(getTestVertices(),
-                                                                                        getTestRefProg(),
-                                                                                        10.0,
-                                                                                        3,
-                                                                                        false);
+        final List<Vertex> twoVertices = selector.selectVerticesWithinNSphere(getTestVertices(),
+                                                                              getTestRefProg(),
+                                                                              10.0,
+                                                                              3);
 
-        final List<Vertex> selectedVertices2to3for3 = selector.selectVerticesWithinNSphere(getTestVertices(),
-                                                                                           getTestRefProg(),
-                                                                                           10.0,
-                                                                                           3,
-                                                                                           true);
+        final List<Vertex> fourVertices = selector.selectVerticesWithinNSphere(getTestVertices(),
+                                                                               getTestRefProg(),
+                                                                               1000.0,
+                                                                               3);
 
-        final List<Vertex> selectedVertices4for3 = selector.selectVerticesWithinNSphere(getTestVertices(),
-                                                                                        getTestRefProg(),
-                                                                                        1000.0,
-                                                                                        3,
-                                                                                        false);
+        assertThat(getIds(twoVertices)).containsExactlyInAnyOrder(1, 5);
 
-        final List<Vertex> selectedVertices4to3for3 = selector.selectVerticesWithinNSphere(getTestVertices(),
-                                                                                           getTestRefProg(),
-                                                                                           1000.0,
-                                                                                           3,
-                                                                                           true);
-
-        Assertions.assertThat(selectedVertices2for3.stream()
-                                  .map(Vertex::vertexId)
-                                  .toList())
-            .containsExactlyInAnyOrder(1, 5);
-
-        Assertions.assertThat(selectedVertices2to3for3.stream()
-                                  .map(Vertex::vertexId)
-                                  .toList())
-            .containsExactlyInAnyOrder(1, 4, 5);
-
-        Assertions.assertThat(selectedVertices4for3.stream()
-                                  .map(Vertex::vertexId)
-                                  .toList())
-            .containsExactlyInAnyOrder(1, 3, 4, 5);
-
-        Assertions.assertThat(selectedVertices4to3for3.stream()
-                                  .map(Vertex::vertexId)
-                                  .toList())
-            .containsExactlyInAnyOrder(1, 4, 5);
+        assertThat(getIds(fourVertices)).containsExactlyInAnyOrder(1, 4, 5);
     }
 
     @Test
     void shouldSelectClosest() {
-        final List<Vertex> selectedVertices = selector.selectClosestVertices(getTestVertices(),
-                                                                             getTestRefProg(),
-                                                                             2);
+        final List<Vertex> selectedVertices = selector.selectClosestVertices(getTestVertices(), getTestRefProg(), 2);
 
-        Assertions.assertThat(selectedVertices.stream()
-                                  .map(Vertex::vertexId)
-                                  .toList())
-            .containsExactlyInAnyOrder(1, 5);
+        assertThat(getIds(selectedVertices)).containsExactlyInAnyOrder(1, 5);
     }
 
     private ReferenceProgram getTestRefProg() {
         // net positions : AA = -300 , BB = 600, CC = -300
         return new TestRefProg();
+    }
+
+    private static List<Integer> getIds(final List<Vertex> vertices) {
+        return vertices.stream().map(Vertex::vertexId).toList();
     }
 
     private static class TestRefProg extends ReferenceProgram {

@@ -31,30 +31,29 @@ public class VerticesSelector {
      * @param referenceProgram  contains the market positions
      * @param radius            the n-sphere radius
      * @param nbVertices        how many vertices do we want
-     * @param fallBackOnClosest if we don't have the expected number, do we switch to closest or leave it as is
      * @return selected vertices with n-sphere method
      */
     public List<Vertex> selectVerticesWithinNSphere(final List<Vertex> projectedVertices,
                                                     final ReferenceProgram referenceProgram,
                                                     final double radius,
-                                                    final int nbVertices,
-                                                    final boolean fallBackOnClosest) {
+                                                    final int nbVertices) {
 
         if (projectedVertices.size() <= nbVertices) {
             return projectedVertices;
         }
 
-        final List<Vertex> selected = projectedVertices
+        final List<Vertex> verticesInSphere = projectedVertices
             .stream()
             .filter(vertex -> isInNSphere(vertex, referenceProgram, radius))
             .toList();
 
-        if (!fallBackOnClosest || selected.size() == nbVertices) {
-            // if we selected the right amount, or do not want to re-select using the closest method
-            return selected;
+        if (verticesInSphere.isEmpty()) {
+            return selectClosestVertices(projectedVertices, referenceProgram, nbVertices);
+        } else if (verticesInSphere.size() <= nbVertices) {
+            return verticesInSphere;
         } else {
-            final List<Vertex> verticesToConsider = selected.size() > nbVertices ? selected : projectedVertices;
-            return selectClosestVertices(verticesToConsider, referenceProgram, nbVertices);
+            // too many vertices, we filter again
+            return selectClosestVertices(verticesInSphere, referenceProgram, nbVertices);
         }
 
     }
