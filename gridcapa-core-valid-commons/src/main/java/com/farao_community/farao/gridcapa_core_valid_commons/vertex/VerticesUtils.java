@@ -63,10 +63,12 @@ public final class VerticesUtils {
             boolean shouldProject = false;
             for (final FlowBasedDomainBranchData branch : branchesData) {
                 final BigDecimal f0Core = f0Core(vertex, branch, flowBasedToVertexCodeMap);
-                final BigDecimal delta = delta(branch, f0Core);
-                if (delta != null && delta.compareTo(deltaMin) < 0) {
-                    shouldProject = true;
-                    deltaMin = delta;
+                if (shouldComputeDelta(branch, f0Core)) {
+                    final BigDecimal delta = delta(branch, f0Core);
+                    if (delta != null && delta.compareTo(deltaMin) < 0) {
+                        shouldProject = true;
+                        deltaMin = delta;
+                    }
                 }
             }
 
@@ -78,6 +80,11 @@ public final class VerticesUtils {
         }
 
         return newVertices;
+    }
+
+    private static boolean shouldComputeDelta(final FlowBasedDomainBranchData branch,
+                                              final BigDecimal f0Core) {
+        return BigDecimal.valueOf(branch.getRam0Core() + branch.getAmr()).subtract(f0Core).compareTo(ZERO) <= 0;
     }
 
     private static Vertex projectedVertex(final Vertex vertex,
