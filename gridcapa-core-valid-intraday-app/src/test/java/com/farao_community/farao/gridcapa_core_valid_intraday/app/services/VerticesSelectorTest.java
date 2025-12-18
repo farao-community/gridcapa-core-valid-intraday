@@ -30,14 +30,14 @@ class VerticesSelectorTest {
                                                                               10.0,
                                                                               3);
 
-        final List<Vertex> fourVertices = selector.selectVerticesWithinNSphere(getTestVertices(),
-                                                                               getTestRefProg(),
-                                                                               1000.0,
-                                                                               3);
+        final List<Vertex> fourVerticesReducedToThree = selector.selectVerticesWithinNSphere(getTestVertices(),
+                                                                                             getTestRefProg(),
+                                                                                             1000.0,
+                                                                                             3);
 
         assertThat(getIds(twoVertices)).containsExactlyInAnyOrder(1, 5);
 
-        assertThat(getIds(fourVertices)).containsExactlyInAnyOrder(1, 4, 5);
+        assertThat(getIds(fourVerticesReducedToThree)).containsExactlyInAnyOrder(1, 4, 5);
     }
 
     @Test
