@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
-import static java.math.RoundingMode.FLOOR;
+import static java.math.RoundingMode.UP;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
 
@@ -63,10 +63,12 @@ public final class VerticesUtils {
             boolean shouldProject = false;
             for (final FlowBasedDomainBranchData branch : branchesData) {
                 final BigDecimal f0Core = f0Core(vertex, branch, flowBasedToVertexCodeMap);
-                final BigDecimal delta = delta(branch, f0Core);
-                if (delta != null && delta.compareTo(deltaMin) < 0) {
-                    shouldProject = true;
-                    deltaMin = delta;
+                if (shouldComputeDelta(branch, f0Core)) {
+                    final BigDecimal delta = delta(branch, f0Core);
+                    if (delta != null && delta.compareTo(deltaMin) < 0) {
+                        shouldProject = true;
+                        deltaMin = delta;
+                    }
                 }
             }
 
@@ -78,6 +80,11 @@ public final class VerticesUtils {
         }
 
         return newVertices;
+    }
+
+    private static boolean shouldComputeDelta(final FlowBasedDomainBranchData branch,
+                                              final BigDecimal f0Core) {
+        return BigDecimal.valueOf(branch.getRam0Core()).add(BigDecimal.valueOf(branch.getAmr())).subtract(f0Core).compareTo(ZERO) <= 0;
     }
 
     private static Vertex projectedVertex(final Vertex vertex,
@@ -132,19 +139,19 @@ public final class VerticesUtils {
 
     private static int toProjectedPosition(final Integer netPosition,
                                            final BigDecimal delta) {
-        return BigDecimal.valueOf(netPosition).multiply(delta).intValue();
+        return BigDecimal.valueOf(netPosition).multiply(delta).setScale(0, UP).intValue();
     }
 
     private static BigDecimal delta(final FlowBasedDomainBranchData branchData,
                                     final BigDecimal f0Core) {
 
-        if (ZERO.equals(f0Core)) {
+        if (ZERO.compareTo(f0Core) == 0) {
             return null;
         }
 
         return BigDecimal.valueOf(branchData.getAmr())
                 .add(BigDecimal.valueOf(branchData.getRam0Core()))
-                .divide(f0Core, DELTA_SCALE, FLOOR);
+                .divide(f0Core, DELTA_SCALE, UP);
     }
 
     private static BigDecimal f0Core(final Vertex vertex,
