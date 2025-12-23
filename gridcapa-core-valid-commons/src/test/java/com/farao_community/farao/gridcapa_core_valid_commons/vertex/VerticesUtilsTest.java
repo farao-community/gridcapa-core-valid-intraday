@@ -19,13 +19,15 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
+import static java.math.RoundingMode.UP;
+
 class VerticesUtilsTest {
 
     private final List<CoreHub> coreHubs = getTestCoreHubs();
 
     @Test
     void importVertices() throws IOException {
-        try (final InputStream inputStream = getClass().getResource("vertices.csv").openStream();) {
+        try (final InputStream inputStream = getClass().getResource("vertices.csv").openStream()) {
             final List<Vertex> vertices = VerticesUtils.importVertices(inputStream, coreHubs);
             Assertions.assertThat(vertices)
                     .isNotNull()
@@ -59,7 +61,7 @@ class VerticesUtilsTest {
 
     @Test
     void importVerticesWithException() throws IOException {
-        try (final InputStream inputStream = Mockito.mock(InputStream.class);) {
+        try (final InputStream inputStream = Mockito.mock(InputStream.class)) {
             Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
                     .isThrownBy(() -> VerticesUtils.importVertices(inputStream, coreHubs))
                     .withMessage("Exception occurred while parsing vertices file");
@@ -68,7 +70,7 @@ class VerticesUtilsTest {
 
     @Test
     void importEmptyNonHvdcVerticesWithException() throws IOException {
-        try (final InputStream inputStream = getClass().getResource("bad-vertices.csv").openStream();) {
+        try (final InputStream inputStream = getClass().getResource("bad-vertices.csv").openStream()) {
             Assertions.assertThatExceptionOfType(CoreValidCommonsInvalidDataException.class)
                     .isThrownBy(() -> VerticesUtils.importVertices(inputStream, coreHubs))
                     .withMessage("Exception occurred while parsing vertices file");
@@ -90,7 +92,7 @@ class VerticesUtilsTest {
                 .forEach((countryCode, baseValue) ->
                                  Assertions.assertThat(projected.getFirst().coordinates())
                                          .containsEntry(countryCode, BigDecimal.valueOf(2.0 / 3.0)
-                                                 .multiply(BigDecimal.valueOf(baseValue)).intValue()));
+                                                 .multiply(BigDecimal.valueOf(baseValue)).setScale(0, UP).intValue()));
 
         //fcore v2 = 0.1*1000+0.2*-1000+0.3*500 = 50
         //      => delta = 3 or 2 => no change

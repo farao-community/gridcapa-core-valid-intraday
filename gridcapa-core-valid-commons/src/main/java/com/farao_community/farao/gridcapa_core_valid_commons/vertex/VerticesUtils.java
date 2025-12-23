@@ -26,7 +26,7 @@ import java.util.function.Predicate;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
-import static java.math.RoundingMode.FLOOR;
+import static java.math.RoundingMode.UP;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
 
@@ -139,19 +139,19 @@ public final class VerticesUtils {
 
     private static int toProjectedPosition(final Integer netPosition,
                                            final BigDecimal delta) {
-        return BigDecimal.valueOf(netPosition).multiply(delta).intValue();
+        return BigDecimal.valueOf(netPosition).multiply(delta).setScale(0, UP).intValue();
     }
 
     private static BigDecimal delta(final FlowBasedDomainBranchData branchData,
                                     final BigDecimal f0Core) {
 
-        if (ZERO.equals(f0Core)) {
+        if (ZERO.compareTo(f0Core) == 0) {
             return null;
         }
 
         return BigDecimal.valueOf(branchData.getAmr())
                 .add(BigDecimal.valueOf(branchData.getRam0Core()))
-                .divide(f0Core, DELTA_SCALE, FLOOR);
+                .divide(f0Core, DELTA_SCALE, UP);
     }
 
     private static BigDecimal f0Core(final Vertex vertex,
