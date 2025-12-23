@@ -84,7 +84,7 @@ public final class VerticesUtils {
 
     private static boolean shouldComputeDelta(final FlowBasedDomainBranchData branch,
                                               final BigDecimal f0Core) {
-        return BigDecimal.valueOf(branch.getRam0Core() + branch.getAmr()).subtract(f0Core).compareTo(ZERO) <= 0;
+        return BigDecimal.valueOf(branch.getRam0Core()).add(BigDecimal.valueOf(branch.getAmr())).subtract(f0Core).compareTo(ZERO) <= 0;
     }
 
     private static Vertex projectedVertex(final Vertex vertex,
