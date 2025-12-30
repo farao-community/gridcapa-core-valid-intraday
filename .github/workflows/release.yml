@@ -98,9 +98,9 @@ jobs:
         uses: devmasx/merge-branch@master
         with:
           type: now
-          from_branch: next-release-v${{ env.RELEASE_VERSION }}
+          from_branch: next-release-v${{ env.NEXT_VERSION }}
           target_branch: ${{ github.ref_name }}
-          message: Automatic merge after release ${{ env.NEXT_VERSION }}
+          message: Automatic merge after release ${{ env.RELEASE_VERSION }}
           github_token: ${{ secrets.REPO_ACCESS_TOKEN }}
         env:
           RELEASE_VERSION: ${{ github.event.inputs.releaseVersion }}
