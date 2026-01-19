@@ -71,7 +71,6 @@ public class IvaVolumesManager {
         return BigDecimal.TEN;
     }
 
-
     private static List<CriticalBranchType> getCriticalBranchesFromInterval(final IntervalType interval) {
         final List<CriticalBranchType> result = new ArrayList<>();
 
@@ -86,7 +85,6 @@ public class IvaVolumesManager {
                     .forEach(result::add);
             }
         }
-
         return result;
     }
 

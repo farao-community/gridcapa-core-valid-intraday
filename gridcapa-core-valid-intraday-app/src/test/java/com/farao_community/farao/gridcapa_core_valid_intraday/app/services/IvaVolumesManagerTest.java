@@ -41,7 +41,6 @@ class IvaVolumesManagerTest {
         ), flowBasedDomainDocument);
         assertThat(mgr.computeIvaVolumes(100)).isNotEmpty();
         assertThat(mgr.computeIvaVolumes(100)).containsValue(ZERO);
-
         // add test call to mock RAO when service exists
     }
 
@@ -58,13 +57,11 @@ class IvaVolumesManagerTest {
         ), flowBasedDomainDocument);
         assertThat(mgr.computeIvaVolumes(100)).isNotEmpty();
         assertThat(mgr.computeIvaVolumes(100)).doesNotContainValue(ZERO);
-
         // add test call to mock RAO when service exists
     }
 
     private Vertex getTestVertex(final int frValue) {
         return new Vertex(1, Map.of("FR", frValue, "BE", -1000, "AT", 500));
     }
-
 
 }
