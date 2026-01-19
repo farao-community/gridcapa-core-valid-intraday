@@ -118,12 +118,9 @@ public class IvaVolumesManager {
         final BigDecimal ramRefProg = BigDecimal.valueOf(criticalBranch.getFMax()
                                                          - criticalBranch.getFRef()
                                                          - criticalBranch.getFrmMw());
-        
-        final BigDecimal frenchPosVertex = BigDecimal.valueOf(
-            Optional.ofNullable(
-                vertex.coordinates().get(FRENCH)
-            ).orElseThrow()
-        );
+
+        final BigDecimal frenchPosVertex = BigDecimal.valueOf(Optional.ofNullable(vertex.coordinates().get(FRENCH))
+                                                                  .orElseThrow());
 
         return ramRefProg.subtract(getFlowGap(criticalBranch, frenchPosVertex));
     }
