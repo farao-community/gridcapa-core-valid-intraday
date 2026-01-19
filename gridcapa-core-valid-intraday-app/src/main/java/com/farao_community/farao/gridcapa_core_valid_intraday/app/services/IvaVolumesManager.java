@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.math.BigDecimal.ZERO;
 
@@ -101,7 +102,7 @@ public class IvaVolumesManager {
      */
     private BigDecimal getFlowGap(final CriticalBranchType criticalBranch,
                                   final BigDecimal vertexNP) {
-        return ptdfsZsByBranch.get(criticalBranch.getId())
+        return ptdfsZsByBranch.getOrDefault(criticalBranch.getId(), ZERO)
             .multiply(vertexNP.subtract(frenchMarketGlobalNetPosition));
     }
 
@@ -117,7 +118,13 @@ public class IvaVolumesManager {
         final BigDecimal ramRefProg = BigDecimal.valueOf(criticalBranch.getFMax()
                                                          - criticalBranch.getFRef()
                                                          - criticalBranch.getFrmMw());
-        final BigDecimal frenchPosVertex = BigDecimal.valueOf(vertex.coordinates().get(FRENCH));
+        
+        final BigDecimal frenchPosVertex = BigDecimal.valueOf(
+            Optional.ofNullable(
+                vertex.coordinates().get(FRENCH)
+            ).orElseThrow()
+        );
+
         return ramRefProg.subtract(getFlowGap(criticalBranch, frenchPosVertex));
     }
 
