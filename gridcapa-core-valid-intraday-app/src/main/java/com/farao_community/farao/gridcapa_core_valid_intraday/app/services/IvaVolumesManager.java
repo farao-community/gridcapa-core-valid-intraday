@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
@@ -20,8 +26,8 @@ import java.util.Optional;
 import static java.math.BigDecimal.ZERO;
 
 public class IvaVolumesManager {
-    private static final String FRENCH = "FR";
-    private static final String RTE_CODE = "10YFR-RTE------C";
+    private static final String FR = "FR";
+    private static final String FRENCH_TSO_EIC = "10YFR-RTE------C";
     private static final double FRM_MARGIN_PERCENTAGE = 0.05;
 
     private final List<Vertex> vertices;
@@ -35,7 +41,7 @@ public class IvaVolumesManager {
                              final FlowBasedDomainDocument fbDomainDoc) {
         this.vertices = vertices;
         // global = in regard to the whole zone, france excluded
-        this.frenchMarketGlobalNetPosition = BigDecimal.valueOf(refProg.getGlobalNetPosition(RTE_CODE));
+        this.frenchMarketGlobalNetPosition = BigDecimal.valueOf(refProg.getGlobalNetPosition(FRENCH_TSO_EIC));
         this.ptdfsZsByBranch = ptdfsZsByBranch;
         this.criticalBranches = new ArrayList<>();
 
@@ -90,7 +96,7 @@ public class IvaVolumesManager {
     }
 
     private static boolean isFrenchOrigin(final CriticalBranchType criticalBranch) {
-        return FRENCH.equals(criticalBranch.getTsoOrigin());
+        return FR.equals(criticalBranch.getTsoOrigin());
     }
 
     /**
@@ -119,7 +125,7 @@ public class IvaVolumesManager {
                                                          - criticalBranch.getFRef()
                                                          - criticalBranch.getFrmMw());
 
-        final BigDecimal frenchPosVertex = BigDecimal.valueOf(Optional.ofNullable(vertex.coordinates().get(FRENCH))
+        final BigDecimal frenchPosVertex = BigDecimal.valueOf(Optional.ofNullable(vertex.coordinates().get(FR))
                                                                   .orElseThrow());
 
         return ramRefProg.subtract(getFlowGap(criticalBranch, frenchPosVertex));
