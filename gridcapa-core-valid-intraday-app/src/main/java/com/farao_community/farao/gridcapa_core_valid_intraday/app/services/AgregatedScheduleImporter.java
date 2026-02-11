@@ -94,7 +94,7 @@ public final class AgregatedScheduleImporter {
                 .filter(p -> {
                     OffsetDateTime pointDateTime =
                             periodStart.plusMinutes(
-                                    15 * (p.getPosition() - 1)
+                                    15L * (p.getPosition() - 1)
                             );
                     return !pointDateTime.isBefore(hourStart) && pointDateTime.isBefore(hourEnd);
                 })
