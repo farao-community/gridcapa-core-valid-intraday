@@ -28,7 +28,6 @@ import java.util.stream.Stream;
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 public final class AggregatedScheduleImporter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AggregatedScheduleImporter.class);
 
     private AggregatedScheduleImporter() {
         // Utility class
