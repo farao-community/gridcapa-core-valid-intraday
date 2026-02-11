@@ -13,14 +13,17 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.Core
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.AbstractMap;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.List;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
