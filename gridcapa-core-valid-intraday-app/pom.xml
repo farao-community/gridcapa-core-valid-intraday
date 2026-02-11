@@ -73,6 +73,19 @@
                             <forceRegenerate>true</forceRegenerate>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>agregated_schedule</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>src/main/resources/xsd/agregated_schedule</schemaDirectory>
+                            <bindingDirectory>src/main/resources/xsd/agregated_schedule</bindingDirectory>
+                            <generateDirectory>${project.build.directory}/generated-sources/xjc-agregated_schedule</generateDirectory>
+                            <forceRegenerate>true</forceRegenerate>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
