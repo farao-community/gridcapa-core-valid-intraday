@@ -80,7 +80,7 @@ public class FileImporter {
     }
 
     public Map<String, BigDecimal> importAgregatedScheduleFile(final CoreValidIntradayFileResource agregatedScheduleFile, final OffsetDateTime targetProcessDateTime) {
-        return importFile(agregatedScheduleFile, is -> AgregatedScheduleImporter.importAndExtractHourlyPn(is, targetProcessDateTime));
+        return importFile(agregatedScheduleFile, is -> AgregatedScheduleImporter.importAndExtractHourlyNetPositions(is, targetProcessDateTime));
     }
 
     public <T> T importFile(final CoreValidIntradayFileResource file,

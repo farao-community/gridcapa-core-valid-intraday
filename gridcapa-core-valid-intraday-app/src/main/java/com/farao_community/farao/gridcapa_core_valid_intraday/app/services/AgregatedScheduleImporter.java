@@ -34,9 +34,9 @@ public final class AgregatedScheduleImporter {
         // Utility class
     }
 
-    public static Map<String, BigDecimal> importAndExtractHourlyPn(final InputStream inputStream, final OffsetDateTime targetProcessDateTime) {
-        ScheduleMarketDocument schedule = importAgregatedSchedule(inputStream);
-        return extractHourlyPnFromScheduleDocument(schedule, targetProcessDateTime);
+    public static Map<String, BigDecimal> importAndExtractHourlyNetPositions(final InputStream inputStream, final OffsetDateTime targetProcessDateTime) {
+        final ScheduleMarketDocument schedule = importAgregatedSchedule(inputStream);
+        return extractHourlyNetPositionsFromScheduleDocument(schedule, targetProcessDateTime);
     }
 
     private static ScheduleMarketDocument importAgregatedSchedule(final InputStream inputStream) {
@@ -55,57 +55,55 @@ public final class AgregatedScheduleImporter {
         }
     }
 
-    private static Map<String, BigDecimal> extractHourlyPnFromScheduleDocument(final ScheduleMarketDocument schedule, final OffsetDateTime targetProcessDateTime) {
+    private static Map<String, BigDecimal> extractHourlyNetPositionsFromScheduleDocument(final ScheduleMarketDocument schedule, final OffsetDateTime targetProcessDateTime) {
         if (schedule == null || schedule.getTimeSeries() == null) {
-            LOGGER.warn("Schedule or TimeSeries is null.");
-            return Collections.emptyMap();
+            throw new CoreValidIntradayInvalidDataException("Schedule or TimeSeries is null.");
         }
 
         return schedule.getTimeSeries().stream()
                 .filter(Objects::nonNull)
                 .flatMap(ts -> {
-                    try {
-                        List<Point> hourlyPoints = findPointsForTargetHour(ts, targetProcessDateTime);
-                        BigDecimal constrainedPn = computeConstrainedPnFromPoints(hourlyPoints);
-                        return Stream.of(new AbstractMap.SimpleEntry<>(ts.getMRID(), constrainedPn));
-                    } catch (final Exception e) {
-                        LOGGER.error("Skipping TimeSeries {} due to exception: {}", ts.getMRID(), e.getMessage(), e);
-                        return Stream.empty();
-                    }
-                })
+                            final List<Point> hourlyPoints = findPointsForTargetHour(ts, targetProcessDateTime);
+                            final BigDecimal netPosition = computeMaxAbsoluteNetPositionFromPoints(hourlyPoints);
+                            return Stream.of(new AbstractMap.SimpleEntry<>(ts.getMRID(), netPosition));
+                        }
+                )
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     private static List<Point> findPointsForTargetHour(final TimeSeries ts, final OffsetDateTime targetProcessDateTime) {
-
-        OffsetDateTime periodStart = OffsetDateTime.parse(
+        if (ts.getPeriod() == null || ts.getPeriod().isEmpty()) {
+            throw new CoreValidIntradayInvalidDataException("Time series contains no periods.");
+        }
+        final OffsetDateTime periodStart = OffsetDateTime.parse(
                 ts.getPeriod().getFirst().getTimeInterval()
                         .getStart()
         );
-
-        OffsetDateTime hourStart = targetProcessDateTime
+        final OffsetDateTime hourStart = targetProcessDateTime
                 .withMinute(0)
                 .withSecond(0)
                 .withNano(0);
-
-        OffsetDateTime hourEnd = hourStart.plusHours(1);
-
-        return ts.getPeriod().getFirst().getPoint().stream()
-                .filter(p -> {
-                    OffsetDateTime pointDateTime =
-                            periodStart.plusMinutes(
-                                    15L * (p.getPosition() - 1)
-                            );
-                    return !pointDateTime.isBefore(hourStart) && pointDateTime.isBefore(hourEnd);
-                })
+        final OffsetDateTime hourEnd = hourStart.plusHours(1);
+        return ts.getPeriod().getFirst().getPoint() == null
+                ? List.of()
+                : ts.getPeriod().getFirst().getPoint().stream()
+                .filter(p -> isPointWithinHour(periodStart, hourStart, hourEnd, p))
                 .toList();
     }
 
-    private static BigDecimal computeConstrainedPnFromPoints(final List<Point> points) {
+    private static boolean isPointWithinHour(final OffsetDateTime periodStart, final OffsetDateTime hourStart, final OffsetDateTime hourEnd, final Point p) {
+        final OffsetDateTime pointDateTime =
+                periodStart.plusMinutes(
+                        15L * (p.getPosition() - 1)
+                );
+        return !pointDateTime.isBefore(hourStart) && pointDateTime.isBefore(hourEnd);
+    }
 
-        if (points == null || points.size() != 4) {
+    private static BigDecimal computeMaxAbsoluteNetPositionFromPoints(final List<Point> points) {
+        final int size = points == null ? 0 : points.size();
+        if (size != 4) {
             throw new CoreValidIntradayInvalidDataException(
-                    "Invalid hourly period: expected 4 points but found " + points.size()
+                    "Invalid hourly period: expected 4 points (15-minute intervals) but found " + size
             );
         }
 
