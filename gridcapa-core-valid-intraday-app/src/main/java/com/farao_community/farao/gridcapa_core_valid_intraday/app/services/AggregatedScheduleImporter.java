@@ -27,19 +27,19 @@ import java.util.stream.Stream;
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
-public final class AgregatedScheduleImporter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AgregatedScheduleImporter.class);
+public final class AggregatedScheduleImporter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AggregatedScheduleImporter.class);
 
-    private AgregatedScheduleImporter() {
+    private AggregatedScheduleImporter() {
         // Utility class
     }
 
     public static Map<String, BigDecimal> importAndExtractHourlyNetPositions(final InputStream inputStream, final OffsetDateTime targetProcessDateTime) {
-        final ScheduleMarketDocument schedule = importAgregatedSchedule(inputStream);
+        final ScheduleMarketDocument schedule = importAggregatedSchedule(inputStream);
         return extractHourlyNetPositionsFromScheduleDocument(schedule, targetProcessDateTime);
     }
 
-    private static ScheduleMarketDocument importAgregatedSchedule(final InputStream inputStream) {
+    private static ScheduleMarketDocument importAggregatedSchedule(final InputStream inputStream) {
         try {
             final JAXBContext context = JAXBContext.newInstance(ScheduleMarketDocument.class);
             final Unmarshaller unmarshaller = context.createUnmarshaller();

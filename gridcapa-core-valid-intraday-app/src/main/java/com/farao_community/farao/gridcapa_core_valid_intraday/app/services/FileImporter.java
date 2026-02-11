@@ -79,8 +79,8 @@ public class FileImporter {
         return importFile(mergedCnecFile, is -> (FbConstraintCreationContext) new FbConstraintImporter().importData(is, cracCreationParameters, network));
     }
 
-    public Map<String, BigDecimal> importAgregatedScheduleFile(final CoreValidIntradayFileResource agregatedScheduleFile, final OffsetDateTime targetProcessDateTime) {
-        return importFile(agregatedScheduleFile, is -> AgregatedScheduleImporter.importAndExtractHourlyNetPositions(is, targetProcessDateTime));
+    public Map<String, BigDecimal> importAggregatedScheduleFile(final CoreValidIntradayFileResource aggregatedScheduleFile, final OffsetDateTime targetProcessDateTime) {
+        return importFile(aggregatedScheduleFile, is -> AggregatedScheduleImporter.importAndExtractHourlyNetPositions(is, targetProcessDateTime));
     }
 
     public <T> T importFile(final CoreValidIntradayFileResource file,

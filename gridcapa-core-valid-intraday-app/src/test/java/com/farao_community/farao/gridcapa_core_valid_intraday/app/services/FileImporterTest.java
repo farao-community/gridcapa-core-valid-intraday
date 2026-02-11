@@ -144,10 +144,10 @@ class FileImporterTest {
     }
 
     @Test
-    void importAgregatedScheduleFileTest() {
-        final CoreValidIntradayFileResource agregatedScheduleFile = createFileResource("agregatedSchedule", getClass().getResource("/DA_agregated_schedule_20251014_003.xml"));
-        final Map<String, BigDecimal> constrainedHourlyPnByMrid = fileImporter.importAgregatedScheduleFile(agregatedScheduleFile, OffsetDateTime.parse("2025-10-13T22:30Z"));
-        final Map<String, BigDecimal> constrainedHourlyPnByMrid2 = fileImporter.importAgregatedScheduleFile(agregatedScheduleFile, OffsetDateTime.parse("2025-10-13T23:30Z"));
+    void importAggregatedScheduleFileTest() {
+        final CoreValidIntradayFileResource aggregatedScheduleFile = createFileResource("aggregatedSchedule", getClass().getResource("/DA_agregated_schedule_20251014_003.xml"));
+        final Map<String, BigDecimal> constrainedHourlyPnByMrid = fileImporter.importAggregatedScheduleFile(aggregatedScheduleFile, OffsetDateTime.parse("2025-10-13T22:30Z"));
+        final Map<String, BigDecimal> constrainedHourlyPnByMrid2 = fileImporter.importAggregatedScheduleFile(aggregatedScheduleFile, OffsetDateTime.parse("2025-10-13T23:30Z"));
         assertNotNull(constrainedHourlyPnByMrid);
         assertNotNull(constrainedHourlyPnByMrid2);
         assertEquals(new BigDecimal("15.500"), constrainedHourlyPnByMrid.get("DE_RTE_20251014"));
