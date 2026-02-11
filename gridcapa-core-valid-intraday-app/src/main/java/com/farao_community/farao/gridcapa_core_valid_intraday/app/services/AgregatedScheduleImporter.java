@@ -103,7 +103,7 @@ public final class AgregatedScheduleImporter {
 
     private static BigDecimal computeConstrainedPnFromPoints(final List<Point> points) {
 
-        if (points == null && points.size() != 4) {
+        if (points == null || points.size() != 4) {
             throw new CoreValidIntradayInvalidDataException(
                     "Invalid hourly period: expected 4 points but found " + points.size()
             );
