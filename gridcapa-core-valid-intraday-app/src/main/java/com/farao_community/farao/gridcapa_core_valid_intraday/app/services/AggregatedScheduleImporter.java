@@ -12,6 +12,7 @@ import _351.iec62325.tc57wg16._451_2.scheduledocument._5._1.TimeSeries;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 
 import javax.xml.transform.stream.StreamSource;
@@ -32,6 +33,8 @@ import java.util.stream.Stream;
  */
 public final class AggregatedScheduleImporter {
 
+    private static final JAXBContext JAXB_CONTEXT = initJaxbContext();
+
     private AggregatedScheduleImporter() {
         // Utility class
     }
@@ -43,8 +46,7 @@ public final class AggregatedScheduleImporter {
 
     private static ScheduleMarketDocument importAggregatedSchedule(final InputStream inputStream) {
         try {
-            final JAXBContext context = JAXBContext.newInstance(ScheduleMarketDocument.class);
-            final Unmarshaller unmarshaller = context.createUnmarshaller();
+            final Unmarshaller unmarshaller = JAXB_CONTEXT.createUnmarshaller();
             final JAXBElement<ScheduleMarketDocument> root =
                     unmarshaller.unmarshal(
                             new StreamSource(inputStream),
@@ -111,7 +113,16 @@ public final class AggregatedScheduleImporter {
 
         return points.stream()
                 .map(Point::getQuantity)
+                .filter(Objects::nonNull)
                 .max(Comparator.comparing(BigDecimal::abs))
-                .orElseThrow();
+                .orElseThrow(() -> new CoreValidIntradayInvalidDataException("No valid quantities found."));
+    }
+
+    private static JAXBContext initJaxbContext() {
+        try {
+            return JAXBContext.newInstance(ScheduleMarketDocument.class);
+        } catch (JAXBException e) {
+            throw new ExceptionInInitializerError(e);
+        }
     }
 }
