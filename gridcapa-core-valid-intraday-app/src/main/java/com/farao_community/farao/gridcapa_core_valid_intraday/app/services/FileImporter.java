@@ -26,12 +26,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -75,6 +77,10 @@ public class FileImporter {
         cracCreationParameters.addExtension(FbConstraintCracCreationParameters.class, new FbConstraintCracCreationParameters());
         cracCreationParameters.getExtension(FbConstraintCracCreationParameters.class).setTimestamp(targetProcessDateTime);
         return importFile(mergedCnecFile, is -> (FbConstraintCreationContext) new FbConstraintImporter().importData(is, cracCreationParameters, network));
+    }
+
+    public Map<String, BigDecimal> importAggregatedScheduleFile(final CoreValidIntradayFileResource aggregatedScheduleFile, final OffsetDateTime targetProcessDateTime) {
+        return importFile(aggregatedScheduleFile, is -> AggregatedScheduleImporter.importAndExtractHourlyNetPositions(is, targetProcessDateTime));
     }
 
     public <T> T importFile(final CoreValidIntradayFileResource file,
