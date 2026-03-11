@@ -19,29 +19,25 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.AbstractMap;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Objects;
+import java.util.LinkedHashMap;
 import java.util.List;
-
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
 public final class AggregatedScheduleImporter {
-
+    private static final String FR_EIC = "10YFR-RTE------C";
     private static final JAXBContext JAXB_CONTEXT = initJaxbContext();
 
     private AggregatedScheduleImporter() {
         // Utility class
     }
 
-    public static Map<String, BigDecimal> importAndExtractHourlyNetPositions(final InputStream inputStream, final OffsetDateTime targetProcessDateTime) {
+    public static BigDecimal extractFrenchNetPositionFromScheduleMarketDocument(final InputStream inputStream, final OffsetDateTime targetProcessDateTime) {
         final ScheduleMarketDocument schedule = importAggregatedSchedule(inputStream);
-        return extractHourlyNetPositionsFromScheduleDocument(schedule, targetProcessDateTime);
+        return getHighestFrenchNetPositionQuantity(schedule, targetProcessDateTime);
     }
 
     private static ScheduleMarketDocument importAggregatedSchedule(final InputStream inputStream) {
@@ -59,20 +55,31 @@ public final class AggregatedScheduleImporter {
         }
     }
 
-    private static Map<String, BigDecimal> extractHourlyNetPositionsFromScheduleDocument(final ScheduleMarketDocument schedule, final OffsetDateTime targetProcessDateTime) {
+    private static BigDecimal getHighestFrenchNetPositionQuantity(final ScheduleMarketDocument schedule, final OffsetDateTime targetProcessDateTime) {
         if (schedule == null || schedule.getTimeSeries() == null) {
             throw new CoreValidIntradayInvalidDataException("Schedule or TimeSeries is null.");
         }
-
-        return schedule.getTimeSeries().stream()
-                .filter(Objects::nonNull)
-                .flatMap(ts -> {
-                            final List<Point> hourlyPoints = findPointsForTargetHour(ts, targetProcessDateTime);
-                            final BigDecimal netPosition = computeMaxAbsoluteNetPositionFromPoints(hourlyPoints);
-                            return Stream.of(new AbstractMap.SimpleEntry<>(ts.getMRID(), netPosition));
-                        }
-                )
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<Integer, BigDecimal> totalQuantityByPosition = new LinkedHashMap<>();
+        for (final TimeSeries ts : schedule.getTimeSeries()) {
+            if (ts != null) {
+                final String inDomain = ts.getInDomainMRID() != null ? ts.getInDomainMRID().getValue() : null;
+                final String outDomain = ts.getOutDomainMRID() != null ? ts.getOutDomainMRID().getValue() : null;
+                if (FR_EIC.equals(inDomain) || FR_EIC.equals(outDomain)) {
+                    final List<Point> hourlyPoints = findPointsForTargetHour(ts, targetProcessDateTime);
+                    int sign = FR_EIC.equals(outDomain) ? 1 : -1;
+                    for (final Point point : hourlyPoints) {
+                        final BigDecimal quantity = point.getQuantity().multiply(BigDecimal.valueOf(sign));
+                        totalQuantityByPosition.put(
+                                point.getPosition(),
+                                totalQuantityByPosition.getOrDefault(point.getPosition(), BigDecimal.ZERO).add(quantity)
+                        );
+                    }
+                }
+            }
+        }
+        return totalQuantityByPosition.values().stream()
+                .max(Comparator.comparing(BigDecimal::abs))
+                .orElseThrow(() -> new RuntimeException("No quantities found"));
     }
 
     private static List<Point> findPointsForTargetHour(final TimeSeries ts, final OffsetDateTime targetProcessDateTime) {
@@ -101,21 +108,6 @@ public final class AggregatedScheduleImporter {
                         15L * (p.getPosition() - 1)
                 );
         return !pointDateTime.isBefore(hourStart) && pointDateTime.isBefore(hourEnd);
-    }
-
-    private static BigDecimal computeMaxAbsoluteNetPositionFromPoints(final List<Point> points) {
-        final int size = points == null ? 0 : points.size();
-        if (size != 4) {
-            throw new CoreValidIntradayInvalidDataException(
-                    "Invalid hourly period: expected 4 points (15-minute intervals) but found " + size
-            );
-        }
-
-        return points.stream()
-                .map(Point::getQuantity)
-                .filter(Objects::nonNull)
-                .max(Comparator.comparing(BigDecimal::abs))
-                .orElseThrow(() -> new CoreValidIntradayInvalidDataException("No valid quantities found."));
     }
 
     private static JAXBContext initJaxbContext() {
