@@ -146,12 +146,25 @@ class FileImporterTest {
     @Test
     void importAggregatedScheduleFileTest() {
         final CoreValidIntradayFileResource aggregatedScheduleFile = createFileResource("aggregatedSchedule", getClass().getResource("/DA_agregated_schedule_20251014_003.xml"));
-        final Map<String, BigDecimal> constrainedHourlyPnByMrid = fileImporter.importAggregatedScheduleFile(aggregatedScheduleFile, OffsetDateTime.parse("2025-10-13T22:30Z"));
-        final Map<String, BigDecimal> constrainedHourlyPnByMrid2 = fileImporter.importAggregatedScheduleFile(aggregatedScheduleFile, OffsetDateTime.parse("2025-10-13T23:30Z"));
-        assertNotNull(constrainedHourlyPnByMrid);
-        assertNotNull(constrainedHourlyPnByMrid2);
-        assertEquals(new BigDecimal("15.500"), constrainedHourlyPnByMrid.get("DE_RTE_20251014"));
-        assertEquals(new BigDecimal("9.000"), constrainedHourlyPnByMrid2.get("DE_RTE_20251014"));
+
+        final BigDecimal frNetPositionForFirstTs = fileImporter.importAggregatedScheduleFile(aggregatedScheduleFile, OffsetDateTime.parse("2025-10-13T22:30Z"));
+        final BigDecimal frNetPositionForSecondTs = fileImporter.importAggregatedScheduleFile(aggregatedScheduleFile, OffsetDateTime.parse("2025-10-13T23:30Z"));
+
+        assertNotNull(frNetPositionForFirstTs);
+        assertNotNull(frNetPositionForSecondTs);
+        assertEquals(new BigDecimal("-15.500"), frNetPositionForFirstTs);
+        assertEquals(new BigDecimal("-9.000"), frNetPositionForSecondTs);
+    }
+
+    @Test
+    void importAggregatedScheduleFileWithMultipleTimeSeriesTest() {
+        final CoreValidIntradayFileResource aggregatedScheduleMultipleTimeSeries = createFileResource("aggregatedSchedule", getClass().getResource("/DA_agregated_schedule_20251014_003_multiple_timeseries.xml"));
+        final BigDecimal frNetPositionForFirstTs = fileImporter.importAggregatedScheduleFile(aggregatedScheduleMultipleTimeSeries, OffsetDateTime.parse("2025-10-13T22:30Z"));
+        final BigDecimal frNetPositionForSecondTs = fileImporter.importAggregatedScheduleFile(aggregatedScheduleMultipleTimeSeries, OffsetDateTime.parse("2025-10-13T23:30Z"));
+
+        assertEquals(new BigDecimal("-20.000"), frNetPositionForFirstTs);
+        assertEquals(new BigDecimal("-9.000"), frNetPositionForSecondTs);
+
     }
 
     private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {

@@ -33,7 +33,6 @@ import java.net.URISyntaxException;
 import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -79,8 +78,8 @@ public class FileImporter {
         return importFile(mergedCnecFile, is -> (FbConstraintCreationContext) new FbConstraintImporter().importData(is, cracCreationParameters, network));
     }
 
-    public Map<String, BigDecimal> importAggregatedScheduleFile(final CoreValidIntradayFileResource aggregatedScheduleFile, final OffsetDateTime targetProcessDateTime) {
-        return importFile(aggregatedScheduleFile, is -> AggregatedScheduleImporter.importAndExtractHourlyNetPositions(is, targetProcessDateTime));
+    public BigDecimal importAggregatedScheduleFile(final CoreValidIntradayFileResource aggregatedScheduleFile, final OffsetDateTime targetProcessDateTime) {
+        return importFile(aggregatedScheduleFile, is -> AggregatedScheduleImporter.calculateFrenchNetPositionFromScheduleMarketDocument(is, targetProcessDateTime));
     }
 
     public <T> T importFile(final CoreValidIntradayFileResource file,
