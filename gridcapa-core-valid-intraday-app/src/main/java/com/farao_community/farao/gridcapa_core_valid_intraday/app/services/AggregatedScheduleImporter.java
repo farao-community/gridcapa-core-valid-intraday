@@ -79,7 +79,7 @@ public final class AggregatedScheduleImporter {
         }
         return totalQuantityByPosition.values().stream()
                 .max(Comparator.comparing(BigDecimal::abs))
-                .orElseThrow(() -> new RuntimeException("No quantities found"));
+                .orElseThrow(() -> new CoreValidIntradayInvalidDataException("No quantities found."));
     }
 
     private static List<Point> findPointsForTargetHour(final TimeSeries ts, final OffsetDateTime targetProcessDateTime) {
