@@ -79,7 +79,7 @@ public class FileImporter {
     }
 
     public BigDecimal importAggregatedScheduleFile(final CoreValidIntradayFileResource aggregatedScheduleFile, final OffsetDateTime targetProcessDateTime) {
-        return importFile(aggregatedScheduleFile, is -> AggregatedScheduleImporter.extractFrenchNetPositionFromScheduleMarketDocument(is, targetProcessDateTime));
+        return importFile(aggregatedScheduleFile, is -> AggregatedScheduleImporter.calculateFrenchNetPositionFromScheduleMarketDocument(is, targetProcessDateTime));
     }
 
     public <T> T importFile(final CoreValidIntradayFileResource file,

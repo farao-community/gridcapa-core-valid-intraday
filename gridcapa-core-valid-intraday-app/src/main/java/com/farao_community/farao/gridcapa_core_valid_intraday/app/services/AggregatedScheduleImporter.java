@@ -35,7 +35,7 @@ public final class AggregatedScheduleImporter {
         // Utility class
     }
 
-    public static BigDecimal extractFrenchNetPositionFromScheduleMarketDocument(final InputStream inputStream, final OffsetDateTime targetProcessDateTime) {
+    public static BigDecimal calculateFrenchNetPositionFromScheduleMarketDocument(final InputStream inputStream, final OffsetDateTime targetProcessDateTime) {
         final ScheduleMarketDocument schedule = importAggregatedSchedule(inputStream);
         return getHighestFrenchNetPositionQuantity(schedule, targetProcessDateTime);
     }
