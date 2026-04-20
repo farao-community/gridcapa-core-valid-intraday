@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import static java.math.RoundingMode.UP;
+import static java.math.RoundingMode.HALF_EVEN;
 
 class VerticesUtilsTest {
 
@@ -92,7 +92,7 @@ class VerticesUtilsTest {
                 .forEach((countryCode, baseValue) ->
                                  Assertions.assertThat(projected.getFirst().coordinates())
                                          .containsEntry(countryCode, BigDecimal.valueOf(2.0 / 3.0)
-                                                 .multiply(BigDecimal.valueOf(baseValue)).setScale(0, UP).intValue()));
+                                                 .multiply(BigDecimal.valueOf(baseValue)).setScale(0, HALF_EVEN).intValue()));
 
         //fcore v2 = 0.1*1000+0.2*-1000+0.3*500 = 50
         //      => delta = 3 or 2 => no change

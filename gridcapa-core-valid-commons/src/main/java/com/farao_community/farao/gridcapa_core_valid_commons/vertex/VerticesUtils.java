@@ -25,7 +25,7 @@ import java.util.Map;
 
 import static java.math.BigDecimal.ONE;
 import static java.math.BigDecimal.ZERO;
-import static java.math.RoundingMode.UP;
+import static java.math.RoundingMode.HALF_EVEN;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toMap;
 
@@ -130,7 +130,7 @@ public final class VerticesUtils {
 
     private static int toProjectedPosition(final Integer netPosition,
                                            final BigDecimal delta) {
-        return BigDecimal.valueOf(netPosition).multiply(delta).setScale(0, UP).intValue();
+        return BigDecimal.valueOf(netPosition).multiply(delta).setScale(0, HALF_EVEN).intValue();
     }
 
     private static BigDecimal delta(final FlowBasedDomainBranchData branchData,
@@ -142,7 +142,7 @@ public final class VerticesUtils {
 
         return BigDecimal.valueOf(branchData.getAmr())
                 .add(BigDecimal.valueOf(branchData.getRam0Core()))
-                .divide(f0Core, DELTA_SCALE, UP);
+                .divide(f0Core, DELTA_SCALE, HALF_EVEN);
     }
 
     private static BigDecimal f0Core(final Vertex vertex,
