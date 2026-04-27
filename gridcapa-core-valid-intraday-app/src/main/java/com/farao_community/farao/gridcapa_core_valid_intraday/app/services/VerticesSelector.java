@@ -7,12 +7,23 @@
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
+import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubUtils;
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
+import com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesUtils;
+import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecVertexRamData;
+import com.powsybl.iidm.network.Country;
+import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -82,6 +93,46 @@ public class VerticesSelector {
     }
 
     /**
+     *
+     * @param vertices              all considered vertices
+     * @param cnecRamBranchDatas    all considered CNECs
+     * @param nbVertices            the maximum number of constrained vertices to return
+     * @return the list of nbVertices constrained vertices with the most constrained CNEC and its calculated constrained RAM
+     */
+    public List<CnecVertexRamData> selectConstrainedVertices(final List<Vertex> vertices,
+                                                             final List<CnecRamBranchData> cnecRamBranchDatas,
+                                                             final int nbVertices) {
+
+        final Map<String, String> flowBasedToVertexCodeMap = CoreHubUtils.getFlowBasedToVertexCodeMap(coreHubs);
+        final List<CnecVertexRamData> constrainedOrderedVertices = new ArrayList<>();
+        for (final Vertex vertex : vertices) {
+            final List<CnecVertexRamData> vertexRamsByCnec = new ArrayList<>();
+            for (final CnecRamBranchData branch : cnecRamBranchDatas) {
+                final BigDecimal cnecVertexFlow = VerticesUtils.f0Core(vertex, branch, flowBasedToVertexCodeMap);
+                if (cnecVertexFlow.compareTo(BigDecimal.ZERO) > 0) {
+                    final BigDecimal cnecVerticeRam = BigDecimal.valueOf(branch.getRam0Core()).subtract(cnecVertexFlow);
+                    vertexRamsByCnec.add(new CnecVertexRamData(branch, vertex, cnecVerticeRam.setScale(0, RoundingMode.HALF_EVEN).intValue()));
+                }
+            }
+            //for a given vertex get the lowest ram giving the most constrained CNEC
+            if (!vertexRamsByCnec.isEmpty()) {
+                constrainedOrderedVertices.add(vertexRamsByCnec.stream()
+                                                       .min(Comparator.comparingInt(CnecVertexRamData::ram))
+                                                       .orElseThrow(
+                                                               () -> new CoreValidIntradayInvalidDataException(
+                                                                       String.format("Impossible to find worse CNEC for vertex id %s", vertex.vertexId())
+                                                               )
+                                                       )
+                );
+            }
+        }
+        return constrainedOrderedVertices.stream()
+                                         .sorted(Comparator.comparingInt(CnecVertexRamData::ram))
+                                         .limit(nbVertices)
+                                         .toList();
+    }
+
+    /**
      * @param vertex           the considered vertex
      * @param referenceProgram contains the market positions
      * @param radius           n-dimension sphere radius, input by user
@@ -108,7 +159,7 @@ public class VerticesSelector {
         // global distance² = sum_over_hub(k_hub * [1D distance]²)
         double sumOfWeightedSquared = 0.0;
         for (final CoreHub hub : coreHubs) {
-            final Double marketPos = referenceProgram.getGlobalNetPosition(hub.forecastCode());
+            final Double marketPos = referenceProgram.getGlobalNetPosition(getEICodeForCoreHub(hub.forecastCode()));
             final Integer vertexPos = vertexPositions.get(hub.clusterVerticeCode());
 
             if (vertexPos == null) {
@@ -123,6 +174,38 @@ public class VerticesSelector {
         }
 
         return Pair.of(vertex, Math.sqrt(sumOfWeightedSquared));
+    }
+
+    private EICode getEICodeForCoreHub(String hubForecastCode) {
+        Country country;
+        switch (hubForecastCode) {
+            case "AT-CORE" : country = Country.AT;
+                break;
+            case "ALBE-CORE", "BE-CORE" : country =  Country.BE;
+                break;
+            case "CZ-CORE" : country =  Country.CZ;
+                break;
+            case "ALDE-CORE", "DE-CORE" : country = Country.DE;
+                break;
+            case "FR-CORE" : country =  Country.FR;
+                break;
+            case "HR-CORE" : country =  Country.HR;
+                break;
+            case "HU-CORE" : country =  Country.HU;
+                break;
+            case "NL-CORE" : country =  Country.NL;
+                break;
+            case "PL-CORE" : country =  Country.PL;
+                break;
+            case "RO-CORE" : country =  Country.RO;
+                break;
+            case "SI-CORE" : country =  Country.SI;
+                break;
+            case "SK-CORE" : country =  Country.SK;
+                break;
+            default: throw new IllegalArgumentException("Unknown hubForecastCode : " + hubForecastCode + ".");
+        }
+        return new EICode(country);
     }
 
 }
