@@ -10,6 +10,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.farao_community.gridcapa_core_valid_intraday.xsd.f645.FlowBasedDomainDocument;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,38 +30,43 @@ class IvaVolumesManagerTest {
     private FileImporter fileImporter;
     private static final OffsetDateTime TEST_DATE_TIME = OffsetDateTime.parse("2021-07-22T22:30Z");
 
+    private ReferenceProgram referenceProgram;
+    private FlowBasedDomainDocument flowBasedDomainDocument;
+
     private CoreValidIntradayFileResource createFileResource(final String filename,
                                                              final String filePath) {
         return new CoreValidIntradayFileResource(filename, getClass().getResource(filePath).toExternalForm());
     }
 
+    @BeforeEach
+    void setup() {
+        final CoreValidIntradayFileResource refProgFile = createFileResource("refprog", "/20210723-FID2-632-v2-10V1001C--00264T-to-10V1001C--00085T.xml");
+        referenceProgram = fileImporter.importReferenceProgram(refProgFile, TEST_DATE_TIME);
+        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", "/20260119-0000-FID2-645-INIT_VIRG_REFBAL_PRES_FBPARAMS-v3.xml");
+        flowBasedDomainDocument = fileImporter.importCnecRamFile(cnecRamFile);
+    }
+
     @Test
     void shouldHaveZeroIfRaoNotCalled() {
-        final CoreValidIntradayFileResource refProgFile = createFileResource("refprog", "/20210723-FID2-632-v2-10V1001C--00264T-to-10V1001C--00085T.xml");
-        final ReferenceProgram referenceProgram = fileImporter.importReferenceProgram(refProgFile, TEST_DATE_TIME);
-        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", "/20260119-0000-FID2-645-INIT_VIRG_REFBAL_PRES_FBPARAMS-v3.xml");
-        final FlowBasedDomainDocument flowBasedDomainDocument = fileImporter.importCnecRamFile(cnecRamFile);
         final IvaVolumesManager mgr = new IvaVolumesManager(List.of(getTestVertex(2000)),
                                                             referenceProgram,
                                                             Map.of("CCCCCCCCCCCC", BigDecimal.valueOf(0.1)),
                                                             flowBasedDomainDocument);
-        assertThat(mgr.computeIvaVolumes(100)).isNotEmpty();
-        assertThat(mgr.computeIvaVolumes(100)).containsValue(ZERO);
+        assertThat(mgr.computeIvaVolumes(100))
+            .isNotEmpty()
+            .containsValue(ZERO);
         // add test call to mock RAO when service exists
     }
 
     @Test
     void shouldNotHaveZeroIfRaoCalled() {
-        final CoreValidIntradayFileResource refProgFile = createFileResource("refprog", "/20210723-FID2-632-v2-10V1001C--00264T-to-10V1001C--00085T.xml");
-        final ReferenceProgram referenceProgram = fileImporter.importReferenceProgram(refProgFile, TEST_DATE_TIME);
-        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", "/20260119-0000-FID2-645-INIT_VIRG_REFBAL_PRES_FBPARAMS-v3.xml");
-        final FlowBasedDomainDocument flowBasedDomainDocument = fileImporter.importCnecRamFile(cnecRamFile);
         final IvaVolumesManager mgr = new IvaVolumesManager(List.of(getTestVertex(-300000)),
                                                             referenceProgram,
                                                             Map.of("CCCCCCCCCCCC", BigDecimal.valueOf(1000)),
                                                             flowBasedDomainDocument);
-        assertThat(mgr.computeIvaVolumes(100)).isNotEmpty();
-        assertThat(mgr.computeIvaVolumes(100)).doesNotContainValue(ZERO);
+        assertThat(mgr.computeIvaVolumes(100))
+            .isNotEmpty()
+            .doesNotContainValue(ZERO);
         // add test call to mock RAO when service exists
     }
 
