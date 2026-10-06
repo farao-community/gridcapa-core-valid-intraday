@@ -46,12 +46,11 @@ public class PrefilterVertices {
         coreHubs = coreHubsConfiguration.getCoreHubs();
     }
 
-    public List<Vertex> prefilterVertices(
-            final OffsetDateTime targetProcessDateTime,
-            final ReferenceProgram marketPoints,
-            final Network network,
-            final List<Vertex> projectedVertices,
-            final CoreValidIntradayTaskParameters parameters) {
+    public List<Vertex> prefilterVertices(final OffsetDateTime targetProcessDateTime,
+                                          final ReferenceProgram marketPoints,
+                                          final Network network,
+                                          final List<Vertex> projectedVertices,
+                                          final CoreValidIntradayTaskParameters parameters) {
         final int maxSelectedVertices = parameters.getMaxSelectedVertices();
         final List<Vertex> historicalFilteredVertices = historicPositionsFilter(targetProcessDateTime, marketPoints, projectedVertices);
         if (isListSmallerThanMax(historicalFilteredVertices, maxSelectedVertices)) {
@@ -64,10 +63,9 @@ public class PrefilterVertices {
         return hubCapacityFilteredVertices;
     }
 
-    private List<Vertex> historicPositionsFilter(
-            final OffsetDateTime targetProcessDateTime,
-            final ReferenceProgram marketPoints,
-            final List<Vertex> projectedVertices) {
+    private List<Vertex> historicPositionsFilter(final OffsetDateTime targetProcessDateTime,
+                                                 final ReferenceProgram marketPoints,
+                                                 final List<Vertex> projectedVertices) {
         final Map<CoreHub, NetPositionHistory> nphByCoreHub = getAndUpdateNetPositionHistory(targetProcessDateTime, marketPoints);
         return projectedVertices.stream()
                 .filter(vertex -> isVertexInNpBounds(vertex, nphByCoreHub))
@@ -140,10 +138,12 @@ public class PrefilterVertices {
 
     private Map<CoreHub, NetPositionHistory> mapCoreHubsToNetPositionHistories(final Set<NetPositionHistory> npHistory) {
         final Map<CoreHub, NetPositionHistory> coreHubsNph = new HashMap<>();
-        coreHubs.forEach(coreHub -> coreHubsNph.put(coreHub, npHistory.stream()
-                .filter(nph -> nph.getHubRamcep2Code().equals(coreHub.ramcep2Code()))
-                .findFirst()
-                .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("CoreHub configuration for net position history missing for hub : %s", coreHub.name())))));
+        coreHubs.forEach(coreHub -> coreHubsNph.put(
+                coreHub,
+                npHistory.stream()
+                        .filter(nph -> nph.getHubRamcep2Code().equals(coreHub.ramcep2Code()))
+                        .findFirst()
+                        .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("CoreHub configuration for net position history missing for hub : %s", coreHub.name())))));
         return coreHubsNph;
     }
 

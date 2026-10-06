@@ -10,8 +10,6 @@ import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsCo
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.NetPositionHistory;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.Season;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,19 +22,15 @@ import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.T
 class NetPositionHistoryRepositoryTest {
 
     @Autowired
-    NetPositionHistoryRepository netPositionHistoryRepository;
+    private NetPositionHistoryRepository netPositionHistoryRepository;
 
     @Autowired
     private CoreHubsConfiguration coreHubsConfiguration;
 
-    @BeforeEach
-    void setup() {
-        final Set<NetPositionHistory> summerNphs = createNphsFromSeason(Season.SUMMER, coreHubsConfiguration.getCoreHubs());
-        netPositionHistoryRepository.saveAllAndFlush(summerNphs);
-    }
-
     @Test
     void findAllBySeason() {
+        final Set<NetPositionHistory> summerNphs = createNphsFromSeason(Season.SUMMER, coreHubsConfiguration.getCoreHubs());
+        netPositionHistoryRepository.saveAllAndFlush(summerNphs);
         Assertions.assertThat(netPositionHistoryRepository.findAllBySeason(Season.SPRING))
                 .isEmpty();
         Assertions.assertThat(netPositionHistoryRepository.findAllBySeason(Season.AUTUMN))
@@ -46,10 +40,6 @@ class NetPositionHistoryRepositoryTest {
         Assertions.assertThat(netPositionHistoryRepository.findAllBySeason(Season.SUMMER))
                 .isNotEmpty()
                 .hasSize(coreHubsConfiguration.getCoreHubs().size());
-    }
-
-    @AfterEach
-    void tearDown() {
         netPositionHistoryRepository.deleteAll();
     }
 }

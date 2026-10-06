@@ -29,7 +29,7 @@ import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.T
 class NetPositionHistoryServiceTest {
 
     @Autowired
-    NetPositionHistoryService netPositionHistoryService;
+    private NetPositionHistoryService netPositionHistoryService;
 
     @Autowired
     private CoreHubsConfiguration coreHubsConfiguration;

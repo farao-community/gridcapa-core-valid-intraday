@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.utils;
 
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
@@ -8,9 +14,9 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.NetPo
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.Season;
 
 import java.net.URL;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class TestUtils {
 
@@ -53,12 +59,10 @@ public final class TestUtils {
 
     public static Set<NetPositionHistory> createNphsFromSeason(final Season season,
                                                                final List<CoreHub> coreHubs) {
-        Set<NetPositionHistory> set = new HashSet<>();
-        for (CoreHub ch : coreHubs) {
-            NetPositionHistory nphFromSeasonAndCode = createNphFromSeasonAndCode(ch.ramcep2Code(), season);
-            set.add(nphFromSeasonAndCode);
-        }
-        return set;
+        return coreHubs.stream()
+                .map(ch -> createNphFromSeasonAndCode(ch.ramcep2Code(), season))
+                .collect(Collectors.toSet());
+
     }
 
     public static NetPositionHistory createNphFromSeasonAndCode(final String ramcep2Code,

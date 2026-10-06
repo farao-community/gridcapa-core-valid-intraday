@@ -59,6 +59,10 @@ class PrefilterVerticesTest {
     void setup() {
         final List<CoreHub> coreHubs = coreHubsConfiguration.getCoreHubs();
         netPositionHistoryRepository.saveAll(createNphsFromSeason(Season.SUMMER, coreHubs));
+        testVertices = getTestVertices();
+        testEmptyNetwork = getTestEmptyNetwork();
+        testRefProg = getTestRefProg();
+        parametersMaxSelect2 = getTestCoreValidIntradayTaskParametersMaxSelect2();
     }
 
     @AfterEach
@@ -66,40 +70,56 @@ class PrefilterVerticesTest {
         netPositionHistoryRepository.deleteAll();
     }
 
-    @Test
-    void prefilterVerticesTest() {
+    private List<Vertex> testVertices;
+    private Network testEmptyNetwork;
+    private ReferenceProgram testRefProg;
+    private CoreValidIntradayTaskParameters parametersMaxSelect2;
 
+    @Test
+    void lessVerticesThanMaxTest() {
         //less vertices than max selected vertices: should return entry
-        final List<Vertex> testVertices = getTestVertices();
-        final Network testEmptyNetwork = getTestEmptyNetwork();
-        final ReferenceProgram testRefProg = getTestRefProg();
         final List<Vertex> verticesResult1 = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, testEmptyNetwork, testVertices, getTestCoreValidIntradayTaskParameters());
         Assertions.assertThat(verticesResult1)
                 .isEqualTo(testVertices);
+    }
 
+    @Test
+    void testNoSeasonData() {
         //first prefilter ko: no season data
-        final CoreValidIntradayTaskParameters parametersMaxSelect2 = getTestCoreValidIntradayTaskParametersMaxSelect2();
+
         final OffsetDateTime winterDate = OffsetDateTime.parse("2021-12-31T22:30Z");
         Assertions.assertThatExceptionOfType(CoreValidIntradayInvalidDataException.class)
                 .isThrownBy(() -> prefilterVertices.prefilterVertices(winterDate, testRefProg, testEmptyNetwork, testVertices, parametersMaxSelect2))
                 .withMessage("CoreHub configuration for net position history missing for hub : Belgique");
+    }
 
+    @Test
+    void testFirstPrefilterOkButSecondNoGenerators() {
         //first prefilter ok but second prefilter no generators
         final List<Vertex> verticesNoGen = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, testEmptyNetwork, testVertices, parametersMaxSelect2);
         Assertions.assertThat(verticesNoGen)
                 .isEqualTo(testVertices);
+    }
 
+    @Test
+    void testFirstPrefilterOkButSecondNoLoads() {
         //first prefilter ok but second prefilter no loads
         final Network testEmptyNetworkWithCountryBE = getTestEmptyNetworkWithCountryGenerator(Country.BE);
         final List<Vertex> verticesNoLoad = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, testEmptyNetworkWithCountryBE, testVertices, parametersMaxSelect2);
         Assertions.assertThat(verticesNoLoad)
                 .isEqualTo(testVertices);
+    }
 
+    @Test
+    void testBothFiltersOkButLessThanMaxParam() {
         //both filters ok but less than max selected vertices param
         final List<Vertex> verticesResult2 = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, getTestNetwork(), testVertices, getTestCoreValidIntradayTaskParameters());
         Assertions.assertThat(verticesResult2)
                 .isEqualTo(testVertices);
+    }
 
+    @Test
+    void testBothFiltersOk() {
         //both filters ok
         final List<Vertex> verticesResult3 = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, getTestNetwork(), testVertices, parametersMaxSelect2);
         Assertions.assertThat(verticesResult3)
