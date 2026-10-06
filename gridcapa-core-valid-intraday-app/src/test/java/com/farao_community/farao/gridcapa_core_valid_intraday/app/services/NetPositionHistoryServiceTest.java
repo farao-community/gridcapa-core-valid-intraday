@@ -112,6 +112,7 @@ class NetPositionHistoryServiceTest {
         Assertions.assertThat(autumn2Result)
                 .first()
                 .hasFieldOrPropertyWithValue("season", Season.AUTUMN);
+        netPositionHistoryRepository.deleteAll();
     }
 
 }

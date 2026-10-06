@@ -45,20 +45,22 @@ public class NetPositionHistoryService {
         final OffsetDateTime winterStart = getSeasonStartDate(seasonDatesConfiguration.getWinterStartDate(), targetProcessDateTime);
         //not knowing the dates, this is a temporary implementation
         //WARNING the logic depends on the configuration dates : here we consider the winter to be on two different years
-        if (istargetDateInSeason(targetProcessDateTime, springStart, summerStart)) {
+        if (isTargetDateInSeason(targetProcessDateTime, springStart, summerStart)) {
             return Season.SPRING;
-        } else if (istargetDateInSeason(targetProcessDateTime, summerStart, autumnStart)) {
+        } else if (isTargetDateInSeason(targetProcessDateTime, summerStart, autumnStart)) {
             return Season.SUMMER;
-        } else if (istargetDateInSeason(targetProcessDateTime, autumnStart, winterStart)) {
+        } else if (isTargetDateInSeason(targetProcessDateTime, autumnStart, winterStart)) {
             return Season.AUTUMN;
         } else if (winterStart.isBefore(targetProcessDateTime) || winterStart.isEqual(targetProcessDateTime) || springStart.isAfter(targetProcessDateTime)) {
+            //winter is a special case where it usually spans over two years
+            //so to catch th winter case the test is different from other seasons
             return Season.WINTER;
         } else {
             throw new CoreValidIntradayInvalidDataException("Impossible to find season for target process date : configuration issue possible!");
         }
     }
 
-    private boolean istargetDateInSeason(OffsetDateTime targetDate, OffsetDateTime seasonStart, OffsetDateTime seasonEnd) {
+    private boolean isTargetDateInSeason(final OffsetDateTime targetDate, final OffsetDateTime seasonStart, final OffsetDateTime seasonEnd) {
         return (seasonStart.isBefore(targetDate) || seasonStart.isEqual(targetDate)) && seasonEnd.isAfter(targetDate);
     }
 
