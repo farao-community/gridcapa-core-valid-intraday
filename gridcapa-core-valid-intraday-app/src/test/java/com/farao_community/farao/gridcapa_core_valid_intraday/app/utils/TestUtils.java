@@ -1,9 +1,22 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.utils;
 
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
+import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
+import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.NetPositionHistory;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.Season;
 
+import java.net.URL;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class TestUtils {
 
@@ -37,5 +50,28 @@ public final class TestUtils {
         );
 
         return new CoreValidIntradayTaskParameters(parameters);
+    }
+
+    public static CoreValidIntradayFileResource createFileResource(final String filename,
+                                                                   final URL resource) {
+        return new CoreValidIntradayFileResource(filename, resource.toExternalForm());
+    }
+
+    public static Set<NetPositionHistory> createNphsFromSeason(final Season season,
+                                                               final List<CoreHub> coreHubs) {
+        return coreHubs.stream()
+                .map(ch -> createNphFromSeasonAndCode(ch.ramcep2Code(), season))
+                .collect(Collectors.toSet());
+
+    }
+
+    public static NetPositionHistory createNphFromSeasonAndCode(final String ramcep2Code,
+                                                                final Season season) {
+        final NetPositionHistory nph = new NetPositionHistory();
+        nph.setSeason(season);
+        nph.setHubRamcep2Code(ramcep2Code);
+        nph.setMinimumNetPosition(-401.0);
+        nph.setMaximumNetPosition(999.0);
+        return nph;
     }
 }
