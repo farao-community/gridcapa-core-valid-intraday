@@ -24,6 +24,7 @@ public class CoreValidIntradayTaskParameters {
     private static final String PONDERATION_CLOSEST = "PONDERATION_CLOSEST";
     private static final String PONDERATION_ANGLE = "PONDERATION_ANGLE";
     private static final String PONDERATION_CONSTRAINED = "PONDERATION_CONSTRAINED";
+    private static final String RAM_MARGIN = "RAM_MARGIN";
 
     private int maxSelectedVertices;
     private int marginForPrefilter;
@@ -34,6 +35,7 @@ public class CoreValidIntradayTaskParameters {
     private int ponderationClosest;
     private int ponderationAngle;
     private int ponderationConstrained;
+    private int ramMargin;
 
     public CoreValidIntradayTaskParameters(final List<TaskParameterDto> parameters) {
         List<String> errors = new ArrayList<>();
@@ -48,6 +50,7 @@ public class CoreValidIntradayTaskParameters {
                 case PONDERATION_CLOSEST -> ponderationClosest = validateIsPositiveIntegerAndGet(parameter, errors);
                 case PONDERATION_ANGLE -> ponderationAngle = validateIsPositiveIntegerAndGet(parameter, errors);
                 case PONDERATION_CONSTRAINED -> ponderationConstrained = validateIsPositiveIntegerAndGet(parameter, errors);
+                case RAM_MARGIN -> ramMargin = validateIsPositiveIntegerAndGet(parameter, errors);
                 default -> LOGGER.warn("Unknown parameter {} (value: {}) will be ignored", parameter.getId(), parameter.getValue());
             }
         }
@@ -124,6 +127,10 @@ public class CoreValidIntradayTaskParameters {
 
     public int getPonderationConstrained() {
         return ponderationConstrained;
+    }
+
+    public int getRamMargin() {
+        return ramMargin;
     }
 
     public String toString() {
