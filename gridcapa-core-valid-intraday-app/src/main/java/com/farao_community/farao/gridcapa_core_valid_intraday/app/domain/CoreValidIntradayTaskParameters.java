@@ -25,6 +25,8 @@ public class CoreValidIntradayTaskParameters {
     private static final String PONDERATION_ANGLE = "PONDERATION_ANGLE";
     private static final String PONDERATION_CONSTRAINED = "PONDERATION_CONSTRAINED";
     private static final String RAM_MARGIN = "RAM_MARGIN";
+    private static final String MERGE_ANGLE = "MERGE_ANGLE";
+    private static final String FR_CNEC_COUNT_LIMIT = "FR_CNEC_COUNT_LIMIT";
 
     private int maxSelectedVertices;
     private int marginForPrefilter;
@@ -36,6 +38,8 @@ public class CoreValidIntradayTaskParameters {
     private int ponderationAngle;
     private int ponderationConstrained;
     private int ramMargin;
+    private int mergeAngle;
+    private int frenchCnecCountLimit;
 
     public CoreValidIntradayTaskParameters(final List<TaskParameterDto> parameters) {
         List<String> errors = new ArrayList<>();
@@ -51,6 +55,8 @@ public class CoreValidIntradayTaskParameters {
                 case PONDERATION_ANGLE -> ponderationAngle = validateIsPositiveIntegerAndGet(parameter, errors);
                 case PONDERATION_CONSTRAINED -> ponderationConstrained = validateIsPositiveIntegerAndGet(parameter, errors);
                 case RAM_MARGIN -> ramMargin = validateIsPositiveIntegerAndGet(parameter, errors);
+                case MERGE_ANGLE -> mergeAngle = validateIsPositiveIntegerAndGet(parameter, errors);
+                case FR_CNEC_COUNT_LIMIT -> frenchCnecCountLimit = validateIsPositiveIntegerAndGet(parameter, errors);
                 default -> LOGGER.warn("Unknown parameter {} (value: {}) will be ignored", parameter.getId(), parameter.getValue());
             }
         }
@@ -133,6 +139,14 @@ public class CoreValidIntradayTaskParameters {
         return ramMargin;
     }
 
+    public int getMergeAngle() {
+        return mergeAngle;
+    }
+
+    public int getFrenchCnecCountLimit() {
+        return frenchCnecCountLimit;
+    }
+
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
@@ -149,6 +163,8 @@ public class CoreValidIntradayTaskParameters {
         appender.add(String.format(KEY_VALUE_FORMAT, PONDERATION_ANGLE, ponderationAngle));
         appender.add(String.format(KEY_VALUE_FORMAT, PONDERATION_CONSTRAINED, ponderationConstrained));
         appender.add(String.format(KEY_VALUE_FORMAT, RAM_MARGIN, ramMargin));
+        appender.add(String.format(KEY_VALUE_FORMAT, MERGE_ANGLE, mergeAngle));
+        appender.add(String.format(KEY_VALUE_FORMAT, FR_CNEC_COUNT_LIMIT, frenchCnecCountLimit));
         return String.format("{%s%n}", String.join(", ", appender));
     }
 }

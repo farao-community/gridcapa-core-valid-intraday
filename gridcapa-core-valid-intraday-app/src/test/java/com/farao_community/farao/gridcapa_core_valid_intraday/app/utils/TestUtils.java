@@ -35,7 +35,9 @@ public final class TestUtils {
                 new TaskParameterDto("PONDERATION_CLOSEST", "INT", "31", "1515"),
                 new TaskParameterDto("PONDERATION_ANGLE", "INT", "33", "1515"),
                 new TaskParameterDto("PONDERATION_CONSTRAINED", "INT", "34", "1515"),
-                new TaskParameterDto("RAM_MARGIN", "INT", "15", "213")
+                new TaskParameterDto("RAM_MARGIN", "INT", "15", "213"),
+                new TaskParameterDto("MERGE_ANGLE", "INT", "1", "23"),
+                new TaskParameterDto("FR_CNEC_COUNT_LIMIT", "INT", "7", "14")
         );
     }
 

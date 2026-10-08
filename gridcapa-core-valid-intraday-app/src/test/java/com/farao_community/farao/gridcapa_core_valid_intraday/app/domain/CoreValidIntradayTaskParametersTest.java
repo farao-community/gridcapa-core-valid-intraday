@@ -26,6 +26,8 @@ class CoreValidIntradayTaskParametersTest {
         assertThat(params.getPonderationAngle()).isEqualTo(33);
         assertThat(params.getPonderationConstrained()).isEqualTo(34);
         assertThat(params.getRamMargin()).isEqualTo(15);
+        assertThat(params.getMergeAngle()).isEqualTo(1);
+        assertThat(params.getFrenchCnecCountLimit()).isEqualTo(7);
     }
 
     @Test
