@@ -128,6 +128,36 @@ class PrefilterVerticesTest {
                 .containsExactly(1, 2, 3, 7);
     }
 
+    @Test
+    void testHistFiltersOff() {
+        //both filters ok
+        final List<Vertex> verticesResult3 = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, getTestNetwork(), testVertices, getTestCoreValidIntradayTaskParametersFilterHistOff());
+        Assertions.assertThat(verticesResult3)
+                .hasSize(4);
+        Assertions.assertThat(verticesResult3.stream().map(Vertex::vertexId).toList())
+                .containsExactly(1, 2, 3, 7);
+    }
+
+    @Test
+    void testHubCapFiltersOff() {
+        //both filters ok
+        final List<Vertex> verticesResult3 = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, getTestNetwork(), testVertices, getTestCoreValidIntradayTaskParametersFilterHubOff());
+        Assertions.assertThat(verticesResult3)
+                .hasSize(4);
+        Assertions.assertThat(verticesResult3.stream().map(Vertex::vertexId).toList())
+                .containsExactly(1, 2, 3, 7);
+    }
+
+    @Test
+    void testAllFiltersOff() {
+        //both filters ok
+        final List<Vertex> verticesResult3 = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, getTestNetwork(), testVertices, getTestCoreValidIntradayTaskParametersBothFiltersOff());
+        Assertions.assertThat(verticesResult3)
+                .hasSize(7);
+        Assertions.assertThat(verticesResult3.stream().map(Vertex::vertexId).toList())
+                .containsExactly(1, 2, 3, 4, 5, 6, 7);
+    }
+
     private List<Vertex> getTestVertices() {
         final CoreValidIntradayFileResource verticesFile = createFileResource("vertex", getClass().getResource("/fake-vertice-PrefilterTest.csv"));
         return fileImporter.importVertices(verticesFile);

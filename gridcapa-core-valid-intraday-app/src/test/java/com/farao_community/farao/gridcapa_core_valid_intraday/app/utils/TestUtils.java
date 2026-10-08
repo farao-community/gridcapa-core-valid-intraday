@@ -28,6 +28,8 @@ public final class TestUtils {
         List<TaskParameterDto> parameters = List.of(
                 new TaskParameterDto("MAX_SELECTED_VERTICES", "INT", "16", "6"),
                 new TaskParameterDto("MARGIN_FOR_PREFILTER", "INT", "100", "1515"),
+                new TaskParameterDto("IS_HISTORIC_FILTER_ACTIVE", "BOOLEAN", "true", "false"),
+                new TaskParameterDto("IS_HUB_CAPACITY_FILTER_ACTIVE", "BOOLEAN", "true", "false"),
                 new TaskParameterDto("FRM_MARGIN_PERCENTAGE", "INT", "5", "45"),
                 new TaskParameterDto("MIN_RAM_MCCC", "INT", "20", "25"),
                 new TaskParameterDto("PONDERATION_CLOSEST", "INT", "31", "1515"),
@@ -42,6 +44,56 @@ public final class TestUtils {
         List<TaskParameterDto> parameters = List.of(
                 new TaskParameterDto("MAX_SELECTED_VERTICES", "INT", "2", "6"),
                 new TaskParameterDto("MARGIN_FOR_PREFILTER", "INT", "100", "1515"),
+                new TaskParameterDto("IS_HISTORIC_FILTER_ACTIVE", "BOOLEAN", "true", "false"),
+                new TaskParameterDto("IS_HUB_CAPACITY_FILTER_ACTIVE", "BOOLEAN", "true", "false"),
+                new TaskParameterDto("FRM_MARGIN_PERCENTAGE", "INT", "5", "45"),
+                new TaskParameterDto("MIN_RAM_MCCC", "INT", "20", "25"),
+                new TaskParameterDto("PONDERATION_CLOSEST", "INT", "31", "1515"),
+                new TaskParameterDto("PONDERATION_ANGLE", "INT", "33", "1515"),
+                new TaskParameterDto("PONDERATION_CONSTRAINED", "INT", "34", "1515")
+        );
+
+        return new CoreValidIntradayTaskParameters(parameters);
+    }
+
+    public static CoreValidIntradayTaskParameters getTestCoreValidIntradayTaskParametersFilterHistOff() {
+        List<TaskParameterDto> parameters = List.of(
+                new TaskParameterDto("MAX_SELECTED_VERTICES", "INT", "2", "6"),
+                new TaskParameterDto("MARGIN_FOR_PREFILTER", "INT", "100", "1515"),
+                new TaskParameterDto("IS_HISTORIC_FILTER_ACTIVE", "BOOLEAN", "false", "false"),
+                new TaskParameterDto("IS_HUB_CAPACITY_FILTER_ACTIVE", "BOOLEAN", "true", "false"),
+                new TaskParameterDto("FRM_MARGIN_PERCENTAGE", "INT", "5", "45"),
+                new TaskParameterDto("MIN_RAM_MCCC", "INT", "20", "25"),
+                new TaskParameterDto("PONDERATION_CLOSEST", "INT", "31", "1515"),
+                new TaskParameterDto("PONDERATION_ANGLE", "INT", "33", "1515"),
+                new TaskParameterDto("PONDERATION_CONSTRAINED", "INT", "34", "1515")
+        );
+
+        return new CoreValidIntradayTaskParameters(parameters);
+    }
+
+    public static CoreValidIntradayTaskParameters getTestCoreValidIntradayTaskParametersFilterHubOff() {
+        List<TaskParameterDto> parameters = List.of(
+                new TaskParameterDto("MAX_SELECTED_VERTICES", "INT", "2", "6"),
+                new TaskParameterDto("MARGIN_FOR_PREFILTER", "INT", "100", "1515"),
+                new TaskParameterDto("IS_HISTORIC_FILTER_ACTIVE", "BOOLEAN", "true", "false"),
+                new TaskParameterDto("IS_HUB_CAPACITY_FILTER_ACTIVE", "BOOLEAN", "false", "false"),
+                new TaskParameterDto("FRM_MARGIN_PERCENTAGE", "INT", "5", "45"),
+                new TaskParameterDto("MIN_RAM_MCCC", "INT", "20", "25"),
+                new TaskParameterDto("PONDERATION_CLOSEST", "INT", "31", "1515"),
+                new TaskParameterDto("PONDERATION_ANGLE", "INT", "33", "1515"),
+                new TaskParameterDto("PONDERATION_CONSTRAINED", "INT", "34", "1515")
+        );
+
+        return new CoreValidIntradayTaskParameters(parameters);
+    }
+
+    public static CoreValidIntradayTaskParameters getTestCoreValidIntradayTaskParametersBothFiltersOff() {
+        List<TaskParameterDto> parameters = List.of(
+                new TaskParameterDto("MAX_SELECTED_VERTICES", "INT", "2", "6"),
+                new TaskParameterDto("MARGIN_FOR_PREFILTER", "INT", "100", "1515"),
+                new TaskParameterDto("IS_HISTORIC_FILTER_ACTIVE", "BOOLEAN", "false", "false"),
+                new TaskParameterDto("IS_HUB_CAPACITY_FILTER_ACTIVE", "BOOLEAN", "false", "false"),
                 new TaskParameterDto("FRM_MARGIN_PERCENTAGE", "INT", "5", "45"),
                 new TaskParameterDto("MIN_RAM_MCCC", "INT", "20", "25"),
                 new TaskParameterDto("PONDERATION_CLOSEST", "INT", "31", "1515"),
