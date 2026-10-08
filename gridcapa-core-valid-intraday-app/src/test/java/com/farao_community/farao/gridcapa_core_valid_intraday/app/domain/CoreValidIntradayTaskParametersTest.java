@@ -18,6 +18,8 @@ class CoreValidIntradayTaskParametersTest {
 
         assertThat(params.getMaxSelectedVertices()).isEqualTo(16);
         assertThat(params.getMarginForPrefilter()).isEqualTo(100);
+        assertThat(params.isHistoricFilterActive()).isTrue();
+        assertThat(params.isHubCapacityFilterActive()).isTrue();
         assertThat(params.getFrmMarginPercentage()).isEqualTo(5);
         assertThat(params.getMinRamMccc()).isEqualTo(20);
         assertThat(params.getPonderationClosest()).isEqualTo(31);
@@ -83,4 +85,16 @@ class CoreValidIntradayTaskParametersTest {
                              "\"Parameter PONDERATION_CONSTRAINED should be positive (value: -5)\"" +
                              "].");
     }
+
+    @Test
+    void validationFailureBooleanParameterNotParseableTest() {
+        List<TaskParameterDto> parameters = List.of(
+                new TaskParameterDto("IS_HISTORIC_FILTER_ACTIVE", "INT", "15", "10")
+        );
+
+        Assertions.assertThatExceptionOfType(CoreValidIntradayInvalidDataException.class)
+                .isThrownBy(() -> new CoreValidIntradayTaskParameters(parameters))
+                .withMessage("Validation of parameters failed. Failure reasons are: [\"Parameter IS_HISTORIC_FILTER_ACTIVE was expected to be of type BOOLEAN, got INT\"].");
+    }
+
 }
