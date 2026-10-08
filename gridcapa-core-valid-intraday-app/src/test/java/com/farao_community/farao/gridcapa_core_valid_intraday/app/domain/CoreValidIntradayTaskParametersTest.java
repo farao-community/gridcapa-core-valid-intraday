@@ -25,6 +25,7 @@ class CoreValidIntradayTaskParametersTest {
         assertThat(params.getPonderationClosest()).isEqualTo(31);
         assertThat(params.getPonderationAngle()).isEqualTo(33);
         assertThat(params.getPonderationConstrained()).isEqualTo(34);
+        assertThat(params.getRamMargin()).isEqualTo(15);
     }
 
     @Test

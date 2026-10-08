@@ -34,7 +34,8 @@ public final class TestUtils {
                 new TaskParameterDto("MIN_RAM_MCCC", "INT", "20", "25"),
                 new TaskParameterDto("PONDERATION_CLOSEST", "INT", "31", "1515"),
                 new TaskParameterDto("PONDERATION_ANGLE", "INT", "33", "1515"),
-                new TaskParameterDto("PONDERATION_CONSTRAINED", "INT", "34", "1515")
+                new TaskParameterDto("PONDERATION_CONSTRAINED", "INT", "34", "1515"),
+                new TaskParameterDto("RAM_MARGIN", "INT", "15", "213")
         );
     }
 

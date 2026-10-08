@@ -148,6 +148,7 @@ public class CoreValidIntradayTaskParameters {
         appender.add(String.format(KEY_VALUE_FORMAT, PONDERATION_CLOSEST, ponderationClosest));
         appender.add(String.format(KEY_VALUE_FORMAT, PONDERATION_ANGLE, ponderationAngle));
         appender.add(String.format(KEY_VALUE_FORMAT, PONDERATION_CONSTRAINED, ponderationConstrained));
+        appender.add(String.format(KEY_VALUE_FORMAT, RAM_MARGIN, ramMargin));
         return String.format("{%s%n}", String.join(", ", appender));
     }
 }
