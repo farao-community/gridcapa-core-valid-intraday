@@ -18,8 +18,8 @@ class CoreValidIntradayTaskParametersTest {
 
         assertThat(params.getMaxSelectedVertices()).isEqualTo(16);
         assertThat(params.getMarginForPrefilter()).isEqualTo(100);
-        assertThat(params.isHistoricFilterActive()).isEqualTo(true);
-        assertThat(params.isHubCapacityFilterActive()).isEqualTo(true);
+        assertThat(params.isHistoricFilterActive()).isTrue();
+        assertThat(params.isHubCapacityFilterActive()).isTrue();
         assertThat(params.getFrmMarginPercentage()).isEqualTo(5);
         assertThat(params.getMinRamMccc()).isEqualTo(20);
         assertThat(params.getPonderationClosest()).isEqualTo(31);
