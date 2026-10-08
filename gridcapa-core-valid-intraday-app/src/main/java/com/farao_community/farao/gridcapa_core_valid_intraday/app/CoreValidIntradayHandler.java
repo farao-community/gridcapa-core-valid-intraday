@@ -12,7 +12,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesUtil
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayRequest;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
-import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.CnecRamMapper;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.CnecRamMapper;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.FileImporter;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.PrefilterVertices;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.VerticesSelector;
