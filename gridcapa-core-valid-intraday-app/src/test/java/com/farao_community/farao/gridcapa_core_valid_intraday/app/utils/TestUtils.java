@@ -8,13 +8,17 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.utils;
 
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
+import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
+import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.NetPositionHistory;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.Season;
+import com.powsybl.iidm.network.Country;
 
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -98,5 +102,36 @@ public final class TestUtils {
         nph.setMinimumNetPosition(-401.0);
         nph.setMaximumNetPosition(999.0);
         return nph;
+    }
+
+    public static List<Vertex> getTestVertices() {
+        return List.of(new Vertex(1, Map.of("AA", -301, "BB", 600, "CC", -300)),
+                       new Vertex(2, Map.of("AA", 300, "BB", -600, "CC", -300)),
+                       new Vertex(3, Map.of("AA", 300, "BB", 600, "CC", -300)),
+                       new Vertex(4, Map.of("AA", -350, "BB", 600, "CC", -300)),
+                       new Vertex(5, Map.of("AA", -299, "BB", 600, "CC", -300)));
+    }
+
+    public static List<Vertex> getTestVertices2() {
+        return List.of(new Vertex(1, Map.of("AA", -500, "BB", 400, "CC", 300)),
+                       new Vertex(2, Map.of("AA", 1300, "BB", -1600, "CC", 1300)),
+                       new Vertex(3, Map.of("AA", 200, "BB", 100, "CC", 50)),
+                       new Vertex(4, Map.of("AA", -350, "BB", 600, "CC", 300)),
+                       new Vertex(5, Map.of("AA", -299, "BB", 600, "CC", 300)));
+    }
+
+    public static class TestCoreHubConf extends CoreHubsConfiguration {
+        public TestCoreHubConf() {
+            // test class
+        }
+
+        @Override
+        public List<CoreHub> getCoreHubs() {
+            return List.of(
+                    new CoreHub("Test1", "ram1", "fb1", "FR-CORE", "AA", false, false, 1, Country.FR),
+                    new CoreHub("Test2", "ram2", "fb2", "DE-CORE", "BB", false, false, 1, Country.DE),
+                    new CoreHub("Test3", "ram3", "fb3", "BE-CORE", "CC", false, false, 1, Country.BE)
+            );
+        }
     }
 }

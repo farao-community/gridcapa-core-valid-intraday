@@ -43,6 +43,9 @@ class CnecRamMapperTest {
         Assertions.assertThat(cnecRamBranchDataFirst.getRam0Core())
                 .isEqualTo(cnecRamBranchDataFirst.ram0Core())
                 .isEqualTo(100);
+        Assertions.assertThat(cnecRamBranchDataFirst.ram()).isEqualTo(1000);
+        Assertions.assertThat(cnecRamBranchDataFirst.isFrench()).isFalse();
+        Assertions.assertThat(cnecRamBranchDataFirst.isLimiting()).isFalse();
     }
 
     @Test

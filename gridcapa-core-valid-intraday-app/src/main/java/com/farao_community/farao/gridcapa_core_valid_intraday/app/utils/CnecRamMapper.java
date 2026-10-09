@@ -19,6 +19,8 @@ import java.util.stream.Collectors;
 
 public final class CnecRamMapper {
 
+    private static final String FRENCH_TSO_ORIGIN = "FR";
+
     private CnecRamMapper() {
         // utility class
     }
@@ -43,7 +45,13 @@ public final class CnecRamMapper {
                         p -> BigDecimal.valueOf(p.getValue())
                 ));
         final CriticalBranchType cb = constraintResult.getCriticalBranch();
-        return new CnecRamBranchData(cb.getId(), getIntValue(cb.getRAM0Core()), getIntValue(cb.getAmr()), ptdfs);
+        return new CnecRamBranchData(cb.getId(),
+                                     getIntValue(cb.getRAM0Core()),
+                                     getIntValue(cb.getAmr()),
+                                     getIntValue(cb.getRAM()),
+                                     constraintResult.getDomainLimit().isRegion(),
+                                     cb.getTsoOrigin().equals(FRENCH_TSO_ORIGIN),
+                                     ptdfs);
     }
 
     private static int getIntValue(final Float nullableFloatValue) {
