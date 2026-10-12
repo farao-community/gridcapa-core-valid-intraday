@@ -68,8 +68,10 @@ class DichotomyMethodFinderTest {
         final CnecRamBranchData cnec4 = new CnecRamBranchData("id4", 1450, 157, 360, true, false, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
         final CnecRamBranchData cnec5 = new CnecRamBranchData("id5", 3450, 257, 365, false, true, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
         final CnecRamBranchData cnec6 = new CnecRamBranchData("id6", 3450, 257, 360, false, true, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec7 = new CnecRamBranchData("id7", 1450, 157, 360, false, false, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec8 = new CnecRamBranchData("id8", 3450, 257, 365, true, true, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
 
-        return List.of(cnec1, cnec2, cnec3, cnec4, cnec5, cnec6);
+        return List.of(cnec1, cnec2, cnec3, cnec4, cnec5, cnec6, cnec7, cnec8);
     }
 
     private static List<CnecRamBranchData> getTestCnecRam2() {
