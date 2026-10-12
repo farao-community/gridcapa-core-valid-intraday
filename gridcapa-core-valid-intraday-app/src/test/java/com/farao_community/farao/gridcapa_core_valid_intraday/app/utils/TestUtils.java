@@ -120,6 +120,14 @@ public final class TestUtils {
                        new Vertex(5, Map.of("AA", -299, "BB", 600, "CC", 300)));
     }
 
+    public static List<Vertex> getTestVertices3() {
+        return List.of(new Vertex(1, Map.of("AA", -100, "BB", 100, "CC", 100)),
+                       new Vertex(2, Map.of("AA", 1500, "BB", -3000, "CC", 1500)),
+                       new Vertex(3, Map.of("AA", 400, "BB", -400, "CC", 400)),
+                       new Vertex(4, Map.of("AA", -200, "BB", 200, "CC", 200)),
+                       new Vertex(5, Map.of("AA", -300, "BB", 300, "CC", 300)));
+    }
+
     public static class TestCoreHubConf extends CoreHubsConfiguration {
         public TestCoreHubConf() {
             // test class

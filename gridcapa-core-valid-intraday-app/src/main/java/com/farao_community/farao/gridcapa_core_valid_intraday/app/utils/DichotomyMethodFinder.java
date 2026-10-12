@@ -49,7 +49,7 @@ public final class DichotomyMethodFinder {
         final List<CnecRamBranchData> frenchNonlimitedCnecs = getFrenchNonlimitingCnecs(marginFilteredCnecs);
         final List<CnecRamBranchData> nonFrenchlimitingCnecs = getNonFrenchlimitingCnecs(marginFilteredCnecs);
         final List<CnecRamBranchData> frenchCorrespondingCnecs = nonFrenchlimitingCnecs.stream()
-                .map(nonFrenchCnec -> getVertexCorrepondingFrenchCnec(vertex, nonFrenchCnec, frenchNonlimitedCnecs, coreHubs, taskParameters.getMergeAngle()))
+                .map(nonFrenchCnec -> getVertexCorrepondingFrenchCnec(nonFrenchCnec, frenchNonlimitedCnecs, coreHubs, taskParameters.getMergeAngle()))
                 .toList()
                 .stream()
                 .filter(Optional::isPresent)
@@ -68,8 +68,7 @@ public final class DichotomyMethodFinder {
         return true;
     }
 
-    private static Optional<CnecRamBranchData> getVertexCorrepondingFrenchCnec(final Vertex vertex,
-                                                                               final CnecRamBranchData nonFrenchCnec,
+    private static Optional<CnecRamBranchData> getVertexCorrepondingFrenchCnec(final CnecRamBranchData nonFrenchCnec,
                                                                                final List<CnecRamBranchData> frenchNonlimitedCnecs,
                                                                                final List<CoreHub> coreHubs,
                                                                                final int mergeAngle) {
@@ -139,7 +138,7 @@ public final class DichotomyMethodFinder {
                                         final CnecRamBranchData cnec,
                                         final List<CoreHub> coreHubs) {
 
-        BigDecimal cnecVerticeProduct = coreHubs.stream()
+        final BigDecimal cnecVerticeProduct = coreHubs.stream()
                 .map(ch -> cnec.getPtdfValues().get(ch.flowbasedCode()).multiply(BigDecimal.valueOf(vertex.coordinates().get(ch.clusterVerticeCode()))))
                 .reduce(BigDecimal::add)
                 .orElseThrow(() -> new IllegalStateException(
