@@ -17,7 +17,7 @@ spring:
 core-valid-intraday-runner:
   seasons:
     spring-start-date: 23-03
-    summer-start-date: 22-06
+    summer-start-date: 21-06
     autumn-start-date: 23-09
     winter-start-date: 21-12
 

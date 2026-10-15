@@ -130,17 +130,15 @@ class PrefilterVerticesTest {
 
     @Test
     void testHistFiltersOff() {
-        //both filters ok
         final List<Vertex> verticesResult3 = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, getTestNetwork(), testVertices, getTestCoreValidIntradayTaskParametersFilterHistOff());
         Assertions.assertThat(verticesResult3)
-                .hasSize(4);
+                .hasSize(5);
         Assertions.assertThat(verticesResult3.stream().map(Vertex::vertexId).toList())
-                .containsExactly(1, 2, 3, 7);
+                .containsExactly(1, 2, 3, 4, 7);
     }
 
     @Test
     void testHubCapFiltersOff() {
-        //both filters ok
         final List<Vertex> verticesResult3 = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, getTestNetwork(), testVertices, getTestCoreValidIntradayTaskParametersFilterHubOff());
         Assertions.assertThat(verticesResult3)
                 .hasSize(4);
@@ -150,7 +148,6 @@ class PrefilterVerticesTest {
 
     @Test
     void testAllFiltersOff() {
-        //both filters ok
         final List<Vertex> verticesResult3 = prefilterVertices.prefilterVertices(TEST_DATE_TIME, testRefProg, getTestNetwork(), testVertices, getTestCoreValidIntradayTaskParametersBothFiltersOff());
         Assertions.assertThat(verticesResult3)
                 .hasSize(7);
