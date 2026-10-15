@@ -134,6 +134,7 @@ public final class DichotomyMethodFinder {
                 .toList();
     }
 
+    // Computes distance (margin) between Cnec and Vertex
     private static int marginVertexCnec(final Vertex vertex,
                                         final CnecRamBranchData cnec,
                                         final List<CoreHub> coreHubs) {
