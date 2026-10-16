@@ -73,7 +73,7 @@ public final class DichotomyMethodFinder {
                                                                                final List<CoreHub> coreHubs,
                                                                                final int mergeAngle) {
         return frenchNonlimitedCnecs.stream()
-                .map(frCnec -> computeAngle(nonFrenchCnec, frCnec, coreHubs))
+                .map(frCnec -> computeAngleBetweenCnecs(nonFrenchCnec, frCnec, coreHubs))
                 .max((t1, t2) -> t1._1().compareTo(t2._1()))
                 .filter(t -> {
                     return t._1().compareTo(BigDecimal.valueOf(mergeAngle)) < 0;
@@ -82,9 +82,9 @@ public final class DichotomyMethodFinder {
 
     }
 
-    private static Tuple<BigDecimal, CnecRamBranchData> computeAngle(final CnecRamBranchData nonFrenchCnec,
-                                                                     final CnecRamBranchData frCnec,
-                                                                     final List<CoreHub> coreHubs) {
+    private static Tuple<BigDecimal, CnecRamBranchData> computeAngleBetweenCnecs(final CnecRamBranchData nonFrenchCnec,
+                                                                                 final CnecRamBranchData frCnec,
+                                                                                 final List<CoreHub> coreHubs) {
         final BigDecimal angle = coreHubs.stream()
                 .map(ch -> nonFrenchCnec.getPtdfValues().get(ch.flowbasedCode()).multiply(frCnec.getPtdfValues().get(ch.flowbasedCode())))
                 .reduce(BigDecimal::add)

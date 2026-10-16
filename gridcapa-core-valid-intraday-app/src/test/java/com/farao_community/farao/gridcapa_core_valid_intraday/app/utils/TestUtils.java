@@ -11,11 +11,13 @@ import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.NetPositionHistory;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.Season;
 import com.powsybl.iidm.network.Country;
 
+import java.math.BigDecimal;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -126,6 +128,26 @@ public final class TestUtils {
                        new Vertex(3, Map.of("AA", 400, "BB", -400, "CC", 400)),
                        new Vertex(4, Map.of("AA", -200, "BB", 200, "CC", 200)),
                        new Vertex(5, Map.of("AA", -300, "BB", 300, "CC", 300)));
+    }
+
+    public static List<CnecRamBranchData> getTestCnecRam1() {
+        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 15, true, false, Map.of("fb1", BigDecimal.valueOf(.1), "fb2", BigDecimal.valueOf(0.1), "fb3", BigDecimal.valueOf(.1)));
+        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 16, false, true, Map.of("fb1", BigDecimal.valueOf(.101), "fb2", BigDecimal.valueOf(0.101), "fb3", BigDecimal.valueOf(.1)));
+        final CnecRamBranchData cnec3 = new CnecRamBranchData("id3", 3450, 257, 14, false, true, Map.of("fb1", BigDecimal.valueOf(.101), "fb2", BigDecimal.valueOf(0.101), "fb3", BigDecimal.valueOf(.1)));
+        final CnecRamBranchData cnec4 = new CnecRamBranchData("id4", 1450, 157, 360, true, false, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec5 = new CnecRamBranchData("id5", 3450, 257, 365, false, true, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec6 = new CnecRamBranchData("id6", 3450, 257, 360, false, true, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec7 = new CnecRamBranchData("id7", 1450, 157, 360, false, false, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec8 = new CnecRamBranchData("id8", 3450, 257, 365, true, true, Map.of("fb1", BigDecimal.valueOf(.9), "fb2", BigDecimal.valueOf(0.9), "fb3", BigDecimal.valueOf(.9)));
+
+        return List.of(cnec1, cnec2, cnec3, cnec4, cnec5, cnec6, cnec7, cnec8);
+    }
+
+    public static List<CnecRamBranchData> getTestCnecRam2() {
+        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1000, true, false, Map.of("fb1", BigDecimal.valueOf(.1), "fb2", BigDecimal.valueOf(0.2), "fb3", BigDecimal.valueOf(.1)));
+        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 700, false, true, Map.of("fb1", BigDecimal.valueOf(.101), "fb2", BigDecimal.valueOf(0.201), "fb3", BigDecimal.valueOf(.1)));
+
+        return List.of(cnec1, cnec2);
     }
 
     public static class TestCoreHubConf extends CoreHubsConfiguration {
