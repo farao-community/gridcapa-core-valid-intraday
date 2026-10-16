@@ -17,6 +17,8 @@ public class CoreValidIntradayTaskParameters {
 
     private static final String MAX_SELECTED_VERTICES = "MAX_SELECTED_VERTICES";
     private static final String MARGIN_FOR_PREFILTER = "MARGIN_FOR_PREFILTER";
+    private static final String IS_HISTORIC_FILTER_ACTIVE = "IS_HISTORIC_FILTER_ACTIVE";
+    private static final String IS_HUB_CAPACITY_FILTER_ACTIVE = "IS_HUB_CAPACITY_FILTER_ACTIVE";
     private static final String FRM_MARGIN_PERCENTAGE = "FRM_MARGIN_PERCENTAGE";
     private static final String MIN_RAM_MCCC = "MIN_RAM_MCCC";
     private static final String PONDERATION_CLOSEST = "PONDERATION_CLOSEST";
@@ -25,6 +27,8 @@ public class CoreValidIntradayTaskParameters {
 
     private int maxSelectedVertices;
     private int marginForPrefilter;
+    private boolean isHistoricFilterActive;
+    private boolean isHubCapacityFilterActive;
     private int frmMarginPercentage;
     private int minRamMccc;
     private int ponderationClosest;
@@ -37,6 +41,8 @@ public class CoreValidIntradayTaskParameters {
             switch (parameter.getId()) {
                 case MAX_SELECTED_VERTICES -> maxSelectedVertices = validateIsPositiveIntegerAndGet(parameter, errors);
                 case MARGIN_FOR_PREFILTER -> marginForPrefilter = validateIsPositiveIntegerAndGet(parameter, errors);
+                case IS_HISTORIC_FILTER_ACTIVE -> isHistoricFilterActive = validateIsBooleanAndGet(parameter, errors);
+                case IS_HUB_CAPACITY_FILTER_ACTIVE -> isHubCapacityFilterActive = validateIsBooleanAndGet(parameter, errors);
                 case FRM_MARGIN_PERCENTAGE -> frmMarginPercentage = validateIsPositiveIntegerAndGet(parameter, errors);
                 case MIN_RAM_MCCC -> minRamMccc = validateIsPositiveIntegerAndGet(parameter, errors);
                 case PONDERATION_CLOSEST -> ponderationClosest = validateIsPositiveIntegerAndGet(parameter, errors);
@@ -74,12 +80,30 @@ public class CoreValidIntradayTaskParameters {
         return value;
     }
 
+    private boolean validateIsBooleanAndGet(final TaskParameterDto parameter, final List<String> errors) {
+        if ("BOOLEAN".equals(parameter.getParameterType())) {
+            String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
+            return Boolean.parseBoolean(value);
+        } else {
+            errors.add(String.format("Parameter %s was expected to be of type BOOLEAN, got %s", parameter.getId(), parameter.getParameterType()));
+            return false; // default return value, won't be used as this return can be reached only in case of validation error
+        }
+    }
+
     public int getMaxSelectedVertices() {
         return maxSelectedVertices;
     }
 
     public int getMarginForPrefilter() {
         return marginForPrefilter;
+    }
+
+    public boolean isHistoricFilterActive() {
+        return isHistoricFilterActive;
+    }
+
+    public boolean isHubCapacityFilterActive() {
+        return isHubCapacityFilterActive;
     }
 
     public int getFrmMarginPercentage() {
@@ -110,6 +134,8 @@ public class CoreValidIntradayTaskParameters {
         List<String> appender = new ArrayList<>();
         appender.add(String.format(KEY_VALUE_FORMAT, MAX_SELECTED_VERTICES, maxSelectedVertices));
         appender.add(String.format(KEY_VALUE_FORMAT, MARGIN_FOR_PREFILTER, marginForPrefilter));
+        appender.add(String.format(KEY_VALUE_FORMAT, IS_HISTORIC_FILTER_ACTIVE, isHistoricFilterActive));
+        appender.add(String.format(KEY_VALUE_FORMAT, IS_HUB_CAPACITY_FILTER_ACTIVE, isHubCapacityFilterActive));
         appender.add(String.format(KEY_VALUE_FORMAT, FRM_MARGIN_PERCENTAGE, frmMarginPercentage));
         appender.add(String.format(KEY_VALUE_FORMAT, MIN_RAM_MCCC, minRamMccc));
         appender.add(String.format(KEY_VALUE_FORMAT, PONDERATION_CLOSEST, ponderationClosest));
