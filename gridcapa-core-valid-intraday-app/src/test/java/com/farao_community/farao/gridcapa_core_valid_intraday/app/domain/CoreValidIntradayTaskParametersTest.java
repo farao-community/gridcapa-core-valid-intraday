@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2025, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.domain;
 
 import com.farao_community.farao.gridcapa.task_manager.api.TaskParameterDto;
@@ -25,6 +31,9 @@ class CoreValidIntradayTaskParametersTest {
         assertThat(params.getPonderationClosest()).isEqualTo(31);
         assertThat(params.getPonderationAngle()).isEqualTo(33);
         assertThat(params.getPonderationConstrained()).isEqualTo(34);
+        assertThat(params.getRamMargin()).isEqualTo(15);
+        assertThat(params.getMergeAngle()).isEqualTo(1);
+        assertThat(params.getFrenchCnecCountLimit()).isEqualTo(7);
     }
 
     @Test
@@ -47,6 +56,9 @@ class CoreValidIntradayTaskParametersTest {
         assertThat(params.getPonderationClosest()).isZero();
         assertThat(params.getPonderationAngle()).isZero();
         assertThat(params.getPonderationConstrained()).isZero();
+        assertThat(params.getRamMargin()).isZero();
+        assertThat(params.getMergeAngle()).isZero();
+        assertThat(params.getFrenchCnecCountLimit()).isZero();
     }
 
     @Test

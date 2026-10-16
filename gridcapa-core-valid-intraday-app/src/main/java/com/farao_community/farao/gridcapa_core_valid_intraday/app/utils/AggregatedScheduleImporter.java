@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
+package com.farao_community.farao.gridcapa_core_valid_intraday.app.utils;
 
 import _351.iec62325.tc57wg16._451_2.scheduledocument._5._1.Point;
 import _351.iec62325.tc57wg16._451_2.scheduledocument._5._1.ScheduleMarketDocument;

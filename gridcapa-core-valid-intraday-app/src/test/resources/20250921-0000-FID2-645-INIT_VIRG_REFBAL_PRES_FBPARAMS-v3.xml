@@ -57,7 +57,7 @@
                   <Status>N</Status>
                 </outage>
                 <RAM0core>100</RAM0core>
-                <RAM>100</RAM>
+                <RAM>1000</RAM>
                 <tsoOrigin>AT</tsoOrigin>
               </criticalBranch>
               <ptdfs>
