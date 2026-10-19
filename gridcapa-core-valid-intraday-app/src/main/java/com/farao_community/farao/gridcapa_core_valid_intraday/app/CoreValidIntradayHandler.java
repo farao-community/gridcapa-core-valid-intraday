@@ -81,6 +81,11 @@ public class CoreValidIntradayHandler {
         }
         //select vertices
         final List<CnecRamBranchData> cnecRamBranchData = CnecRamMapper.mapCnecRamToBranches(flowBasedDomainCnecRam);
+        List<Vertex> projectedVertices = importedVertices;
+        if (coreValidIntradayTaskParameters.isProjectionActive()) {
+            businessLogger.info("Projecting Vertices on domain");
+            projectedVertices = VerticesUtils.getVerticesProjectedOnDomain(importedVertices, cnecRamBranchData, coreHubsConfiguration.getCoreHubs());
+        }
         businessLogger.info("Projecting Vertices on domain [start]");
         final List<Vertex> projectedVertices = VerticesUtils.getVerticesProjectedOnDomain(importedVertices, cnecRamBranchData, coreHubsConfiguration.getCoreHubs());
         businessLogger.info("Projecting Vertices on domain [end]");
