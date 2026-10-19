@@ -18,13 +18,13 @@ class CnecRamBranchDataTest {
     private static final int RAM_0_CORE = 100;
     private static final int RAM = 1200;
     private static final int AMR = 200;
-    private static final boolean IS_FRENCH = true;
-    private static final boolean IS_LIMITING = true;
 
     @Test
     void testCnecRamBranchData() {
         Map<String, BigDecimal> ptdfs = Map.of("AA", BigDecimal.valueOf(0.00123), "BB", BigDecimal.valueOf(0.00456), "CC", BigDecimal.valueOf(0.00789));
-        CnecRamBranchData cnecRamBranchData = new CnecRamBranchData(TEST_ID, RAM_0_CORE, AMR, RAM, IS_LIMITING, IS_FRENCH, ptdfs);
+        final boolean isLimiting = true;
+        final boolean isFrench = true;
+        CnecRamBranchData cnecRamBranchData = new CnecRamBranchData(TEST_ID, RAM_0_CORE, AMR, RAM, isLimiting, isFrench, ptdfs);
         Assertions.assertThat(cnecRamBranchData).isNotNull();
         Assertions.assertThat(cnecRamBranchData.branchId())
                 .isEqualTo(TEST_ID);

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.math.RoundingMode.HALF_EVEN;
+import static java.util.Comparator.comparing;
 
 public final class DichotomyMethodFinder {
 
@@ -46,17 +47,14 @@ public final class DichotomyMethodFinder {
                                                            final CoreValidIntradayTaskParameters taskParameters) {
 
         final List<CnecRamBranchData> marginFilteredCnecs = filterCnecsByMarginForVertex(vertex, cnecs, coreHubs, taskParameters.getRamMargin());
-        final List<CnecRamBranchData> frenchNonlimitedCnecs = getFrenchNonlimitingCnecs(marginFilteredCnecs);
-        final List<CnecRamBranchData> nonFrenchlimitingCnecs = getNonFrenchlimitingCnecs(marginFilteredCnecs);
-        final List<CnecRamBranchData> frenchCorrespondingCnecs = nonFrenchlimitingCnecs.stream()
-                .map(nonFrenchCnec -> getVertexCorrepondingFrenchCnec(nonFrenchCnec, frenchNonlimitedCnecs, coreHubs, taskParameters.getMergeAngle()))
-                .toList()
-                .stream()
+        final List<CnecRamBranchData> frenchNonLimitedCnecs = getFrenchNonLimitingCnecs(marginFilteredCnecs);
+        final List<CnecRamBranchData> nonFrenchLimitingCnecs = getNonFrenchLimitingCnecs(marginFilteredCnecs);
+        final List<CnecRamBranchData> frenchCorrespondingCnecs = nonFrenchLimitingCnecs.stream()
+                .map(nonFrenchCnec -> getVertexCorrepondingFrenchCnec(nonFrenchCnec, frenchNonLimitedCnecs, coreHubs, taskParameters.getMergeAngle()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .toList();
-        return new VertexToFrenchCnecs(vertex,
-                                       frenchCorrespondingCnecs);
+        return new VertexToFrenchCnecs(vertex, frenchCorrespondingCnecs);
     }
 
     private static boolean filterVertexWithNoFrenchCnecs(final VertexToFrenchCnecs vfc,
@@ -74,10 +72,8 @@ public final class DichotomyMethodFinder {
                                                                                final int mergeAngle) {
         return frenchNonlimitedCnecs.stream()
                 .map(frCnec -> computeAngleBetweenCnecs(nonFrenchCnec, frCnec, coreHubs))
-                .max((t1, t2) -> t1._1().compareTo(t2._1()))
-                .filter(t -> {
-                    return t._1().compareTo(BigDecimal.valueOf(mergeAngle)) < 0;
-                })
+                .max(comparing(Tuple::_1))
+                .filter(t -> t._1().compareTo(BigDecimal.valueOf(mergeAngle)) < 0)
                 .map(Tuple::_2);
 
     }
@@ -86,25 +82,24 @@ public final class DichotomyMethodFinder {
                                                                                  final CnecRamBranchData frCnec,
                                                                                  final List<CoreHub> coreHubs) {
         final BigDecimal angle = coreHubs.stream()
-                .map(ch -> nonFrenchCnec.getPtdfValues().get(ch.flowbasedCode()).multiply(frCnec.getPtdfValues().get(ch.flowbasedCode())))
+                .map(CoreHub::flowbasedCode)
+                .map(fbc -> nonFrenchCnec.getPtdfValues().get(fbc).multiply(frCnec.getPtdfValues().get(fbc)))
                 .reduce(BigDecimal::add)
                 .orElseThrow(() -> new IllegalStateException(
                         String.format("Cnecs %S and %S are missing required coordinates for angle computation",
                                       frCnec.branchId(), nonFrenchCnec.branchId())
                 ));
 
-        final BigDecimal frCnecNorme = computeNorme(nonFrenchCnec, coreHubs);
-        final BigDecimal nonFrCnecNorme = computeNorme(frCnec, coreHubs);
-        return new Tuple<>(angle.multiply(frCnecNorme).multiply(nonFrCnecNorme), frCnec);
+        final BigDecimal frCnecNorm = computeNorm(nonFrenchCnec, coreHubs);
+        final BigDecimal nonFrCnecNorm = computeNorm(frCnec, coreHubs);
+        return new Tuple<>(angle.multiply(frCnecNorm).multiply(nonFrCnecNorm), frCnec);
     }
 
-    private static BigDecimal computeNorme(final CnecRamBranchData cnec,
-                                           final List<CoreHub> coreHubs) {
+    private static BigDecimal computeNorm(final CnecRamBranchData cnec,
+                                          final List<CoreHub> coreHubs) {
         final BigDecimal norme = coreHubs.stream()
-                .map(ch -> {
-                    BigDecimal ptdfValue = cnec.getPtdfValues().get(ch.flowbasedCode());
-                    return ptdfValue.multiply(ptdfValue);
-                })
+                .map(ch -> cnec.getPtdfValues().get(ch.flowbasedCode()))
+                .map(ptdfVal -> ptdfVal.multiply(ptdfVal))
                 .reduce(BigDecimal::add)
                 .orElseThrow(() -> new IllegalStateException(
                         String.format("Cannot compute norme of Cnec: %S",
@@ -113,13 +108,13 @@ public final class DichotomyMethodFinder {
         return norme.sqrt(MathContext.DECIMAL32);
     }
 
-    private static List<CnecRamBranchData> getNonFrenchlimitingCnecs(final List<CnecRamBranchData> marginFilteredCnecs) {
+    private static List<CnecRamBranchData> getNonFrenchLimitingCnecs(final List<CnecRamBranchData> marginFilteredCnecs) {
         return marginFilteredCnecs.stream()
                 .filter(cnec -> !cnec.isFrench() && cnec.isLimiting())
                 .toList();
     }
 
-    private static List<CnecRamBranchData> getFrenchNonlimitingCnecs(final List<CnecRamBranchData> marginFilteredCnecs) {
+    private static List<CnecRamBranchData> getFrenchNonLimitingCnecs(final List<CnecRamBranchData> marginFilteredCnecs) {
         return marginFilteredCnecs.stream()
                 .filter(cnec -> cnec.isFrench() && !cnec.isLimiting())
                 .toList();
@@ -128,9 +123,9 @@ public final class DichotomyMethodFinder {
     private static List<CnecRamBranchData> filterCnecsByMarginForVertex(final Vertex vertex,
                                                                         final List<CnecRamBranchData> cnecs,
                                                                         final List<CoreHub> coreHubs,
-                                                                        int margeRam) {
+                                                                        final int marginRam) {
         return cnecs.stream()
-                .filter(cnec -> marginVertexCnec(vertex, cnec, coreHubs) < margeRam)
+                .filter(cnec -> marginVertexCnec(vertex, cnec, coreHubs) < marginRam)
                 .toList();
     }
 
