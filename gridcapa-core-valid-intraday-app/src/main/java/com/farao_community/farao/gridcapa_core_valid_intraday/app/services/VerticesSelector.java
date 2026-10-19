@@ -140,7 +140,8 @@ public class VerticesSelector {
         fillVertexPonderationMap(constrainedVertices, ponderationToQuotient(ponderationConstrained), vertexIdToPonderation);
         return vertexIdToPonderation.entrySet().stream()
                 .sorted(ORDER_BY_PONDERATION)
-                .limit(parameters.getMaxSelectedVertices())
+                // We will take twice the limit because later we need more vertices than the limit and will apply the limit again
+                .limit(parameters.getMaxSelectedVertices() * 2L)
                 .map(Map.Entry::getKey)
                 .toList();
     }

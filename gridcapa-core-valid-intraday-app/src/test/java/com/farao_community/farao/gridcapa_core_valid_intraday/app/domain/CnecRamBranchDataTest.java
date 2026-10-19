@@ -16,12 +16,15 @@ class CnecRamBranchDataTest {
 
     private static final String TEST_ID = "testId";
     private static final int RAM_0_CORE = 100;
+    private static final int RAM = 1200;
     private static final int AMR = 200;
 
     @Test
     void testCnecRamBranchData() {
         Map<String, BigDecimal> ptdfs = Map.of("AA", BigDecimal.valueOf(0.00123), "BB", BigDecimal.valueOf(0.00456), "CC", BigDecimal.valueOf(0.00789));
-        CnecRamBranchData cnecRamBranchData = new CnecRamBranchData(TEST_ID, RAM_0_CORE, AMR, ptdfs);
+        final boolean isLimiting = true;
+        final boolean isFrench = true;
+        CnecRamBranchData cnecRamBranchData = new CnecRamBranchData(TEST_ID, RAM_0_CORE, AMR, RAM, isLimiting, isFrench, ptdfs);
         Assertions.assertThat(cnecRamBranchData).isNotNull();
         Assertions.assertThat(cnecRamBranchData.branchId())
                 .isEqualTo(TEST_ID);
@@ -31,6 +34,9 @@ class CnecRamBranchDataTest {
         Assertions.assertThat(cnecRamBranchData.amr())
                 .isEqualTo(cnecRamBranchData.getAmr())
                 .isEqualTo(AMR);
+        Assertions.assertThat(cnecRamBranchData.ram()).isEqualTo(RAM);
+        Assertions.assertThat(cnecRamBranchData.isFrench()).isTrue();
+        Assertions.assertThat(cnecRamBranchData.isLimiting()).isTrue();
         Assertions.assertThat(cnecRamBranchData.getPtdfValues())
                 .isEqualTo(cnecRamBranchData.ptdfValues())
                 .isEqualTo(ptdfs);

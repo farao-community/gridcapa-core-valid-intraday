@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
+package com.farao_community.farao.gridcapa_core_valid_intraday.app.utils;
 
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class CnecRamMapper {
+
+    private static final String FRENCH_TSO_ORIGIN = "FR";
 
     private CnecRamMapper() {
         // utility class
@@ -43,7 +45,13 @@ public final class CnecRamMapper {
                         p -> BigDecimal.valueOf(p.getValue())
                 ));
         final CriticalBranchType cb = constraintResult.getCriticalBranch();
-        return new CnecRamBranchData(cb.getId(), getIntValue(cb.getRAM0Core()), getIntValue(cb.getAmr()), ptdfs);
+        return new CnecRamBranchData(cb.getId(),
+                                     getIntValue(cb.getRAM0Core()),
+                                     getIntValue(cb.getAmr()),
+                                     getIntValue(cb.getRAM()),
+                                     constraintResult.getDomainLimit().isRegion(),
+                                     cb.getTsoOrigin().equals(FRENCH_TSO_ORIGIN),
+                                     ptdfs);
     }
 
     private static int getIntValue(final Float nullableFloatValue) {

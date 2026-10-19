@@ -12,6 +12,8 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesUtils;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.AggregatedScheduleImporter;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.CnecRamImporter;
 import com.farao_community.gridcapa_core_valid_intraday.xsd.f645.FlowBasedDomainDocument;
 import com.powsybl.glsk.api.GlskDocument;
 import com.powsybl.glsk.api.io.GlskDocumentImporters;
