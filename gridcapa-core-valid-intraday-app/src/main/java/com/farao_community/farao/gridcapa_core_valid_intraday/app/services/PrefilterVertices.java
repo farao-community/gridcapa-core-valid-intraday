@@ -143,7 +143,9 @@ public class PrefilterVertices {
 
     private Map<CoreHub, NetPositionHistory> mapCoreHubsToNetPositionHistories(final Set<NetPositionHistory> npHistory) {
         final Map<CoreHub, NetPositionHistory> coreHubsNph = new HashMap<>();
-        coreHubs.forEach(coreHub -> coreHubsNph.put(
+        coreHubs.stream()
+                .filter(not(CoreHub::isHvdcHub))
+                .forEach(coreHub -> coreHubsNph.put(
                 coreHub,
                 npHistory.stream()
                         .filter(nph -> nph.getHubRamcep2Code().equals(coreHub.ramcep2Code()))
