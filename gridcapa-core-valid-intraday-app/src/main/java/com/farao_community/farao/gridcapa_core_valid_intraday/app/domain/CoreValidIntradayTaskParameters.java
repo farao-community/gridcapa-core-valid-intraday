@@ -166,6 +166,7 @@ public class CoreValidIntradayTaskParameters {
 
     public String toJsonString() {
         List<String> appender = new ArrayList<>();
+        appender.add(String.format(KEY_VALUE_FORMAT, IS_PROJECTION_ACTIVE, isProjectionActive));
         appender.add(String.format(KEY_VALUE_FORMAT, MAX_SELECTED_VERTICES, maxSelectedVertices));
         appender.add(String.format(KEY_VALUE_FORMAT, MARGIN_FOR_PREFILTER, marginForPrefilter));
         appender.add(String.format(KEY_VALUE_FORMAT, IS_HISTORIC_FILTER_ACTIVE, isHistoricFilterActive));
