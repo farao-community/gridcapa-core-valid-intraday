@@ -146,11 +146,11 @@ public class PrefilterVertices {
         coreHubs.stream()
                 .filter(not(CoreHub::isHvdcHub))
                 .forEach(coreHub -> coreHubsNph.put(
-                coreHub,
-                npHistory.stream()
-                        .filter(nph -> nph.getHubRamcep2Code().equals(coreHub.ramcep2Code()))
-                        .findFirst()
-                        .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("CoreHub configuration for net position history missing for hub : %s", coreHub.name())))));
+                        coreHub,
+                        npHistory.stream()
+                                .filter(nph -> nph.getHubRamcep2Code().equals(coreHub.ramcep2Code()))
+                                .findFirst()
+                                .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("CoreHub configuration for net position history missing for hub : %s", coreHub.name())))));
         return coreHubsNph;
     }
 
