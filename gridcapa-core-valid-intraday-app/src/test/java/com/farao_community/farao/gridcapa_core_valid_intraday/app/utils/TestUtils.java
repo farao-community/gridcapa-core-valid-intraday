@@ -32,8 +32,6 @@ public final class TestUtils {
 
     private static List<TaskParameterDto> getTaskParameterDtos() {
         return List.of(
-
-                new TaskParameterDto("IS_PROJECTION_ACTIVE", "BOOLEAN", "true", "false"),
                 new TaskParameterDto("MAX_SELECTED_VERTICES", "INT", "16", "6"),
                 new TaskParameterDto("MARGIN_FOR_PREFILTER", "INT", "100", "1515"),
                 new TaskParameterDto("IS_HISTORIC_FILTER_ACTIVE", "BOOLEAN", "true", "false"),
@@ -45,7 +43,8 @@ public final class TestUtils {
                 new TaskParameterDto("PONDERATION_CONSTRAINED", "INT", "34", "1515"),
                 new TaskParameterDto("RAM_MARGIN", "INT", "15", "213"),
                 new TaskParameterDto("MERGE_ANGLE", "INT", "1", "23"),
-                new TaskParameterDto("FR_CNEC_COUNT_LIMIT", "INT", "7", "14")
+                new TaskParameterDto("FR_CNEC_COUNT_LIMIT", "INT", "7", "14"),
+                new TaskParameterDto("IS_PROJECTION_ACTIVE", "BOOLEAN", "true", "false")
         );
     }
 
