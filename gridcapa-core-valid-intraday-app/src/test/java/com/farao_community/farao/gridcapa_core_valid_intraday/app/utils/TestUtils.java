@@ -32,6 +32,8 @@ public final class TestUtils {
 
     private static List<TaskParameterDto> getTaskParameterDtos() {
         return List.of(
+
+                new TaskParameterDto("IS_PROJECTION_ACTIVE", "BOOLEAN", "true", "false"),
                 new TaskParameterDto("MAX_SELECTED_VERTICES", "INT", "16", "6"),
                 new TaskParameterDto("MARGIN_FOR_PREFILTER", "INT", "100", "1515"),
                 new TaskParameterDto("IS_HISTORIC_FILTER_ACTIVE", "BOOLEAN", "true", "false"),
