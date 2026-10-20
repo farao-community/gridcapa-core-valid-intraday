@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static java.math.RoundingMode.HALF_EVEN;
 import static java.util.Comparator.comparing;
@@ -82,8 +83,9 @@ public final class DichotomyMethodFinder {
                                                                                  final CnecRamBranchData frCnec,
                                                                                  final List<CoreHub> coreHubs) {
         final BigDecimal angle = coreHubs.stream()
-                .map(CoreHub::flowbasedCode)
-                .map(fbc -> nonFrenchCnec.getPtdfValues().get(fbc).multiply(frCnec.getPtdfValues().get(fbc)))
+                .filter(Predicate.not(CoreHub::isHvdcHub))
+                .map(CoreHub::clusterVerticeCode)
+                .map(code -> nonFrenchCnec.getPtdfValues().get(code).multiply(frCnec.getPtdfValues().get(code)))
                 .reduce(BigDecimal::add)
                 .orElseThrow(() -> new IllegalStateException(
                         String.format("Cnecs %S and %S are missing required coordinates for angle computation",
@@ -98,7 +100,8 @@ public final class DichotomyMethodFinder {
     private static BigDecimal computeNorm(final CnecRamBranchData cnec,
                                           final List<CoreHub> coreHubs) {
         final BigDecimal norme = coreHubs.stream()
-                .map(ch -> cnec.getPtdfValues().get(ch.flowbasedCode()))
+                .map(CoreHub::clusterVerticeCode)
+                .map(code -> cnec.getPtdfValues().get(code))
                 .map(ptdfVal -> ptdfVal.multiply(ptdfVal))
                 .reduce(BigDecimal::add)
                 .orElseThrow(() -> new IllegalStateException(
@@ -135,7 +138,9 @@ public final class DichotomyMethodFinder {
                                         final List<CoreHub> coreHubs) {
 
         final BigDecimal cnecVerticeProduct = coreHubs.stream()
-                .map(ch -> cnec.getPtdfValues().get(ch.flowbasedCode()).multiply(BigDecimal.valueOf(vertex.coordinates().get(ch.clusterVerticeCode()))))
+                .filter(Predicate.not(CoreHub::isHvdcHub))
+                .map(CoreHub::clusterVerticeCode)
+                .map(code -> cnec.getPtdfValues().get(code).multiply(BigDecimal.valueOf(vertex.coordinates().get(code))))
                 .reduce(BigDecimal::add)
                 .orElseThrow(() -> new IllegalStateException(
                         String.format("Vertex %d and Cnec %S missing required coordinates for margin computation",
