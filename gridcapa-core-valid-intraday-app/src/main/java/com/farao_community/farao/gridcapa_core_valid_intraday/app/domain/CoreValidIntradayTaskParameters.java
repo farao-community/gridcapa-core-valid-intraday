@@ -50,7 +50,7 @@ public class CoreValidIntradayTaskParameters {
     private int frenchCnecCountLimit;
 
     public CoreValidIntradayTaskParameters(final List<TaskParameterDto> parameters) {
-        List<String> errors = new ArrayList<>();
+        final List<String> errors = new ArrayList<>();
         for (TaskParameterDto parameter : parameters) {
             switch (parameter.getId()) {
                 case IS_PROJECTION_ACTIVE -> isProjectionActive = validateIsBooleanAndGet(parameter, errors);
@@ -77,7 +77,7 @@ public class CoreValidIntradayTaskParameters {
 
     private int validateIsIntegerAndGet(final TaskParameterDto parameter, final List<String> errors) {
         if ("INT".equals(parameter.getParameterType())) {
-            String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
+            final String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
             try {
                 return Integer.parseInt(value);
             } catch (NumberFormatException e) {
@@ -90,7 +90,7 @@ public class CoreValidIntradayTaskParameters {
     }
 
     private int validateIsPositiveIntegerAndGet(final TaskParameterDto parameter, final List<String> errors) {
-        int value = validateIsIntegerAndGet(parameter, errors);
+        final int value = validateIsIntegerAndGet(parameter, errors);
         if (value < 0) {
             errors.add(String.format("Parameter %s should be positive (value: %s)", parameter.getId(), parameter.getValue()));
             return 0; // default return value, won't be used as this return can be reached only in case of validation error
@@ -100,7 +100,7 @@ public class CoreValidIntradayTaskParameters {
 
     private boolean validateIsBooleanAndGet(final TaskParameterDto parameter, final List<String> errors) {
         if ("BOOLEAN".equals(parameter.getParameterType())) {
-            String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
+            final String value = parameter.getValue() != null ? parameter.getValue() : parameter.getDefaultValue();
             return Boolean.parseBoolean(value);
         } else {
             errors.add(String.format("Parameter %s was expected to be of type BOOLEAN, got %s", parameter.getId(), parameter.getParameterType()));
@@ -165,7 +165,7 @@ public class CoreValidIntradayTaskParameters {
     }
 
     public String toJsonString() {
-        List<String> appender = new ArrayList<>();
+        final List<String> appender = new ArrayList<>();
         appender.add(String.format(KEY_VALUE_FORMAT, IS_PROJECTION_ACTIVE, isProjectionActive));
         appender.add(String.format(KEY_VALUE_FORMAT, MAX_SELECTED_VERTICES, maxSelectedVertices));
         appender.add(String.format(KEY_VALUE_FORMAT, MARGIN_FOR_PREFILTER, marginForPrefilter));
