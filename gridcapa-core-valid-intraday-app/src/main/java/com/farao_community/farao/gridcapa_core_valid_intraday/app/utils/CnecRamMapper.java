@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.farao_community.gridcapa_core_valid_intraday.xsd.f645.BranchStatusType.OUT;
+
 public final class CnecRamMapper {
 
     private static final String FRENCH_TSO_ORIGIN = "FR";
@@ -32,6 +34,7 @@ public final class CnecRamMapper {
                     .getInterval().getFirst()
                     .getFlowBasedDomain().getFirst()
                     .getConstraintResults().getConstraintResult().stream()
+                    .filter(c -> c.getCriticalBranch().getBranchStatus() != OUT)
                     .map(CnecRamMapper::getCnecRamBranchData).toList();
         } catch (final Exception e) {
             throw new CoreValidIntradayInvalidDataException("Failed to map CnecRam data to branch data", e);
