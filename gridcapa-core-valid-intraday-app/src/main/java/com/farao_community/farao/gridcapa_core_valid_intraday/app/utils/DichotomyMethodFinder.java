@@ -102,7 +102,7 @@ public final class DichotomyMethodFinder {
                 .map(ptdfVal -> ptdfVal.multiply(ptdfVal))
                 .reduce(BigDecimal::add)
                 .orElseThrow(() -> new IllegalStateException(
-                        String.format("Cannot compute norme of Cnec: %S",
+                        String.format("Cannot compute norm of Cnec: %S",
                                       cnec.branchId())
                 ));
         return norme.sqrt(MathContext.DECIMAL32);
