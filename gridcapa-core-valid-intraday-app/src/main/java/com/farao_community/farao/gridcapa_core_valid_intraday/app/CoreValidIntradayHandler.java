@@ -11,6 +11,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayRequest;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.VertexToFrenchCnecs;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.CnecRamMapper;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.FileImporter;
@@ -80,12 +81,12 @@ public class CoreValidIntradayHandler {
         }
         //select vertices
         final List<CnecRamBranchData> cnecRamBranchData = CnecRamMapper.mapCnecRamToBranches(flowBasedDomainCnecRam);
-        final List<Vertex> prefilteredVertices = prefilterVertices.prefilterVertices(targetProcessDateTime, marketPoints, network, importedVertices, coreValidIntradayTaskParameters);
-        businessLogger.info("Prefiltered Vertices are : {}", logVerticeIds(prefilteredVertices));
-        final List<Vertex> ponderatedSelection = verticesSelector.selectionSynthesis(prefilteredVertices, marketPoints, cnecRamBranchData, coreValidIntradayTaskParameters);
-        businessLogger.info("Selected Vertices are : {}", logVerticeIds(ponderatedSelection));
+        final List<Vertex> prefilteredVertices = prefilterVertices.prefilterVertices(targetProcessDateTime, marketPoints, network, projectedVertices, coreValidIntradayTaskParameters);
+        businessLogger.info("Prefiltered Vertices count: {}", prefilteredVertices.size());
+        final List<SelectedVertexData> ponderatedSelection = verticesSelector.selectionSynthesis(prefilteredVertices, marketPoints, cnecRamBranchData, coreValidIntradayTaskParameters);
+        businessLogger.info("Selected Vertices are : {}", logVertices(ponderatedSelection));
         //TODO calculate IVA stuff
-        final List<VertexToFrenchCnecs> frenchCnecsDefiningVertices = DichotomyMethodFinder.getFrenchCnecsDefiningVertices(ponderatedSelection, cnecRamBranchData, coreHubsConfiguration.getCoreHubs(), coreValidIntradayTaskParameters, businessLogger);
+        final List<VertexToFrenchCnecs> frenchCnecsDefiningVertices = DichotomyMethodFinder.getFrenchCnecsDefiningVertices(getVerticesFromSelectedVertexData(ponderatedSelection), cnecRamBranchData, coreHubsConfiguration.getCoreHubs(), coreValidIntradayTaskParameters, businessLogger);
 
         //TODO output IVAs
         return coreValidIntradayRequest.getId();
@@ -95,7 +96,14 @@ public class CoreValidIntradayHandler {
         MDC.put("gridcapa-task-id", coreValidIntradayRequest.getId());
     }
 
-    private String logVerticeIds(List<Vertex> vertices) {
-        return vertices.stream().mapToInt(Vertex::vertexId).mapToObj(Integer::toString).collect(Collectors.joining(", "));
+    private String logVertices(List<SelectedVertexData> selectedVertexData) {
+        return selectedVertexData.stream()
+                .map(SelectedVertexData::toString).collect(Collectors.joining(", "));
+    }
+
+    private List<Vertex> getVerticesFromSelectedVertexData(List<SelectedVertexData> selectedVertexData) {
+        return selectedVertexData.stream()
+                .map(SelectedVertexData::getVertex)
+                .toList();
     }
 }

@@ -13,6 +13,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.NetPositionHistory;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.Season;
 import com.powsybl.iidm.network.Country;
@@ -163,5 +164,11 @@ public final class TestUtils {
                     new CoreHub("Test3", "ram3", "fb3", "BE-CORE", "CC", false, false, 1, Country.BE)
             );
         }
+    }
+
+    public static List<SelectedVertexData> mapVerticesToSelectedVerticesData(List<Vertex> vertices) {
+        return vertices.stream()
+                .map(SelectedVertexData::new)
+                .toList();
     }
 }

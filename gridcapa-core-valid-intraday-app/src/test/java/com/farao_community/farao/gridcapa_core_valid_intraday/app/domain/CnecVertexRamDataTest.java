@@ -16,7 +16,7 @@ import static org.assertj.core.api.Assertions.*;
 
 class CnecVertexRamDataTest {
 
-    private static final int RAM = 133;
+    private static final BigDecimal RAM = BigDecimal.valueOf(133);
 
     @Test
     void testCnecVertexRamData() {
