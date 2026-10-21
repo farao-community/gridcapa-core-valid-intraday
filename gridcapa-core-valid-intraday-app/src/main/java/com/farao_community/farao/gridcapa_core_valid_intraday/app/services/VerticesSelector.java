@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.computeCnecVertexProduct;
 import static java.util.Comparator.comparingDouble;
@@ -110,12 +111,7 @@ public class VerticesSelector {
                                              final List<SelectedVertexData> orderedList) {
         for (int index = 0; index < orderedList.size(); index++) {
             final SelectedVertexData vertex = orderedList.get(index);
-            final Double score = vertex.getScore();
-            if (score != null) {
-                vertex.setScore(index * ponderation + score);
-            } else {
-                vertex.setScore(index * ponderation);
-            }
+            vertex.setScore(index * ponderation + Optional.ofNullable(vertex.getScore()).orElse(0D));
         }
     }
 
@@ -138,7 +134,8 @@ public class VerticesSelector {
             for (final CnecRamBranchData branch : frenchCnecs) {
                 final BigDecimal cnecVertexFlow = computeCnecVertexProduct(selectedVertexData.getVertex(), branch, coreHubs);
                 if (cnecVertexFlow.compareTo(BigDecimal.ZERO) > 0) {
-                    vertexRamsByCnec.add(new CnecVertexRamData(branch, selectedVertexData.getVertex(), BigDecimal.valueOf(branch.getRam0Core()).subtract(cnecVertexFlow)));
+                    final BigDecimal constrainedValueRam = BigDecimal.valueOf(branch.getRam0Core()).subtract(cnecVertexFlow);
+                    vertexRamsByCnec.add(new CnecVertexRamData(branch, selectedVertexData.getVertex(), constrainedValueRam));
                 }
             }
             //for a given selectedVertexData get the lowest ram giving the most constrained CNEC
