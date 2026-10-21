@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 
 public class SelectedVertexData {
 
-    final private Vertex vertex;
+    private final Vertex vertex;
     private Double score;
     private BigDecimal normRam;
     private Double normDistance;

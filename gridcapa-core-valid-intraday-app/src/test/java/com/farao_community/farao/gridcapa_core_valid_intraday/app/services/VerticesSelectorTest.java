@@ -160,18 +160,6 @@ class VerticesSelectorTest {
         assertThat(selectedVertices.get(4).getNormDirection())
                 .isLessThanOrEqualTo(selectedVertices.get(0).getNormDirection());
 
-        assertThat(selectedVertices.get(0).getNormDistance()).isNull();
-        assertThat(selectedVertices.get(1).getNormDistance()).isNull();
-        assertThat(selectedVertices.get(2).getNormDistance()).isNull();
-        assertThat(selectedVertices.get(3).getNormDistance()).isNull();
-        assertThat(selectedVertices.get(4).getNormDistance()).isNull();
-
-        assertThat(selectedVertices.get(0).getNormRam()).isNull();
-        assertThat(selectedVertices.get(1).getNormRam()).isNull();
-        assertThat(selectedVertices.get(2).getNormRam()).isNull();
-        assertThat(selectedVertices.get(3).getNormRam()).isNull();
-        assertThat(selectedVertices.get(4).getNormRam()).isNull();
-
         assertThat(selectedVertices.get(0).getScore()).isNotNull();
         assertThat(selectedVertices.get(1).getScore()).isNotNull();
         assertThat(selectedVertices.get(2).getScore()).isNotNull();

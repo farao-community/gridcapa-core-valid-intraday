@@ -84,7 +84,8 @@ public class CoreValidIntradayHandler {
         final List<Vertex> prefilteredVertices = prefilterVertices.prefilterVertices(targetProcessDateTime, marketPoints, network, projectedVertices, coreValidIntradayTaskParameters);
         businessLogger.info("Prefiltered Vertices count: {}", prefilteredVertices.size());
         final List<SelectedVertexData> ponderatedSelection = verticesSelector.selectionSynthesis(prefilteredVertices, marketPoints, cnecRamBranchData, coreValidIntradayTaskParameters);
-        businessLogger.info("Selected Vertices are : {}", logVertices(ponderatedSelection));
+        final String logVerticesPonderated = logVertices(ponderatedSelection);
+        businessLogger.info("Selected Vertices are : {}", logVerticesPonderated);
         //TODO calculate IVA stuff
         final List<VertexToFrenchCnecs> frenchCnecsDefiningVertices = DichotomyMethodFinder.getFrenchCnecsDefiningVertices(getVerticesFromSelectedVertexData(ponderatedSelection), cnecRamBranchData, coreHubsConfiguration.getCoreHubs(), coreValidIntradayTaskParameters, businessLogger);
 

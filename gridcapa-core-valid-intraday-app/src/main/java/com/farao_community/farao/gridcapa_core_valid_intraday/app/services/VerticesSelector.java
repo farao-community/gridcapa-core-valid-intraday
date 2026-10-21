@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.computeCnecVertexProduct;
 import static java.util.Comparator.comparingDouble;
@@ -57,7 +56,7 @@ public class VerticesSelector {
 
         final List<SelectedVertexData> selectedVertexDatas = projectedVertices.stream()
                 .map(SelectedVertexData::new)
-                .collect(Collectors.toList());
+                .toList();
         final int ponderationClosest = parameters.getPonderationClosest();
         orderByDistance(selectedVertexDatas, marketPoints, ponderationToQuotient(ponderationClosest));
         final int ponderationAngle = parameters.getPonderationAngle();
