@@ -166,24 +166,24 @@ class VerticesSelectorTest {
         assertThat(selectedVertices.get(3).getScore()).isNotNull();
         assertThat(selectedVertices.get(4).getScore()).isNotNull();
 
-        final List<SelectedVertexData> angleOnlySelection = mapVerticesToSelectedVerticesData(List.of(new Vertex(6, Map.of("AA", -300, "BB", 600, "CC", 0)),
-                                                                                                      new Vertex(7, Map.of("AA", -600, "BB", 1200, "CC", -600))
+        final List<SelectedVertexData> angleOnlySelection = mapVerticesToSelectedVerticesData(List.of(new Vertex(6, Map.of("AA", -600, "BB", 1200, "CC", -600)),
+                                                                                                      new Vertex(7, Map.of("AA", -300, "BB", 600, "CC", 0))
         ));
         selector.orderByAngle(angleOnlySelection, getTestRefProg(), PONDERATION);
         assertThat(getIds(angleOnlySelection)).containsExactly(6, 7);
 
         // order should be 7 6
-        assertThat(selectedVertices.get(1).getNormDirection())
-                .isLessThanOrEqualTo(selectedVertices.get(0).getNormDirection());
+        assertThat(angleOnlySelection.get(1).getNormDirection())
+                .isLessThanOrEqualTo(angleOnlySelection.get(0).getNormDirection());
 
-        assertThat(selectedVertices.get(0).getNormDistance()).isNull();
-        assertThat(selectedVertices.get(1).getNormDistance()).isNull();
+        assertThat(angleOnlySelection.get(0).getNormDistance()).isNull();
+        assertThat(angleOnlySelection.get(1).getNormDistance()).isNull();
 
-        assertThat(selectedVertices.get(0).getNormRam()).isNull();
-        assertThat(selectedVertices.get(1).getNormRam()).isNull();
+        assertThat(angleOnlySelection.get(0).getNormRam()).isNull();
+        assertThat(angleOnlySelection.get(1).getNormRam()).isNull();
 
-        assertThat(selectedVertices.get(0).getScore()).isNotNull();
-        assertThat(selectedVertices.get(1).getScore()).isNotNull();
+        assertThat(angleOnlySelection.get(0).getScore()).isNotNull();
+        assertThat(angleOnlySelection.get(1).getScore()).isNotNull();
     }
 
     private ReferenceProgram getTestRefProg() {
