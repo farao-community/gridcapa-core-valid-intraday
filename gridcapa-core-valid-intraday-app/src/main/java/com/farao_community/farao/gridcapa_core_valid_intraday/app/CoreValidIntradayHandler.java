@@ -8,7 +8,6 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
-import com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesUtils;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayRequest;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
@@ -81,13 +80,7 @@ public class CoreValidIntradayHandler {
         }
         //select vertices
         final List<CnecRamBranchData> cnecRamBranchData = CnecRamMapper.mapCnecRamToBranches(flowBasedDomainCnecRam);
-        List<Vertex> projectedVertices = importedVertices;
-        if (coreValidIntradayTaskParameters.isProjectionActive()) {
-            businessLogger.info("Projecting Vertices on domain [start]");
-            projectedVertices = VerticesUtils.getVerticesProjectedOnDomain(importedVertices, cnecRamBranchData, coreHubsConfiguration.getCoreHubs());
-            businessLogger.info("Projecting Vertices on domain [end]");
-        }
-        final List<Vertex> prefilteredVertices = prefilterVertices.prefilterVertices(targetProcessDateTime, marketPoints, network, projectedVertices, coreValidIntradayTaskParameters);
+        final List<Vertex> prefilteredVertices = prefilterVertices.prefilterVertices(targetProcessDateTime, marketPoints, network, importedVertices, coreValidIntradayTaskParameters);
         businessLogger.info("Prefiltered Vertices are : {}", logVerticeIds(prefilteredVertices));
         final List<Vertex> ponderatedSelection = verticesSelector.selectionSynthesis(prefilteredVertices, marketPoints, cnecRamBranchData, coreValidIntradayTaskParameters);
         businessLogger.info("Selected Vertices are : {}", logVerticeIds(ponderatedSelection));

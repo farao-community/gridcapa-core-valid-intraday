@@ -21,7 +21,6 @@ public class CoreValidIntradayTaskParameters {
     private static final Logger LOGGER = LoggerFactory.getLogger(CoreValidIntradayTaskParameters.class);
     private static final String KEY_VALUE_FORMAT = "%n\t\"%s\": %s";
 
-    private static final String IS_PROJECTION_ACTIVE = "IS_PROJECTION_ACTIVE";
     private static final String MAX_SELECTED_VERTICES = "MAX_SELECTED_VERTICES";
     private static final String MARGIN_FOR_PREFILTER = "MARGIN_FOR_PREFILTER";
     private static final String IS_HISTORIC_FILTER_ACTIVE = "IS_HISTORIC_FILTER_ACTIVE";
@@ -35,7 +34,6 @@ public class CoreValidIntradayTaskParameters {
     private static final String MERGE_ANGLE = "MERGE_ANGLE";
     private static final String FR_CNEC_COUNT_LIMIT = "FR_CNEC_COUNT_LIMIT";
 
-    private boolean isProjectionActive;
     private int maxSelectedVertices;
     private int marginForPrefilter;
     private boolean isHistoricFilterActive;
@@ -53,7 +51,6 @@ public class CoreValidIntradayTaskParameters {
         final List<String> errors = new ArrayList<>();
         for (TaskParameterDto parameter : parameters) {
             switch (parameter.getId()) {
-                case IS_PROJECTION_ACTIVE -> isProjectionActive = validateIsBooleanAndGet(parameter, errors);
                 case MAX_SELECTED_VERTICES -> maxSelectedVertices = validateIsPositiveIntegerAndGet(parameter, errors);
                 case MARGIN_FOR_PREFILTER -> marginForPrefilter = validateIsPositiveIntegerAndGet(parameter, errors);
                 case IS_HISTORIC_FILTER_ACTIVE -> isHistoricFilterActive = validateIsBooleanAndGet(parameter, errors);
@@ -106,10 +103,6 @@ public class CoreValidIntradayTaskParameters {
             errors.add(String.format("Parameter %s was expected to be of type BOOLEAN, got %s", parameter.getId(), parameter.getParameterType()));
             return false; // default return value, won't be used as this return can be reached only in case of validation error
         }
-    }
-
-    public boolean isProjectionActive() {
-        return isProjectionActive;
     }
 
     public int getMaxSelectedVertices() {
@@ -166,7 +159,6 @@ public class CoreValidIntradayTaskParameters {
 
     public String toJsonString() {
         final List<String> appender = new ArrayList<>();
-        appender.add(String.format(KEY_VALUE_FORMAT, IS_PROJECTION_ACTIVE, isProjectionActive));
         appender.add(String.format(KEY_VALUE_FORMAT, MAX_SELECTED_VERTICES, maxSelectedVertices));
         appender.add(String.format(KEY_VALUE_FORMAT, MARGIN_FOR_PREFILTER, marginForPrefilter));
         appender.add(String.format(KEY_VALUE_FORMAT, IS_HISTORIC_FILTER_ACTIVE, isHistoricFilterActive));
