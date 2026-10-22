@@ -22,7 +22,6 @@ class CoreValidIntradayTaskParametersTest {
     void nominalTest() {
         final CoreValidIntradayTaskParameters params = TestUtils.getTestCoreValidIntradayTaskParameters();
 
-        assertThat(params.isProjectionActive()).isTrue();
         assertThat(params.getMaxSelectedVertices()).isEqualTo(16);
         assertThat(params.getMarginForPrefilter()).isEqualTo(100);
         assertThat(params.isHistoricFilterActive()).isTrue();

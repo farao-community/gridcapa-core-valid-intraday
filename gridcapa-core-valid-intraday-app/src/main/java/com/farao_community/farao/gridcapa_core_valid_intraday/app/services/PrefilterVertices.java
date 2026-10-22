@@ -49,20 +49,20 @@ public class PrefilterVertices {
     public List<Vertex> prefilterVertices(final OffsetDateTime targetProcessDateTime,
                                           final ReferenceProgram marketPoints,
                                           final Network network,
-                                          final List<Vertex> projectedVertices,
+                                          final List<Vertex> importedVertices,
                                           final CoreValidIntradayTaskParameters parameters) {
-        List<Vertex> prefilteredVertices = projectedVertices;
+        List<Vertex> prefilteredVertices = importedVertices;
         final int maxSelectedVertices = parameters.getMaxSelectedVertices();
         if (parameters.isHistoricFilterActive()) {
-            prefilteredVertices = historicPositionsFilter(targetProcessDateTime, marketPoints, projectedVertices);
+            prefilteredVertices = historicPositionsFilter(targetProcessDateTime, marketPoints, importedVertices);
             if (isListSmallerThanMax(prefilteredVertices, maxSelectedVertices)) {
-                return projectedVertices;
+                return importedVertices;
             }
         }
         if (parameters.isHubCapacityFilterActive()) {
             prefilteredVertices = hubCapacityFilter(network, prefilteredVertices, parameters.getMarginForPrefilter());
             if (isListSmallerThanMax(prefilteredVertices, maxSelectedVertices)) {
-                return projectedVertices;
+                return importedVertices;
             }
         }
         return prefilteredVertices;

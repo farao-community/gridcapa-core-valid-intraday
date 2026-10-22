@@ -43,8 +43,7 @@ public final class TestUtils {
                 new TaskParameterDto("PONDERATION_CONSTRAINED", "INT", "34", "1515"),
                 new TaskParameterDto("RAM_MARGIN", "INT", "15", "213"),
                 new TaskParameterDto("MERGE_ANGLE", "INT", "1", "23"),
-                new TaskParameterDto("FR_CNEC_COUNT_LIMIT", "INT", "7", "14"),
-                new TaskParameterDto("IS_PROJECTION_ACTIVE", "BOOLEAN", "true", "false")
+                new TaskParameterDto("FR_CNEC_COUNT_LIMIT", "INT", "7", "14")
         );
     }
 
