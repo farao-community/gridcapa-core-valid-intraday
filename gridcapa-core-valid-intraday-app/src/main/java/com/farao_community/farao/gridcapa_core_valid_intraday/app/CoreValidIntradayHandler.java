@@ -81,7 +81,7 @@ public class CoreValidIntradayHandler {
         }
         //select vertices
         final List<CnecRamBranchData> cnecRamBranchData = CnecRamMapper.mapCnecRamToBranches(flowBasedDomainCnecRam);
-        final List<Vertex> prefilteredVertices = prefilterVertices.prefilterVertices(targetProcessDateTime, marketPoints, network, projectedVertices, coreValidIntradayTaskParameters);
+        final List<Vertex> prefilteredVertices = prefilterVertices.prefilterVertices(targetProcessDateTime, marketPoints, network, importedVertices, coreValidIntradayTaskParameters);
         businessLogger.info("Prefiltered Vertices count: {}", prefilteredVertices.size());
         final List<SelectedVertexData> ponderatedSelection = verticesSelector.selectionSynthesis(prefilteredVertices, marketPoints, cnecRamBranchData, coreValidIntradayTaskParameters);
         final String logVerticesPonderated = logVertices(ponderatedSelection);
