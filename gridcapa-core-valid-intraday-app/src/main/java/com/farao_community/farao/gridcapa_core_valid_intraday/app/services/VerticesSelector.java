@@ -76,6 +76,7 @@ public class VerticesSelector {
      *
      * @param projectedVertices all considered vertices
      * @param referenceProgram  contains the market positions
+     * @param ponderation       the distance ponderation for scoring
      */
     public void orderByDistance(final List<SelectedVertexData> projectedVertices,
                                 final ReferenceProgram referenceProgram,
@@ -94,6 +95,7 @@ public class VerticesSelector {
      *
      * @param projectedVertices all considered vertices
      * @param referenceProgram  contains the market positions
+     * @param ponderation       the angle ponderation for scoring
      */
     public void orderByAngle(final List<SelectedVertexData> projectedVertices,
                              final ReferenceProgram referenceProgram,
@@ -107,19 +109,12 @@ public class VerticesSelector {
         updateVerticesScores(ponderation, orderedList);
     }
 
-    private static void updateVerticesScores(final Double ponderation,
-                                             final List<SelectedVertexData> orderedList) {
-        for (int index = 0; index < orderedList.size(); index++) {
-            final SelectedVertexData vertex = orderedList.get(index);
-            vertex.setScore(index * ponderation + Optional.ofNullable(vertex.getScore()).orElse(0D));
-        }
-    }
-
     /**
      * Scores the vertices based on constrained projectedVertices with the most constrained CNEC and its calculated constrained RAM
      *
      * @param projectedVertices     all considered projectedVertices
      * @param cnecRamBranchDatas    all considered CNECs
+     * @param ponderation           the constrained ponderation for scoring
      */
     public void orderByConstrainedValue(final List<SelectedVertexData> projectedVertices,
                                         final List<CnecRamBranchData> cnecRamBranchDatas,
@@ -152,6 +147,14 @@ public class VerticesSelector {
                 .sorted(ORDER_BY_RAM_SELECTED_VERTEX)
                 .toList();
         updateVerticesScores(ponderation, orderedList);
+    }
+
+    private static void updateVerticesScores(final Double ponderation,
+                                             final List<SelectedVertexData> orderedList) {
+        for (int index = 0; index < orderedList.size(); index++) {
+            final SelectedVertexData vertex = orderedList.get(index);
+            vertex.setScore(index * ponderation + Optional.ofNullable(vertex.getScore()).orElse(0D));
+        }
     }
 
     private double ponderationToQuotient(final int ponderation) {
