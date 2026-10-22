@@ -16,6 +16,8 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreVal
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
 import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,6 +34,7 @@ import static java.util.Comparator.comparingDouble;
 @Service
 public class VerticesSelector {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(VerticesSelector.class);
     private static final Comparator<SelectedVertexData> ORDER_BY_RAM_SELECTED_VERTEX = Comparator.comparing(SelectedVertexData::getNormRam, Comparator.nullsLast(Comparator.naturalOrder()));
     private static final Comparator<CnecVertexRamData> ORDER_BY_RAM = Comparator.comparing(CnecVertexRamData::ram);
     private static final Comparator<SelectedVertexData> VERTEX_SCORE_COMPARATOR = Comparator.comparingDouble(SelectedVertexData::getScore);
@@ -44,18 +47,18 @@ public class VerticesSelector {
 
     /**
      *
-     * @param projectedVertices                  the list of projected vertices
-     * @param marketPoints                       the market points
-     * @param cnecRamBranchData                  the cnec ram branches
-     * @param parameters    the application parameters
+     * @param importedVertices  the list of projected vertices
+     * @param marketPoints      the market points
+     * @param cnecRamBranchData the cnec ram branches
+     * @param parameters        the application parameters
      * @return The ordered list of maxSelectedVertices vertices through ponderated selection
      */
-    public List<SelectedVertexData> selectionSynthesis(List<Vertex> projectedVertices,
+    public List<SelectedVertexData> selectionSynthesis(List<Vertex> importedVertices,
                                                        ReferenceProgram marketPoints,
                                                        List<CnecRamBranchData> cnecRamBranchData,
                                                        CoreValidIntradayTaskParameters parameters) {
 
-        final List<SelectedVertexData> selectedVertexDatas = projectedVertices.stream()
+        final List<SelectedVertexData> selectedVertexDatas = importedVertices.stream()
                 .map(SelectedVertexData::new)
                 .toList();
         final int ponderationClosest = parameters.getPonderationClosest();
@@ -74,15 +77,15 @@ public class VerticesSelector {
     /**
      * Scores the vertices based on distance
      *
-     * @param projectedVertices all considered vertices
-     * @param referenceProgram  contains the market positions
-     * @param ponderation       the distance ponderation for scoring
+     * @param importedVertices all considered vertices
+     * @param referenceProgram contains the market positions
+     * @param ponderation      the distance ponderation for scoring
      */
-    public void orderByDistance(final List<SelectedVertexData> projectedVertices,
+    public void orderByDistance(final List<SelectedVertexData> importedVertices,
                                 final ReferenceProgram referenceProgram,
                                 final Double ponderation) {
 
-        List<SelectedVertexData> orderedList = projectedVertices.stream()
+        List<SelectedVertexData> orderedList = importedVertices.stream()
                 .map(v -> vertexAndMarketDistance(referenceProgram, v))
                 .sorted(comparingDouble(SelectedVertexData::getNormDistance))
                 .toList();
@@ -93,15 +96,15 @@ public class VerticesSelector {
     /**
      * Scores the vertices based on angle
      *
-     * @param projectedVertices all considered vertices
-     * @param referenceProgram  contains the market positions
-     * @param ponderation       the angle ponderation for scoring
+     * @param importedVertices all considered vertices
+     * @param referenceProgram contains the market positions
+     * @param ponderation      the angle ponderation for scoring
      */
-    public void orderByAngle(final List<SelectedVertexData> projectedVertices,
+    public void orderByAngle(final List<SelectedVertexData> importedVertices,
                              final ReferenceProgram referenceProgram,
                              final Double ponderation) {
 
-        List<SelectedVertexData> orderedList = projectedVertices.stream()
+        List<SelectedVertexData> orderedList = importedVertices.stream()
                 .map(v -> vertexAndMarketAngleDistance(referenceProgram, v))
                 .sorted(comparingDouble(SelectedVertexData::getNormDirection))
                 .toList();
@@ -110,13 +113,13 @@ public class VerticesSelector {
     }
 
     /**
-     * Scores the vertices based on constrained projectedVertices with the most constrained CNEC and its calculated constrained RAM
+     * Scores the vertices based on constrained importedVertices with the most constrained CNEC and its calculated constrained RAM
      *
-     * @param projectedVertices     all considered projectedVertices
-     * @param cnecRamBranchDatas    all considered CNECs
-     * @param ponderation           the constrained ponderation for scoring
+     * @param importedVertices   all considered importedVertices
+     * @param cnecRamBranchDatas all considered CNECs
+     * @param ponderation        the constrained ponderation for scoring
      */
-    public void orderByConstrainedValue(final List<SelectedVertexData> projectedVertices,
+    public void orderByConstrainedValue(final List<SelectedVertexData> importedVertices,
                                         final List<CnecRamBranchData> cnecRamBranchDatas,
                                         final Double ponderation) {
 
@@ -124,7 +127,7 @@ public class VerticesSelector {
                 .filter(CnecRamBranchData::isFrench)
                 .toList();
 
-        for (final SelectedVertexData selectedVertexData : projectedVertices) {
+        for (final SelectedVertexData selectedVertexData : importedVertices) {
             final List<CnecVertexRamData> vertexRamsByCnec = new ArrayList<>();
             for (final CnecRamBranchData branch : frenchCnecs) {
                 final BigDecimal cnecVertexFlow = computeCnecVertexProduct(selectedVertexData.getVertex(), branch, coreHubs);
@@ -141,9 +144,11 @@ public class VerticesSelector {
                                 () -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find worse CNEC for selectedVertexData id %s", selectedVertexData.getVertex().vertexId()))
                         );
                 selectedVertexData.setNormRam(minRamCnec.ram());
+            } else {
+                LOGGER.info("Vertex: {}, doesn't hav corresponding french Cnecs", selectedVertexData.getVertex().vertexId());
             }
         }
-        final List<SelectedVertexData> orderedList = projectedVertices.stream()
+        final List<SelectedVertexData> orderedList = importedVertices.stream()
                 .sorted(ORDER_BY_RAM_SELECTED_VERTEX)
                 .toList();
         updateVerticesScores(ponderation, orderedList);
@@ -162,8 +167,8 @@ public class VerticesSelector {
     }
 
     /**
-     * @param referenceProgram        contains the market positions
-     * @param selectedVertexData      the considered selectedVertexData
+     * @param referenceProgram   contains the market positions
+     * @param selectedVertexData the considered selectedVertexData
      * @return the selectedVertexData and its distance from the market
      */
     private SelectedVertexData vertexAndMarketDistance(final ReferenceProgram referenceProgram,
@@ -185,15 +190,15 @@ public class VerticesSelector {
 
             final double distanceIn1D = marketPos - vertexPos;
             final double weightedDistance = hub.coefficient() * distanceIn1D * distanceIn1D;
-            sumOfWeightedSquared = sumOfWeightedSquared + weightedDistance;
+            sumOfWeightedSquared += weightedDistance;
         }
         selectedVertexData.setNormDistance(Math.sqrt(sumOfWeightedSquared));
         return selectedVertexData;
     }
 
     /**
-     * @param referenceProgram contains the market positions
-     * @param selectedVertexData           the considered selectedVertexData
+     * @param referenceProgram   contains the market positions
+     * @param selectedVertexData the considered selectedVertexData
      * @return the selectedVertexData and its distance from the market by direction and angle (uses cosinus)
      */
     private SelectedVertexData vertexAndMarketAngleDistance(final ReferenceProgram referenceProgram,
@@ -207,16 +212,15 @@ public class VerticesSelector {
         double normMarket = 0.0;
         for (final CoreHub hub : coreHubs) {
             final Double marketPos = referenceProgram.getGlobalNetPosition(new EICode(hub.country()));
-            final Integer vertexPos = vertexPositions.get(hub.clusterVerticeCode());
+            final Integer vertexPosition = vertexPositions.get(hub.clusterVerticeCode());
 
-            if (vertexPos == null) {
+            if (vertexPosition == null) {
                 throw new IllegalStateException(
                         String.format("Vertex %d missing required coordinate for hub %s / %s",
                                       selectedVertexData.getVertex().vertexId(), hub.forecastCode(), hub.clusterVerticeCode()));
             }
-            scalarProduct += marketPos * vertexPos;
+            scalarProduct += marketPos * vertexPosition;
             normMarket += marketPos * marketPos;
-            final double vertexPosition = vertexPos;
             normVertex += vertexPosition * vertexPosition;
         }
         final double cosinus = scalarProduct / (Math.sqrt(normMarket) * Math.sqrt(normVertex));
