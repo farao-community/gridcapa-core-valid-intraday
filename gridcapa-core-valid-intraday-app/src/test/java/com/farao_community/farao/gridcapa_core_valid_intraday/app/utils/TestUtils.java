@@ -151,6 +151,17 @@ public final class TestUtils {
         return List.of(cnec1, cnec2);
     }
 
+    public static List<CnecRamBranchData> getTestCnecRamSelectedVertices() {
+        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1400, true, true, Map.of("AA", BigDecimal.valueOf(.3345), "BB", BigDecimal.valueOf(0.156), "CC", BigDecimal.valueOf(.78)));
+        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 1400, true, true, Map.of("AA", BigDecimal.valueOf(.345), "BB", BigDecimal.valueOf(0.256), "CC", BigDecimal.valueOf(.78)));
+
+        return List.of(cnec1, cnec2);
+    }
+
+    public static List<Integer> getIdsFromSelectedVertexData(final List<SelectedVertexData> vertices) {
+        return vertices.stream().map(v -> v.getVertex().vertexId()).toList();
+    }
+
     public static class TestCoreHubConf extends CoreHubsConfiguration {
         public TestCoreHubConf() {
             // test class

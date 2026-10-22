@@ -16,7 +16,7 @@ import java.util.Map;
 class SelectedVertexDataTest {
 
     @Test
-    void testCreate() {
+    void createVertexDataTest() {
         Vertex vertex = new Vertex(123, Map.of("AA", 1000, "BB", 2000, "CC", 3300));
         SelectedVertexData data = new SelectedVertexData(vertex);
         final double normDistance = 0.123;

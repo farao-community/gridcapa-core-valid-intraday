@@ -7,7 +7,6 @@
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
-import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.TestUtils;
@@ -17,11 +16,12 @@ import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceExchangeData;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.TestUtils.getIdsFromSelectedVertexData;
+import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.TestUtils.getTestCnecRamSelectedVertices;
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.TestUtils.getTestVertices;
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.TestUtils.getTestVertices2;
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.TestUtils.mapVerticesToSelectedVerticesData;
@@ -32,12 +32,12 @@ class VerticesSelectorTest {
     private final VerticesSelector selector = new VerticesSelector(new TestUtils.TestCoreHubConf());
 
     @Test
-    void selectionSynthesis() {
+    void selectionSynthesisTest() {
         final CoreValidIntradayTaskParameters coreValidIntradayTaskParameters = TestUtils.getTestCoreValidIntradayTaskParameters();
 
-        final List<SelectedVertexData> rankedVertices1 = selector.selectionSynthesis(getTestVertices2(), getTestRefProg(), getTestCnecRam(), coreValidIntradayTaskParameters);
+        final List<SelectedVertexData> rankedVertices1 = selector.selectionSynthesis(getTestVertices2(), getTestRefProg(), getTestCnecRamSelectedVertices(), coreValidIntradayTaskParameters);
 
-        assertThat(getIds(rankedVertices1))
+        assertThat(getIdsFromSelectedVertexData(rankedVertices1))
                 .isNotEmpty()
                 .hasSize(5)
                 .containsExactly(2, 5, 1, 4, 3);
@@ -49,9 +49,9 @@ class VerticesSelectorTest {
         assertThat(rankedVertices1.get(3).getScore()).isEqualTo(2.31);
         assertThat(rankedVertices1.get(4).getScore()).isEqualTo(2.62);
 
-        final List<SelectedVertexData> rankedVertices2 = selector.selectionSynthesis(getTestVertices2(), getTestRefProg(), getTestCnecRam(), TestUtils.getTestCoreValidIntradayTaskParametersMaxSelect2());
+        final List<SelectedVertexData> rankedVertices2 = selector.selectionSynthesis(getTestVertices2(), getTestRefProg(), getTestCnecRamSelectedVertices(), TestUtils.getTestCoreValidIntradayTaskParametersMaxSelect2());
 
-        assertThat(getIds(rankedVertices2))
+        assertThat(getIdsFromSelectedVertexData(rankedVertices2))
                 .isNotEmpty()
                 .hasSize(4)
                 .containsExactly(2, 5, 1, 4);
@@ -63,12 +63,12 @@ class VerticesSelectorTest {
     }
 
     @Test
-    void shouldOrderByClosest() {
+    void shouldOrderByDistance() {
         final List<SelectedVertexData> selectedVertices = mapVerticesToSelectedVerticesData(getTestVertices());
         selector.orderByDistance(selectedVertices, getTestRefProg(), PONDERATION);
 
         // the list isn't ordered any more but scored
-        assertThat(getIds(selectedVertices)).containsExactly(1, 2, 3, 4, 5);
+        assertThat(getIdsFromSelectedVertexData(selectedVertices)).containsExactly(1, 2, 3, 4, 5);
         assertThat(selectedVertices.get(4).getNormDistance())
                 .isLessThanOrEqualTo(selectedVertices.get(0).getNormDistance());
         assertThat(selectedVertices.get(0).getNormDistance())
@@ -98,9 +98,9 @@ class VerticesSelectorTest {
     }
 
     @Test
-    void shouldOrderByConstrained() {
+    void shouldOrderByConstrainedValue() {
         final List<SelectedVertexData> selectedVertices = mapVerticesToSelectedVerticesData(getTestVertices2());
-        selector.orderByConstrainedValue(selectedVertices, getTestCnecRam(), PONDERATION);
+        selector.orderByConstrainedValue(selectedVertices, getTestCnecRamSelectedVertices(), PONDERATION);
         assertThat(selectedVertices).hasSize(5);
 
         //order should be 2, 5, 1, 3, 4
@@ -133,22 +133,11 @@ class VerticesSelectorTest {
 
     }
 
-    private static List<CnecRamBranchData> getTestCnecRam() {
-        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1400, true, true, Map.of("AA", BigDecimal.valueOf(.3345), "BB", BigDecimal.valueOf(0.156), "CC", BigDecimal.valueOf(.78)));
-        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 1400, true, true, Map.of("AA", BigDecimal.valueOf(.345), "BB", BigDecimal.valueOf(0.256), "CC", BigDecimal.valueOf(.78)));
-
-        return List.of(cnec1, cnec2);
-    }
-
     @Test
-    void shouldOrderByClosestByAngle() {
-        final List<SelectedVertexData> selectedVertice = mapVerticesToSelectedVerticesData(List.of(new Vertex(1, Map.of("AA", -301, "BB", 600, "CC", -300))));
-        selector.orderByAngle(selectedVertice, getTestRefProg(), PONDERATION);
-        assertThat(getIds(selectedVertice)).containsExactly(1);
-
+    void shouldOrderByAngle() {
         final List<SelectedVertexData> selectedVertices = mapVerticesToSelectedVerticesData(getTestVertices());
         selector.orderByAngle(selectedVertices, getTestRefProg(), PONDERATION);
-        assertThat(getIds(selectedVertices)).containsExactly(1, 2, 3, 4, 5);
+        assertThat(getIdsFromSelectedVertexData(selectedVertices)).containsExactly(1, 2, 3, 4, 5);
 
         // order should be 2 3 4 5 1
         assertThat(selectedVertices.get(1).getNormDirection())
@@ -170,7 +159,7 @@ class VerticesSelectorTest {
                                                                                                       new Vertex(7, Map.of("AA", -300, "BB", 600, "CC", 0))
         ));
         selector.orderByAngle(angleOnlySelection, getTestRefProg(), PONDERATION);
-        assertThat(getIds(angleOnlySelection)).containsExactly(6, 7);
+        assertThat(getIdsFromSelectedVertexData(angleOnlySelection)).containsExactly(6, 7);
 
         // order should be 7 6
         assertThat(angleOnlySelection.get(1).getNormDirection())
@@ -189,10 +178,6 @@ class VerticesSelectorTest {
     private ReferenceProgram getTestRefProg() {
         // net positions : AA = -300 , BB = 600, CC = -300
         return new TestRefProg();
-    }
-
-    private static List<Integer> getIds(final List<SelectedVertexData> vertices) {
-        return vertices.stream().map(v -> v.getVertex().vertexId()).toList();
     }
 
     private static class TestRefProg extends ReferenceProgram {
