@@ -54,6 +54,7 @@ public final class CnecRamMapper {
                                      getIntValue(cb.getRAM()),
                                      constraintResult.getDomainLimit().isRegion(),
                                      cb.getTsoOrigin().equals(FRENCH_TSO_ORIGIN),
+                                     cb.getOutage().getName().equals("BASECASE"),
                                      ptdfs);
     }
 

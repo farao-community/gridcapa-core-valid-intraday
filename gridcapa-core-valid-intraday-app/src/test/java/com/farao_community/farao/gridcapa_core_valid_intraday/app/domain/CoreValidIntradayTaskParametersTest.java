@@ -34,6 +34,7 @@ class CoreValidIntradayTaskParametersTest {
         assertThat(params.getRamMargin()).isEqualTo(15);
         assertThat(params.getMergeAngle()).isEqualTo(1);
         assertThat(params.getFrenchCnecCountLimit()).isEqualTo(7);
+        assertThat(params.isHubCapacityFilterActive()).isTrue();
     }
 
     @Test
