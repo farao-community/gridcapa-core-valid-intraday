@@ -17,7 +17,6 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.Selecte
 import com.powsybl.iidm.network.Country;
 import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -240,7 +239,7 @@ public class VerticesSelector {
 
     }
 
-    private static @NotNull BigDecimal getAbsDifferencePtdfHubValues(final CnecRamBranchData cnec,
+    private static BigDecimal getAbsDifferencePtdfHubValues(final CnecRamBranchData cnec,
                                                                      final String code,
                                                                      final BigDecimal hubPtdfValue) {
         return cnec.getPtdfValues().get(code).subtract(hubPtdfValue).abs();
@@ -259,7 +258,7 @@ public class VerticesSelector {
                                              final Double minNormDirection,
                                              final Double maxNormDirection,
                                              final Double ponderation) {
-        final Double directionNormNormalized = (selectedVertexData.getDirectionNorm() - minNormDirection) / (maxNormDirection - minNormDirection);
+        final Double directionNormNormalized = 1 - (selectedVertexData.getDirectionNorm() - minNormDirection) / (maxNormDirection - minNormDirection);
         selectedVertexData.setDirectionNorm(directionNormNormalized);
         updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getDirectionNorm());
     }
