@@ -45,10 +45,10 @@ class VerticesSelectorTest {
 
         //order: 1, 5, 4, 3, 2
         assertThat(rankedVertices1.get(0).getScore()).isEqualTo(0.31);
-        assertThat(rankedVertices1.get(1).getScore()).isEqualTo(0.5513833523926313);
+        assertThat(rankedVertices1.get(1).getScore()).isEqualTo(0.5397865774538846);
         assertThat(rankedVertices1.get(2).getScore()).isEqualTo(0.6349472521720751);
-        assertThat(rankedVertices1.get(3).getScore()).isEqualTo(0.6422019877036211);
-        assertThat(rankedVertices1.get(4).getScore()).isEqualTo(0.6575433117445371);
+        assertThat(rankedVertices1.get(3).getScore()).isEqualTo(0.6421139306533432);
+        assertThat(rankedVertices1.get(4).getScore()).isEqualTo(0.6556669418072328);
 
         final List<SelectedVertexData> rankedVertices2 = selector.selectionSynthesis(getTestVertices2(), getTestRefProg(), getTestCnecRamSelectedVertices(), TestUtils.getTestCoreValidIntradayTaskParametersMaxSelect2());
 
@@ -58,9 +58,9 @@ class VerticesSelectorTest {
                 .containsExactly(2, 3, 5, 4);
         //order: 1, 5, 4, 3
         assertThat(rankedVertices2.get(0).getScore()).isEqualTo(0.31);
-        assertThat(rankedVertices2.get(1).getScore()).isEqualTo(0.5513833523926313);
+        assertThat(rankedVertices2.get(1).getScore()).isEqualTo(0.5397865774538846);
         assertThat(rankedVertices2.get(2).getScore()).isEqualTo(0.6349472521720751);
-        assertThat(rankedVertices2.get(3).getScore()).isEqualTo(0.6422019877036211);
+        assertThat(rankedVertices2.get(3).getScore()).isEqualTo(0.6421139306533432);
     }
 
     @Test

@@ -17,6 +17,7 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.Selecte
 import com.powsybl.iidm.network.Country;
 import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -97,8 +98,9 @@ public class VerticesSelector {
         final Map<String, Double> deltaNpHubMap = isCalculateDeltaNpHub
                 ? getDeltaNpHubMap(coreHubs, importedVertices)
                 : gerDefaultDeltaNpHubMap();
+        final Map<String, Double> kHub = calculateKHub(coreHubs, cnecRamBranchData);
         List<SelectedVertexData> orderedList = importedVertices.stream()
-                .map(vertex -> vertexAndMarketDistance(referenceProgram, vertex, cnecRamBranchData, deltaNpHubMap))
+                .map(vertex -> vertexAndMarketDistance(referenceProgram, vertex, deltaNpHubMap, kHub))
                 .sorted(comparingDouble(SelectedVertexData::getDistanceNorm))
                 .toList();
 
@@ -206,6 +208,44 @@ public class VerticesSelector {
         return deltaNpHubMap;
     }
 
+    private Map<String, Double> calculateKHub(final List<CoreHub> coreHubs,
+                                              final List<CnecRamBranchData> cnecRamBranchData) {
+        final List<CnecRamBranchData> frenchBaseCaseCnecs = cnecRamBranchData.stream()
+                .filter(CnecRamBranchData::isFrench)
+                .filter(CnecRamBranchData::isBaseCase)
+                .toList();
+        final Map<String, Double> deltaNpHubMap = new HashMap<>();
+        for (CoreHub hub : coreHubs) {
+            BigDecimal khubValue = frenchBaseCaseCnecs.stream()
+                    .map(cnec -> calculateFrenchHubPoderation(cnec, hub, coreHubs))
+                    .reduce(BigDecimal::add)
+                    .orElseThrow(() -> new CoreValidIntradayInvalidDataException("Impossible to compute kHub value"));
+
+            deltaNpHubMap.put(hub.clusterVerticeCode(), khubValue.doubleValue());
+        }
+        return deltaNpHubMap;
+    }
+
+    private BigDecimal calculateFrenchHubPoderation(final CnecRamBranchData cnec,
+                                                    final CoreHub hub,
+                                                    final List<CoreHub> coreHubs) {
+
+        BigDecimal hubPtdfValue = cnec.getPtdfValues().get(hub.clusterVerticeCode());
+        return coreHubs.stream()
+                .filter(h -> !hub.equals(h))
+                .map(CoreHub::clusterVerticeCode)
+                .map(code -> getAbsDifferencePtdfHubValues(cnec, code, hubPtdfValue))
+                .reduce(BigDecimal::add)
+                .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find ptdf values for cnec %s", cnec.branchId())));
+
+    }
+
+    private static @NotNull BigDecimal getAbsDifferencePtdfHubValues(final CnecRamBranchData cnec,
+                                                                     final String code,
+                                                                     final BigDecimal hubPtdfValue) {
+        return cnec.getPtdfValues().get(code).subtract(hubPtdfValue).abs();
+    }
+
     private void updateDistanceNormAndScore(final SelectedVertexData selectedVertexData,
                                             final Double minNormDistance,
                                             final Double maxNormDistance,
@@ -253,12 +293,12 @@ public class VerticesSelector {
      */
     private SelectedVertexData vertexAndMarketDistance(final ReferenceProgram referenceProgram,
                                                        final SelectedVertexData selectedVertexData,
-                                                       final List<CnecRamBranchData> cnecRamBranchData,
-                                                       final Map<String, Double> deltaNpHubMap) {
+                                                       final Map<String, Double> deltaNpHubMap,
+                                                       final Map<String, Double> kHub) {
 
         final Map<String, Integer> vertexPositions = selectedVertexData.getVertex().coordinates();
 
-        // global distance² = sum_over_hub(k_hub * [1D distance]²)
+        // global distance² = sum_over_hub(deltaNpHubMap * k_hub * [1D distance]²)
         double sumOfWeightedSquared = 0.0;
         for (final CoreHub hub : coreHubs) {
             final Double marketPos = referenceProgram.getGlobalNetPosition(new EICode(hub.country()));
@@ -271,7 +311,8 @@ public class VerticesSelector {
             }
 
             final double distanceIn1D = marketPos - vertexPos;
-            final double weightedDistance = deltaNpHubMap.get(hub.clusterVerticeCode()) * distanceIn1D * distanceIn1D;
+            final double ponderateByHubs = deltaNpHubMap.get(hub.clusterVerticeCode()) * kHub.get(hub.clusterVerticeCode());
+            final double weightedDistance = ponderateByHubs * distanceIn1D * distanceIn1D;
             sumOfWeightedSquared += weightedDistance;
         }
         selectedVertexData.setDistanceNorm(Math.sqrt(sumOfWeightedSquared));
