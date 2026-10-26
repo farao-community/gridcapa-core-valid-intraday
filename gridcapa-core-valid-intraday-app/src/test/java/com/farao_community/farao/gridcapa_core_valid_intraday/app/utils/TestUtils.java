@@ -13,6 +13,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayFileResource;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.NetPositionHistory;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.entities.Season;
 import com.powsybl.iidm.network.Country;
@@ -150,6 +151,17 @@ public final class TestUtils {
         return List.of(cnec1, cnec2);
     }
 
+    public static List<CnecRamBranchData> getTestCnecRamSelectedVertices() {
+        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1400, true, true, Map.of("AA", BigDecimal.valueOf(.3345), "BB", BigDecimal.valueOf(0.156), "CC", BigDecimal.valueOf(.78)));
+        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 1400, true, true, Map.of("AA", BigDecimal.valueOf(.345), "BB", BigDecimal.valueOf(0.256), "CC", BigDecimal.valueOf(.78)));
+
+        return List.of(cnec1, cnec2);
+    }
+
+    public static List<Integer> getIdsFromSelectedVertexData(final List<SelectedVertexData> vertices) {
+        return vertices.stream().map(v -> v.getVertex().vertexId()).toList();
+    }
+
     public static class TestCoreHubConf extends CoreHubsConfiguration {
         public TestCoreHubConf() {
             // test class
@@ -163,5 +175,11 @@ public final class TestUtils {
                     new CoreHub("Test3", "ram3", "fb3", "BE-CORE", "CC", false, false, 1, Country.BE)
             );
         }
+    }
+
+    public static List<SelectedVertexData> mapVerticesToSelectedVerticesData(List<Vertex> vertices) {
+        return vertices.stream()
+                .map(SelectedVertexData::new)
+                .toList();
     }
 }

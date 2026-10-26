@@ -8,5 +8,7 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.domain;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 
-public record CnecVertexRamData(CnecRamBranchData cnec, Vertex vertex, int ram) {
+import java.math.BigDecimal;
+
+public record CnecVertexRamData(CnecRamBranchData cnec, Vertex vertex, BigDecimal ram) {
 }

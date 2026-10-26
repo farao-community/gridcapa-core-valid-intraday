@@ -7,36 +7,38 @@
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
-import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubUtils;
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
-import com.farao_community.farao.gridcapa_core_valid_commons.vertex.VerticesUtils;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecVertexRamData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
 import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
-import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.computeCnecVertexProduct;
 import static java.util.Comparator.comparingDouble;
 
 @Service
 public class VerticesSelector {
 
-    private static final Comparator<CnecVertexRamData> ORDER_BY_RAM = Comparator.comparingInt(CnecVertexRamData::ram);
-    private static final Comparator<Map.Entry<Vertex, Double>> ORDER_MAP_ENTRY_DOUBLE = Comparator.comparingDouble(Map.Entry::getValue);
-    private static final Comparator<Map.Entry<Vertex, Double>> ORDER_BY_PONDERATION = ORDER_MAP_ENTRY_DOUBLE.thenComparingInt(e -> e.getKey().vertexId());
+    private static final Logger LOGGER = LoggerFactory.getLogger(VerticesSelector.class);
+    private static final Comparator<SelectedVertexData> ORDER_BY_RAM_SELECTED_VERTEX = Comparator.comparing(SelectedVertexData::getRamNorm, Comparator.nullsLast(Comparator.naturalOrder()));
+    private static final Comparator<CnecVertexRamData> ORDER_BY_RAM = Comparator.comparing(CnecVertexRamData::ram);
+    private static final Comparator<SelectedVertexData> VERTEX_SCORE_COMPARATOR = Comparator.comparingDouble(SelectedVertexData::getScore);
+    private static final Comparator<SelectedVertexData> ORDER_BY_PONDERATION = VERTEX_SCORE_COMPARATOR.thenComparingInt(v -> v.getVertex().vertexId());
     private final List<CoreHub> coreHubs;
 
     public VerticesSelector(final CoreHubsConfiguration coreHubsConfiguration) {
@@ -44,134 +46,135 @@ public class VerticesSelector {
     }
 
     /**
-     * @param projectedVertices all considered vertices
-     * @param referenceProgram  contains the market positions
-     * @return the vertices ordered by closest to the global market position
+     *
+     * @param importedVertices  the list of projected vertices
+     * @param marketPoints      the market points
+     * @param cnecRamBranchData the cnec ram branches
+     * @param parameters        the application parameters
+     * @return The ordered list of maxSelectedVertices vertices through ponderated selection
      */
-    public List<Vertex> orderByDistance(final List<Vertex> projectedVertices,
-                                        final ReferenceProgram referenceProgram) {
+    public List<SelectedVertexData> selectionSynthesis(List<Vertex> importedVertices,
+                                                       ReferenceProgram marketPoints,
+                                                       List<CnecRamBranchData> cnecRamBranchData,
+                                                       CoreValidIntradayTaskParameters parameters) {
 
-        return projectedVertices.stream()
-            .map(v -> vertexAndMarketDistance(referenceProgram, v))
-            .sorted(comparingDouble(Pair::getRight))
-            .map(Pair::getLeft)
-            .toList();
-
-    }
-
-    /**
-     * @param projectedVertices all considered vertices
-     * @param referenceProgram  contains the market positions
-     * @return vertices ordered by closest to the global market position by angle
-     */
-    public List<Vertex> orderByAngle(final List<Vertex> projectedVertices,
-                                     final ReferenceProgram referenceProgram) {
-
-        return projectedVertices.stream()
-                .map(v -> vertexAndMarketAngleDistance(referenceProgram, v))
-                .sorted((p1, p2) -> p2.getRight().compareTo(p1.getRight()))
-                .map(Pair::getLeft)
+        final List<SelectedVertexData> selectedVertexDatas = importedVertices.stream()
+                .map(SelectedVertexData::new)
+                .toList();
+        final int ponderationClosest = parameters.getPonderationClosest();
+        orderByDistance(selectedVertexDatas, marketPoints, ponderationToQuotient(ponderationClosest));
+        final int ponderationAngle = parameters.getPonderationAngle();
+        orderByAngle(selectedVertexDatas, marketPoints, ponderationToQuotient(ponderationAngle));
+        final int ponderationConstrained = parameters.getPonderationConstrained();
+        orderByConstrainedValue(selectedVertexDatas, cnecRamBranchData, ponderationToQuotient(ponderationConstrained));
+        return selectedVertexDatas.stream()
+                .sorted(ORDER_BY_PONDERATION)
+                // We will take twice the limit because later we need more vertices than the limit and will apply the limit again
+                .limit(parameters.getMaxSelectedVertices() * 2L)
                 .toList();
     }
 
     /**
+     * Scores the vertices based on distance
      *
-     * @param projectedVertices     all considered projectedVertices
-     * @param cnecRamBranchDatas    all considered CNECs
-     * @return the list of ordered constrained projectedVertices with the most constrained CNEC and its calculated constrained RAM
+     * @param importedVertices all considered vertices
+     * @param referenceProgram contains the market positions
+     * @param ponderation      the distance ponderation for scoring
      */
-    public List<CnecVertexRamData> orderByConstrainedValue(final List<Vertex> projectedVertices,
-                                                           final List<CnecRamBranchData> cnecRamBranchDatas) {
+    public void orderByDistance(final List<SelectedVertexData> importedVertices,
+                                final ReferenceProgram referenceProgram,
+                                final Double ponderation) {
 
-        final Map<String, String> flowBasedToVertexCodeMap = CoreHubUtils.getFlowBasedToVertexCodeMap(coreHubs);
-        final List<CnecVertexRamData> constrainedOrderedVertices = new ArrayList<>();
-        for (final Vertex vertex : projectedVertices) {
+        List<SelectedVertexData> orderedList = importedVertices.stream()
+                .map(v -> vertexAndMarketDistance(referenceProgram, v))
+                .sorted(comparingDouble(SelectedVertexData::getDistanceNorm))
+                .toList();
+
+        updateVerticesScores(ponderation, orderedList);
+    }
+
+    /**
+     * Scores the vertices based on angle
+     *
+     * @param importedVertices all considered vertices
+     * @param referenceProgram contains the market positions
+     * @param ponderation      the angle ponderation for scoring
+     */
+    public void orderByAngle(final List<SelectedVertexData> importedVertices,
+                             final ReferenceProgram referenceProgram,
+                             final Double ponderation) {
+
+        List<SelectedVertexData> orderedList = importedVertices.stream()
+                .map(v -> vertexAndMarketAngleDistance(referenceProgram, v))
+                .sorted(comparingDouble(SelectedVertexData::getDirectionNorm))
+                .toList();
+
+        updateVerticesScores(ponderation, orderedList);
+    }
+
+    /**
+     * Scores the vertices based on constrained importedVertices with the most constrained CNEC and its calculated constrained RAM
+     *
+     * @param importedVertices   all considered importedVertices
+     * @param cnecRamBranchDatas all considered CNECs
+     * @param ponderation        the constrained ponderation for scoring
+     */
+    public void orderByConstrainedValue(final List<SelectedVertexData> importedVertices,
+                                        final List<CnecRamBranchData> cnecRamBranchDatas,
+                                        final Double ponderation) {
+
+        final List<CnecRamBranchData> frenchCnecs = cnecRamBranchDatas.stream()
+                .filter(CnecRamBranchData::isFrench)
+                .toList();
+
+        for (final SelectedVertexData selectedVertexData : importedVertices) {
             final List<CnecVertexRamData> vertexRamsByCnec = new ArrayList<>();
-            for (final CnecRamBranchData branch : cnecRamBranchDatas) {
-                final BigDecimal cnecVertexFlow = VerticesUtils.f0Core(vertex, branch, flowBasedToVertexCodeMap);
+            for (final CnecRamBranchData branch : frenchCnecs) {
+                final BigDecimal cnecVertexFlow = computeCnecVertexProduct(selectedVertexData.getVertex(), branch, coreHubs);
                 if (cnecVertexFlow.compareTo(BigDecimal.ZERO) > 0) {
-                    final BigDecimal cnecVerticeRam = BigDecimal.valueOf(branch.getRam0Core()).subtract(cnecVertexFlow);
-                    vertexRamsByCnec.add(new CnecVertexRamData(branch, vertex, cnecVerticeRam.setScale(0, RoundingMode.HALF_EVEN).intValue()));
+                    final BigDecimal constrainedValueRam = BigDecimal.valueOf(branch.getRam0Core()).subtract(cnecVertexFlow);
+                    vertexRamsByCnec.add(new CnecVertexRamData(branch, selectedVertexData.getVertex(), constrainedValueRam));
                 }
             }
-            //for a given vertex get the lowest ram giving the most constrained CNEC
+            //for a given selectedVertexData get the lowest ram giving the most constrained CNEC
             if (!vertexRamsByCnec.isEmpty()) {
                 final CnecVertexRamData minRamCnec = vertexRamsByCnec.stream()
                         .min(ORDER_BY_RAM)
                         .orElseThrow(
-                                () -> new CoreValidIntradayInvalidDataException(
-                                        String.format("Impossible to find worse CNEC for vertex id %s", vertex.vertexId())
-                                )
+                                () -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find worse CNEC for selectedVertexData id %s", selectedVertexData.getVertex().vertexId()))
                         );
-                constrainedOrderedVertices.add(minRamCnec);
+                selectedVertexData.setRamNorm(minRamCnec.ram());
+            } else {
+                LOGGER.info("Vertex: {}, doesn't hav corresponding french Cnecs", selectedVertexData.getVertex().vertexId());
             }
         }
-        return constrainedOrderedVertices.stream()
-                                         .sorted(ORDER_BY_RAM)
-                                         .toList();
+        final List<SelectedVertexData> orderedList = importedVertices.stream()
+                .sorted(ORDER_BY_RAM_SELECTED_VERTEX)
+                .toList();
+        updateVerticesScores(ponderation, orderedList);
     }
 
-    /**
-     *
-     * @param projectedVertices                  the list of projected vertices
-     * @param marketPoints                       the market points
-     * @param cnecRamBranchData                  the cnec ram branches
-     * @param parameters    the application parameters
-     * @return The ordered list of maxSelectedVertices vertices through ponderated selection
-     */
-    public List<Vertex> selectionSynthesis(List<Vertex> projectedVertices,
-                                           ReferenceProgram marketPoints,
-                                           List<CnecRamBranchData> cnecRamBranchData,
-                                           CoreValidIntradayTaskParameters parameters) {
-
-        final List<Vertex> orderByDistance = orderByDistance(projectedVertices, marketPoints);
-        final List<Vertex> orderByAngle = orderByAngle(projectedVertices, marketPoints);
-        final List<CnecVertexRamData> orderByConstrainedValue = orderByConstrainedValue(projectedVertices, cnecRamBranchData);
-
-        final Map<Vertex, Double> vertexIdToPonderation = new HashMap<>();
-        final int ponderationClosest = parameters.getPonderationClosest();
-        fillVertexPonderationMap(orderByDistance, ponderationToQuotient(ponderationClosest), vertexIdToPonderation);
-        final int ponderationAngle = parameters.getPonderationAngle();
-        fillVertexPonderationMap(orderByAngle, ponderationToQuotient(ponderationAngle), vertexIdToPonderation);
-        final List<Vertex> constrainedVertices = orderByConstrainedValue.stream()
-                .map(CnecVertexRamData::vertex)
-                .toList();
-        final int ponderationConstrained = parameters.getPonderationConstrained();
-        fillVertexPonderationMap(constrainedVertices, ponderationToQuotient(ponderationConstrained), vertexIdToPonderation);
-        return vertexIdToPonderation.entrySet().stream()
-                .sorted(ORDER_BY_PONDERATION)
-                // We will take twice the limit because later we need more vertices than the limit and will apply the limit again
-                .limit(parameters.getMaxSelectedVertices() * 2L)
-                .map(Map.Entry::getKey)
-                .toList();
+    private static void updateVerticesScores(final Double ponderation,
+                                             final List<SelectedVertexData> orderedList) {
+        for (int index = 0; index < orderedList.size(); index++) {
+            final SelectedVertexData vertex = orderedList.get(index);
+            vertex.setScore(index * ponderation + Optional.ofNullable(vertex.getScore()).orElse(0D));
+        }
     }
 
     private double ponderationToQuotient(final int ponderation) {
         return ponderation / 100.0;
     }
 
-    private void fillVertexPonderationMap(final List<Vertex> vertexList, final double ponderation, final Map<Vertex, Double> ponderationMap) {
-        for (int index = 0; index < vertexList.size(); index++) {
-            final Vertex vertex = vertexList.get(index);
-            if (ponderationMap.containsKey(vertex)) {
-                ponderationMap.put(vertex, index * ponderation + ponderationMap.get(vertex));
-            } else {
-                ponderationMap.put(vertex, index * ponderation);
-            }
-        }
-    }
-
     /**
-     * we return a pair because we want to be able to sort by distance but still keep the vertex data
-     *
-     * @param referenceProgram contains the market positions
-     * @param vertex           the considered vertex
-     * @return the vertex and its distance from the market
+     * @param referenceProgram   contains the market positions
+     * @param selectedVertexData the considered selectedVertexData
+     * @return the selectedVertexData and its distance from the market
      */
-    private Pair<Vertex, Double> vertexAndMarketDistance(final ReferenceProgram referenceProgram,
-                                                         final Vertex vertex) {
+    private SelectedVertexData vertexAndMarketDistance(final ReferenceProgram referenceProgram,
+                                                       final SelectedVertexData selectedVertexData) {
 
-        final Map<String, Integer> vertexPositions = vertex.coordinates();
+        final Map<String, Integer> vertexPositions = selectedVertexData.getVertex().coordinates();
 
         // global distance² = sum_over_hub(k_hub * [1D distance]²)
         double sumOfWeightedSquared = 0.0;
@@ -181,50 +184,47 @@ public class VerticesSelector {
 
             if (vertexPos == null) {
                 throw new IllegalStateException(
-                    String.format("Vertex %d missing required coordinate for hub %s / %s",
-                                  vertex.vertexId(), hub.forecastCode(), hub.clusterVerticeCode()));
+                        String.format("Vertex %d missing required coordinate for hub %s / %s",
+                                      selectedVertexData.getVertex().vertexId(), hub.forecastCode(), hub.clusterVerticeCode()));
             }
 
             final double distanceIn1D = marketPos - vertexPos;
             final double weightedDistance = hub.coefficient() * distanceIn1D * distanceIn1D;
-            sumOfWeightedSquared = sumOfWeightedSquared + weightedDistance;
+            sumOfWeightedSquared += weightedDistance;
         }
-
-        return Pair.of(vertex, Math.sqrt(sumOfWeightedSquared));
+        selectedVertexData.setDistanceNorm(Math.sqrt(sumOfWeightedSquared));
+        return selectedVertexData;
     }
 
     /**
-     * we return a pair because we want to be able to sort by distance but still keep the vertex data
-     *
-     * @param referenceProgram contains the market positions
-     * @param vertex           the considered vertex
-     * @return the vertex and its distance from the market by direction and angle (uses cosinus)
+     * @param referenceProgram   contains the market positions
+     * @param selectedVertexData the considered selectedVertexData
+     * @return the selectedVertexData and its distance from the market by direction and angle (uses cosinus)
      */
-    private Pair<Vertex, Double> vertexAndMarketAngleDistance(final ReferenceProgram referenceProgram,
-                                                              final Vertex vertex) {
+    private SelectedVertexData vertexAndMarketAngleDistance(final ReferenceProgram referenceProgram,
+                                                            final SelectedVertexData selectedVertexData) {
 
-        final Map<String, Integer> vertexPositions = vertex.coordinates();
+        final Map<String, Integer> vertexPositions = selectedVertexData.getVertex().coordinates();
 
-        // angle's cosinus = (scalar product of refprog . vertex) divided by (euclidian norm of refprog by vertex)
+        // angle's cosinus = (scalar product of refprog . selectedVertexData) divided by (euclidian norm of refprog by selectedVertexData)
         double scalarProduct = 0.0;
         double normVertex = 0.0;
         double normMarket = 0.0;
         for (final CoreHub hub : coreHubs) {
             final Double marketPos = referenceProgram.getGlobalNetPosition(new EICode(hub.country()));
-            final Integer vertexPos = vertexPositions.get(hub.clusterVerticeCode());
+            final Integer vertexPosition = vertexPositions.get(hub.clusterVerticeCode());
 
-            if (vertexPos == null) {
+            if (vertexPosition == null) {
                 throw new IllegalStateException(
                         String.format("Vertex %d missing required coordinate for hub %s / %s",
-                                      vertex.vertexId(), hub.forecastCode(), hub.clusterVerticeCode()));
+                                      selectedVertexData.getVertex().vertexId(), hub.forecastCode(), hub.clusterVerticeCode()));
             }
-            scalarProduct += marketPos * vertexPos;
+            scalarProduct += marketPos * vertexPosition;
             normMarket += marketPos * marketPos;
-            final double vertexPosition = vertexPos;
             normVertex += vertexPosition * vertexPosition;
         }
         final double cosinus = scalarProduct / (Math.sqrt(normMarket) * Math.sqrt(normVertex));
-
-        return Pair.of(vertex, cosinus);
+        selectedVertexData.setDirectionNorm(cosinus);
+        return selectedVertexData;
     }
 }

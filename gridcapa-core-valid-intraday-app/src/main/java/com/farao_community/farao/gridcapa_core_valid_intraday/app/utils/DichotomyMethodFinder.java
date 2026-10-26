@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.computeCnecVertexProduct;
 import static java.math.RoundingMode.HALF_EVEN;
 import static java.util.Comparator.comparing;
 
@@ -137,16 +138,7 @@ public final class DichotomyMethodFinder {
                                         final CnecRamBranchData cnec,
                                         final List<CoreHub> coreHubs) {
 
-        final BigDecimal cnecVerticeProduct = coreHubs.stream()
-                .filter(Predicate.not(CoreHub::isHvdcHub))
-                .map(CoreHub::clusterVerticeCode)
-                .map(code -> cnec.getPtdfValues().get(code).multiply(BigDecimal.valueOf(vertex.coordinates().get(code))))
-                .reduce(BigDecimal::add)
-                .orElseThrow(() -> new IllegalStateException(
-                        String.format("Vertex %d and Cnec %S missing required coordinates for margin computation",
-                                      vertex.vertexId(), cnec.branchId())
-                ));
+        final BigDecimal cnecVerticeProduct = computeCnecVertexProduct(vertex, cnec, coreHubs);
         return cnec.ram() - cnecVerticeProduct.setScale(0, HALF_EVEN).intValue();
     }
-
 }
