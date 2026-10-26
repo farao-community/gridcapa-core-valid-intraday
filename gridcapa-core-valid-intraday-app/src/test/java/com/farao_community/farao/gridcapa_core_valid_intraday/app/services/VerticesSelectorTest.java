@@ -70,34 +70,34 @@ class VerticesSelectorTest {
 
         // the list isn't ordered any more but scored
         assertThat(getIdsFromSelectedVertexData(selectedVertices)).containsExactly(1, 2, 3, 4, 5);
-        assertThat(selectedVertices.get(4).getNormDistance())
-                .isLessThanOrEqualTo(selectedVertices.get(0).getNormDistance())
+        assertThat(selectedVertices.get(4).getDistanceNorm())
+                .isLessThanOrEqualTo(selectedVertices.get(0).getDistanceNorm())
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(0).getNormDistance())
-                .isLessThanOrEqualTo(selectedVertices.get(3).getNormDistance())
+        assertThat(selectedVertices.get(0).getDistanceNorm())
+                .isLessThanOrEqualTo(selectedVertices.get(3).getDistanceNorm())
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(3).getNormDistance())
-                .isLessThanOrEqualTo(selectedVertices.get(2).getNormDistance())
+        assertThat(selectedVertices.get(3).getDistanceNorm())
+                .isLessThanOrEqualTo(selectedVertices.get(2).getDistanceNorm())
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(2).getNormDistance())
-                .isLessThanOrEqualTo(selectedVertices.get(1).getNormDistance())
+        assertThat(selectedVertices.get(2).getDistanceNorm())
+                .isLessThanOrEqualTo(selectedVertices.get(1).getDistanceNorm())
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
 
-        assertThat(selectedVertices.get(0).getNormDirection()).isNull();
-        assertThat(selectedVertices.get(1).getNormDirection()).isNull();
-        assertThat(selectedVertices.get(2).getNormDirection()).isNull();
-        assertThat(selectedVertices.get(3).getNormDirection()).isNull();
-        assertThat(selectedVertices.get(4).getNormDirection()).isNull();
+        assertThat(selectedVertices.get(0).getDirectionNorm()).isNull();
+        assertThat(selectedVertices.get(1).getDirectionNorm()).isNull();
+        assertThat(selectedVertices.get(2).getDirectionNorm()).isNull();
+        assertThat(selectedVertices.get(3).getDirectionNorm()).isNull();
+        assertThat(selectedVertices.get(4).getDirectionNorm()).isNull();
 
-        assertThat(selectedVertices.get(0).getNormRam()).isNull();
-        assertThat(selectedVertices.get(1).getNormRam()).isNull();
-        assertThat(selectedVertices.get(2).getNormRam()).isNull();
-        assertThat(selectedVertices.get(3).getNormRam()).isNull();
-        assertThat(selectedVertices.get(4).getNormRam()).isNull();
+        assertThat(selectedVertices.get(0).getRamNorm()).isNull();
+        assertThat(selectedVertices.get(1).getRamNorm()).isNull();
+        assertThat(selectedVertices.get(2).getRamNorm()).isNull();
+        assertThat(selectedVertices.get(3).getRamNorm()).isNull();
+        assertThat(selectedVertices.get(4).getRamNorm()).isNull();
 
         assertThat(selectedVertices.get(0).getScore()).isNotNull()
                 .isLessThanOrEqualTo(1)
@@ -168,22 +168,22 @@ class VerticesSelectorTest {
         assertThat(selectedVertices).hasSize(5);
 
         //order should be 2, 5, 1, 3, 4
-        assertThat(selectedVertices.get(1).getNormRam())
+        assertThat(selectedVertices.get(1).getRamNorm())
                 .isLessThanOrEqualTo(BigDecimal.ONE)
                 .isGreaterThanOrEqualTo(BigDecimal.ZERO)
-                .isLessThanOrEqualTo(selectedVertices.get(4).getNormRam());
-        assertThat(selectedVertices.get(4).getNormRam())
+                .isLessThanOrEqualTo(selectedVertices.get(4).getRamNorm());
+        assertThat(selectedVertices.get(4).getRamNorm())
                 .isLessThanOrEqualTo(BigDecimal.ONE)
                 .isGreaterThanOrEqualTo(BigDecimal.ZERO)
-                .isLessThanOrEqualTo(selectedVertices.get(3).getNormRam());
-        assertThat(selectedVertices.get(3).getNormRam())
+                .isLessThanOrEqualTo(selectedVertices.get(3).getRamNorm());
+        assertThat(selectedVertices.get(3).getRamNorm())
                 .isLessThanOrEqualTo(BigDecimal.ONE)
                 .isGreaterThanOrEqualTo(BigDecimal.ZERO)
-                .isLessThanOrEqualTo(selectedVertices.get(0).getNormRam());
-        assertThat(selectedVertices.get(0).getNormRam())
+                .isLessThanOrEqualTo(selectedVertices.get(0).getRamNorm());
+        assertThat(selectedVertices.get(0).getRamNorm())
                 .isLessThanOrEqualTo(BigDecimal.ONE)
                 .isGreaterThanOrEqualTo(BigDecimal.ZERO)
-                .isLessThanOrEqualTo(selectedVertices.get(2).getNormRam());
+                .isLessThanOrEqualTo(selectedVertices.get(2).getRamNorm());
 
         assertThat(selectedVertices.get(0).getScore())
                 .isLessThanOrEqualTo(1)
@@ -210,20 +210,20 @@ class VerticesSelectorTest {
         assertThat(getIdsFromSelectedVertexData(selectedVertices)).containsExactly(1, 2, 3, 4, 5);
 
         // order should be 2 3 4 5 1
-        assertThat(selectedVertices.get(1).getNormDirection())
-                .isLessThanOrEqualTo(selectedVertices.get(2).getNormDirection())
+        assertThat(selectedVertices.get(1).getDirectionNorm())
+                .isLessThanOrEqualTo(selectedVertices.get(2).getDirectionNorm())
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(2).getNormDirection())
-                .isLessThanOrEqualTo(selectedVertices.get(3).getNormDirection())
+        assertThat(selectedVertices.get(2).getDirectionNorm())
+                .isLessThanOrEqualTo(selectedVertices.get(3).getDirectionNorm())
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(3).getNormDirection())
-                .isLessThanOrEqualTo(selectedVertices.get(4).getNormDirection())
+        assertThat(selectedVertices.get(3).getDirectionNorm())
+                .isLessThanOrEqualTo(selectedVertices.get(4).getDirectionNorm())
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(4).getNormDirection())
-                .isLessThanOrEqualTo(selectedVertices.get(0).getNormDirection())
+        assertThat(selectedVertices.get(4).getDirectionNorm())
+                .isLessThanOrEqualTo(selectedVertices.get(0).getDirectionNorm())
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
 

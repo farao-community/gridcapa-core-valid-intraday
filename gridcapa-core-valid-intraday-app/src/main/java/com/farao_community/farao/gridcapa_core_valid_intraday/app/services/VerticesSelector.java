@@ -99,13 +99,11 @@ public class VerticesSelector {
                 : gerDefaultDeltaNpHubMap();
         List<SelectedVertexData> orderedList = importedVertices.stream()
                 .map(vertex -> vertexAndMarketDistance(referenceProgram, vertex, cnecRamBranchData, deltaNpHubMap))
-                .sorted(comparingDouble(SelectedVertexData::getNormDistance))
-                .map(v -> vertexAndMarketDistance(referenceProgram, v))
                 .sorted(comparingDouble(SelectedVertexData::getDistanceNorm))
                 .toList();
 
-        final Double minNormDistance = orderedList.getFirst().getNormDistance();
-        final Double maxNormDistance = orderedList.getLast().getNormDistance();
+        final Double minNormDistance = orderedList.getFirst().getDistanceNorm();
+        final Double maxNormDistance = orderedList.getLast().getDistanceNorm();
         importedVertices.forEach(vertex -> updateDistanceNormAndScore(vertex, minNormDistance, maxNormDistance, ponderation));
     }
 
@@ -125,8 +123,8 @@ public class VerticesSelector {
                 .sorted(comparingDouble(SelectedVertexData::getDirectionNorm))
                 .toList();
 
-        final Double minNormDirection = orderedList.getFirst().getNormDirection();
-        final Double maxNormDirection = orderedList.getLast().getNormDirection();
+        final Double minNormDirection = orderedList.getFirst().getDirectionNorm();
+        final Double maxNormDirection = orderedList.getLast().getDirectionNorm();
         importedVertices.forEach(vertex -> updateDirectionNormAndScore(vertex, minNormDirection, maxNormDirection, ponderation));
     }
 
@@ -169,8 +167,8 @@ public class VerticesSelector {
         final List<SelectedVertexData> orderedList = importedVertices.stream()
                 .sorted(ORDER_BY_RAM_SELECTED_VERTEX)
                 .toList();
-        final BigDecimal minNormConstrained = orderedList.getFirst().getNormRam();
-        final BigDecimal maxNormConstrained = orderedList.getLast().getNormRam();
+        final BigDecimal minNormConstrained = orderedList.getFirst().getRamNorm();
+        final BigDecimal maxNormConstrained = orderedList.getLast().getRamNorm();
         importedVertices.forEach(vertex -> updateConstrainedNormAndScore(vertex, minNormConstrained, maxNormConstrained, ponderation));
     }
 
@@ -212,18 +210,18 @@ public class VerticesSelector {
                                             final Double minNormDistance,
                                             final Double maxNormDistance,
                                             final Double ponderation) {
-        final Double distanceNormNormalized = (selectedVertexData.getNormDistance() - minNormDistance) / (maxNormDistance - minNormDistance);
-        selectedVertexData.setNormDistance(distanceNormNormalized);
-        updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getNormDistance());
+        final Double distanceNormNormalized = (selectedVertexData.getDistanceNorm() - minNormDistance) / (maxNormDistance - minNormDistance);
+        selectedVertexData.setDistanceNorm(distanceNormNormalized);
+        updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getDistanceNorm());
     }
 
     private void updateDirectionNormAndScore(final SelectedVertexData selectedVertexData,
                                              final Double minNormDirection,
                                              final Double maxNormDirection,
                                              final Double ponderation) {
-        final Double directionNormNormalized = (selectedVertexData.getNormDirection() - minNormDirection) / (maxNormDirection - minNormDirection);
-        selectedVertexData.setNormDirection(directionNormNormalized);
-        updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getNormDirection());
+        final Double directionNormNormalized = (selectedVertexData.getDirectionNorm() - minNormDirection) / (maxNormDirection - minNormDirection);
+        selectedVertexData.setDirectionNorm(directionNormNormalized);
+        updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getDirectionNorm());
     }
 
     private void updateConstrainedNormAndScore(final SelectedVertexData selectedVertexData,
@@ -231,11 +229,11 @@ public class VerticesSelector {
                                                final BigDecimal maxNormRam,
                                                final Double ponderation) {
 
-        final BigDecimal numerator = selectedVertexData.getNormRam().subtract(minNormRam);
+        final BigDecimal numerator = selectedVertexData.getRamNorm().subtract(minNormRam);
         final BigDecimal divisor = maxNormRam.subtract(minNormRam);
         final BigDecimal ramNormNormalized = numerator.divide(divisor, RoundingMode.HALF_EVEN);
-        selectedVertexData.setNormRam(ramNormNormalized);
-        updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getNormRam().doubleValue());
+        selectedVertexData.setRamNorm(ramNormNormalized);
+        updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getRamNorm().doubleValue());
     }
 
     private static void updateVerticeScore(final Double ponderation,
