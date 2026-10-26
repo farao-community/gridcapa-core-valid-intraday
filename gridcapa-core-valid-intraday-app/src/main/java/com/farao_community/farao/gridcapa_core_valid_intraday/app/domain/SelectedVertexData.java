@@ -14,9 +14,9 @@ public class SelectedVertexData {
 
     private final Vertex vertex;
     private Double score;
-    private BigDecimal normRam;
-    private Double normDistance;
-    private Double normDirection;
+    private BigDecimal ramNorm;
+    private Double distanceNorm;
+    private Double directionNorm;
 
     public SelectedVertexData(Vertex vertex) {
         this.vertex = vertex;
@@ -34,34 +34,34 @@ public class SelectedVertexData {
         this.score = score;
     }
 
-    public BigDecimal getNormRam() {
-        return normRam;
+    public BigDecimal getRamNorm() {
+        return ramNorm;
     }
 
-    public void setNormRam(final BigDecimal normRam) {
-        this.normRam = normRam;
+    public void setRamNorm(final BigDecimal ramNorm) {
+        this.ramNorm = ramNorm;
     }
 
-    public Double getNormDistance() {
-        return normDistance;
+    public Double getDistanceNorm() {
+        return distanceNorm;
     }
 
-    public void setNormDistance(final Double normDistance) {
-        this.normDistance = normDistance;
+    public void setDistanceNorm(final Double distanceNorm) {
+        this.distanceNorm = distanceNorm;
     }
 
-    public Double getNormDirection() {
-        return normDirection;
+    public Double getDirectionNorm() {
+        return directionNorm;
     }
 
-    public void setNormDirection(final Double normDirection) {
-        this.normDirection = normDirection;
+    public void setDirectionNorm(final Double directionNorm) {
+        this.directionNorm = directionNorm;
     }
 
     @Override
     public String toString() {
         StringBuilder appender = new StringBuilder();
         vertex.coordinates().forEach((hub, val) -> appender.append(hub).append(": ").append(val).append(", "));
-        return "Id: " + vertex.vertexId() + " score: " + score + " " + appender + " norm_ram: " + normRam + " norm_dist: " + normDistance +  " norm_dir: " + normDirection;
+        return "Id: " + vertex.vertexId() + " score: " + score + " " + appender + " norm_ram: " + ramNorm + " norm_dist: " + distanceNorm + " norm_dir: " + directionNorm;
     }
 }

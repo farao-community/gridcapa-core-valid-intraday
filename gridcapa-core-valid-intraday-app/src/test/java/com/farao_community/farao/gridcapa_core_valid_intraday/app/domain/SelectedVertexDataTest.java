@@ -20,18 +20,18 @@ class SelectedVertexDataTest {
         Vertex vertex = new Vertex(123, Map.of("AA", 1000, "BB", 2000, "CC", 3300));
         SelectedVertexData data = new SelectedVertexData(vertex);
         final double normDistance = 0.123;
-        data.setNormDistance(normDistance);
+        data.setDistanceNorm(normDistance);
         final BigDecimal normRam = BigDecimal.valueOf(0.444);
-        data.setNormRam(normRam);
+        data.setRamNorm(normRam);
         final double normDirection = 0.1245;
-        data.setNormDirection(normDirection);
+        data.setDirectionNorm(normDirection);
         final double score = 0.555;
         data.setScore(score);
 
         Assertions.assertThat(data.getVertex()).isEqualTo(vertex);
         Assertions.assertThat(data.getScore()).isEqualTo(score);
-        Assertions.assertThat(data.getNormDistance()).isEqualTo(normDistance);
-        Assertions.assertThat(data.getNormDirection()).isEqualTo(normDirection);
-        Assertions.assertThat(data.getNormRam()).isEqualByComparingTo(normRam);
+        Assertions.assertThat(data.getDistanceNorm()).isEqualTo(normDistance);
+        Assertions.assertThat(data.getDirectionNorm()).isEqualTo(normDirection);
+        Assertions.assertThat(data.getRamNorm()).isEqualByComparingTo(normRam);
     }
 }

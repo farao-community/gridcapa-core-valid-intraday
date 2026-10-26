@@ -35,7 +35,7 @@ import static java.util.Comparator.comparingDouble;
 public class VerticesSelector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(VerticesSelector.class);
-    private static final Comparator<SelectedVertexData> ORDER_BY_RAM_SELECTED_VERTEX = Comparator.comparing(SelectedVertexData::getNormRam, Comparator.nullsLast(Comparator.naturalOrder()));
+    private static final Comparator<SelectedVertexData> ORDER_BY_RAM_SELECTED_VERTEX = Comparator.comparing(SelectedVertexData::getRamNorm, Comparator.nullsLast(Comparator.naturalOrder()));
     private static final Comparator<CnecVertexRamData> ORDER_BY_RAM = Comparator.comparing(CnecVertexRamData::ram);
     private static final Comparator<SelectedVertexData> VERTEX_SCORE_COMPARATOR = Comparator.comparingDouble(SelectedVertexData::getScore);
     private static final Comparator<SelectedVertexData> ORDER_BY_PONDERATION = VERTEX_SCORE_COMPARATOR.thenComparingInt(v -> v.getVertex().vertexId());
@@ -87,7 +87,7 @@ public class VerticesSelector {
 
         List<SelectedVertexData> orderedList = importedVertices.stream()
                 .map(v -> vertexAndMarketDistance(referenceProgram, v))
-                .sorted(comparingDouble(SelectedVertexData::getNormDistance))
+                .sorted(comparingDouble(SelectedVertexData::getDistanceNorm))
                 .toList();
 
         updateVerticesScores(ponderation, orderedList);
@@ -106,7 +106,7 @@ public class VerticesSelector {
 
         List<SelectedVertexData> orderedList = importedVertices.stream()
                 .map(v -> vertexAndMarketAngleDistance(referenceProgram, v))
-                .sorted(comparingDouble(SelectedVertexData::getNormDirection))
+                .sorted(comparingDouble(SelectedVertexData::getDirectionNorm))
                 .toList();
 
         updateVerticesScores(ponderation, orderedList);
@@ -143,7 +143,7 @@ public class VerticesSelector {
                         .orElseThrow(
                                 () -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find worse CNEC for selectedVertexData id %s", selectedVertexData.getVertex().vertexId()))
                         );
-                selectedVertexData.setNormRam(minRamCnec.ram());
+                selectedVertexData.setRamNorm(minRamCnec.ram());
             } else {
                 LOGGER.info("Vertex: {}, doesn't hav corresponding french Cnecs", selectedVertexData.getVertex().vertexId());
             }
@@ -192,7 +192,7 @@ public class VerticesSelector {
             final double weightedDistance = hub.coefficient() * distanceIn1D * distanceIn1D;
             sumOfWeightedSquared += weightedDistance;
         }
-        selectedVertexData.setNormDistance(Math.sqrt(sumOfWeightedSquared));
+        selectedVertexData.setDistanceNorm(Math.sqrt(sumOfWeightedSquared));
         return selectedVertexData;
     }
 
@@ -224,7 +224,7 @@ public class VerticesSelector {
             normVertex += vertexPosition * vertexPosition;
         }
         final double cosinus = scalarProduct / (Math.sqrt(normMarket) * Math.sqrt(normVertex));
-        selectedVertexData.setNormDirection(cosinus);
+        selectedVertexData.setDirectionNorm(cosinus);
         return selectedVertexData;
     }
 }
