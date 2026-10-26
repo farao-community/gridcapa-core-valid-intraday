@@ -26,11 +26,17 @@ public final class ComputeUtils {
         return coreHubs.stream()
                 .filter(Predicate.not(CoreHub::isHvdcHub))
                 .map(CoreHub::clusterVerticeCode)
-                .map(code -> cnec.getPtdfValues().get(code).multiply(BigDecimal.valueOf(vertex.coordinates().get(code))))
+                .map(code -> multiplyVertexAndCnecCoordinates(vertex, cnec, code))
                 .reduce(BigDecimal::add)
                 .orElseThrow(() -> new IllegalStateException(
                         String.format("Vertex %d and Cnec %S missing required coordinates for product computation",
                                       vertex.vertexId(), cnec.branchId())
                 ));
+    }
+
+    private static BigDecimal multiplyVertexAndCnecCoordinates(final Vertex vertex,
+                                                               final CnecRamBranchData cnec,
+                                                               final String code) {
+        return cnec.getPtdfValues().get(code).multiply(BigDecimal.valueOf(vertex.coordinates().get(code)));
     }
 }
