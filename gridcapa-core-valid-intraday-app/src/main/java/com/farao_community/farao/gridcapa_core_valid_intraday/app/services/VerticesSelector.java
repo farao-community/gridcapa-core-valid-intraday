@@ -55,7 +55,7 @@ public class VerticesSelector {
      *
      * @param importedVertices  the list of projected vertices
      * @param marketPoints      the market points
-     * @param cnecRamBranchData the cnec ram branches
+     * @param cnecRamBranchData the CNEC ram branches
      * @param parameters        the application parameters
      * @return The ordered list of maxSelectedVertices vertices through ponderated selection
      */
@@ -68,7 +68,7 @@ public class VerticesSelector {
                 .map(SelectedVertexData::new)
                 .toList();
         final int ponderationClosest = parameters.getPonderationClosest();
-        orderByDistance(selectedVertexDatas, marketPoints, cnecRamBranchData, ponderationToQuotient(ponderationClosest), parameters.isCalculateDeltaNpHub());
+        orderByDistance(selectedVertexDatas, marketPoints, cnecRamBranchData, ponderationToQuotient(ponderationClosest), parameters.shouldCalculate());
         final int ponderationAngle = parameters.getPonderationAngle();
         orderByAngle(selectedVertexDatas, marketPoints, ponderationToQuotient(ponderationAngle));
         final int ponderationConstrained = parameters.getPonderationConstrained();
@@ -161,7 +161,7 @@ public class VerticesSelector {
                         );
                 selectedVertexData.setRamNorm(minRamCnec.ram());
             } else {
-                LOGGER.info("Vertex: {}, doesn't have corresponding french Cnecs", selectedVertexData.getVertex().vertexId());
+                LOGGER.info("Vertex: {}, doesn't have corresponding french CNECs", selectedVertexData.getVertex().vertexId());
             }
         }
         final List<SelectedVertexData> orderedList = importedVertices.stream()
@@ -180,10 +180,10 @@ public class VerticesSelector {
     private Map<String, Double> getDeltaNpHubMap(final List<CoreHub> coreHubs,
                                                  final List<SelectedVertexData> importedVertices) {
 
-        //per hub we want : (maxVerticeNpByHub - minVerticeNpByHub) / (maxVerticeNpbBFrenchHub- minVerticeNpByFrenchHub)
+        //per hub we want : (maxVerticeNpByHub - minVerticeNpByHub) / (maxVerticeNpbBFrenchHub - minVerticeNpByFrenchHub)
         final Map<String, Double> deltaNpHubMap = new HashMap<>();
         final String frenchVertexCode = coreHubs.stream()
-                .filter(coreHub -> coreHub.country().equals(Country.FR))
+                .filter(coreHub -> coreHub.country() == Country.FR)
                 .map(CoreHub::clusterVerticeCode)
                 .findFirst()
                 .orElseThrow(() -> new CoreValidIntradayInvalidDataException("No French CoreHub configuration found during vertex selection! "));
@@ -191,16 +191,16 @@ public class VerticesSelector {
                 .map(vertex -> vertex.getVertex().coordinates().get(frenchVertexCode))
                 .sorted(naturalOrder())
                 .toList();
-        final int minNpFrench = frenchNps.getFirst();
-        final int maxNpFrench = frenchNps.getLast();
+        final double minFrenchNp = frenchNps.getFirst();
+        final double maxFrenchNp = frenchNps.getLast();
 
-        for (CoreHub coreHub : coreHubs) {
+        for (final CoreHub coreHub : coreHubs) {
             final List<SelectedVertexData> vertexOrdereByNpHub = importedVertices.stream()
                     .sorted(comparingInt(vertex -> vertex.getVertex().coordinates().get(coreHub.clusterVerticeCode())))
                     .toList();
-            final int minNp = vertexOrdereByNpHub.getFirst().getVertex().coordinates().get(coreHub.clusterVerticeCode());
-            final int maxNp = vertexOrdereByNpHub.getLast().getVertex().coordinates().get(coreHub.clusterVerticeCode());
-            final double deltaNpHub = (maxNp - minNp) / (double) (maxNpFrench - minNpFrench);
+            final double minNp = vertexOrdereByNpHub.getFirst().getVertex().coordinates().get(coreHub.clusterVerticeCode());
+            final double maxNp = vertexOrdereByNpHub.getLast().getVertex().coordinates().get(coreHub.clusterVerticeCode());
+            final double deltaNpHub = (maxNp - minNp) / (maxFrenchNp - minFrenchNp);
             deltaNpHubMap.put(coreHub.clusterVerticeCode(), deltaNpHub);
         }
         return deltaNpHubMap;
@@ -217,7 +217,7 @@ public class VerticesSelector {
             BigDecimal khubValue = frenchBaseCaseCnecs.stream()
                     .map(cnec -> calculateFrenchHubPoderation(cnec, hub, coreHubs))
                     .reduce(BigDecimal::add)
-                    .orElseThrow(() -> new CoreValidIntradayInvalidDataException("Impossible to compute kHub value"));
+                    .orElseThrow(() -> new CoreValidIntradayInvalidDataException("Impossible to compute kHub value for french CNECs "));
 
             deltaNpHubMap.put(hub.clusterVerticeCode(), khubValue.doubleValue());
         }
@@ -234,7 +234,7 @@ public class VerticesSelector {
                 .map(CoreHub::clusterVerticeCode)
                 .map(code -> getAbsDifferencePtdfHubValues(cnec, code, hubPtdfValue))
                 .reduce(BigDecimal::add)
-                .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find ptdf values for cnec %s", cnec.branchId())));
+                .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find ptdf values for CNEC %s", cnec.branchId())));
 
     }
 
@@ -296,7 +296,7 @@ public class VerticesSelector {
 
         final Map<String, Integer> vertexPositions = selectedVertexData.getVertex().coordinates();
 
-        // global distance² = sum_over_hub(deltaNpHubMap * k_hub * [1D distance]²)
+        // global distance² = sum_over_hub(deltaNpHub * k_hub * [1D distance]²)
         double sumOfWeightedSquared = 0.0;
         for (final CoreHub hub : coreHubs) {
             final Double marketPos = referenceProgram.getGlobalNetPosition(new EICode(hub.country()));

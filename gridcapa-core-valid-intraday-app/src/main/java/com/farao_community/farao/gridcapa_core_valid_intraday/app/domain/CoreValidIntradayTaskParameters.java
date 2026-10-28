@@ -47,7 +47,7 @@ public class CoreValidIntradayTaskParameters {
     private int ramMargin;
     private int mergeAngle;
     private int frenchCnecCountLimit;
-    private boolean isCalculateDeltaNpHub;
+    private boolean shouldCalculate;
 
     public CoreValidIntradayTaskParameters(final List<TaskParameterDto> parameters) {
         final List<String> errors = new ArrayList<>();
@@ -65,7 +65,7 @@ public class CoreValidIntradayTaskParameters {
                 case RAM_MARGIN -> ramMargin = validateIsPositiveIntegerAndGet(parameter, errors);
                 case MERGE_ANGLE -> mergeAngle = validateIsPositiveIntegerAndGet(parameter, errors);
                 case FR_CNEC_COUNT_LIMIT -> frenchCnecCountLimit = validateIsPositiveIntegerAndGet(parameter, errors);
-                case IS_CALCULATE_DELTA_NP_HUB -> isCalculateDeltaNpHub = validateIsBooleanAndGet(parameter, errors);
+                case IS_CALCULATE_DELTA_NP_HUB -> shouldCalculate = validateIsBooleanAndGet(parameter, errors);
                 default -> LOGGER.warn("Unknown parameter {} (value: {}) will be ignored", parameter.getId(), parameter.getValue());
             }
         }
@@ -156,8 +156,8 @@ public class CoreValidIntradayTaskParameters {
         return frenchCnecCountLimit;
     }
 
-    public boolean isCalculateDeltaNpHub() {
-        return isCalculateDeltaNpHub;
+    public boolean shouldCalculate() {
+        return shouldCalculate;
     }
 
     public String toString() {
@@ -178,7 +178,7 @@ public class CoreValidIntradayTaskParameters {
         appender.add(String.format(KEY_VALUE_FORMAT, RAM_MARGIN, ramMargin));
         appender.add(String.format(KEY_VALUE_FORMAT, MERGE_ANGLE, mergeAngle));
         appender.add(String.format(KEY_VALUE_FORMAT, FR_CNEC_COUNT_LIMIT, frenchCnecCountLimit));
-        appender.add(String.format(KEY_VALUE_FORMAT, IS_CALCULATE_DELTA_NP_HUB, isCalculateDeltaNpHub));
+        appender.add(String.format(KEY_VALUE_FORMAT, IS_CALCULATE_DELTA_NP_HUB, shouldCalculate));
         return String.format("{%s%n}", String.join(", ", appender));
     }
 }
