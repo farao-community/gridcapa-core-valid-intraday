@@ -45,7 +45,6 @@ public class VerticesSelector {
     private static final Comparator<CnecVertexRamData> ORDER_BY_RAM = Comparator.comparing(CnecVertexRamData::ram);
     private static final Comparator<SelectedVertexData> VERTEX_SCORE_COMPARATOR = Comparator.comparingDouble(SelectedVertexData::getScore);
     private static final Comparator<SelectedVertexData> ORDER_BY_PONDERATION = VERTEX_SCORE_COMPARATOR.thenComparingInt(v -> v.getVertex().vertexId());
-    private static final String FR_COUNTRY_CODE = "FR";
     private final List<CoreHub> coreHubs;
 
     public VerticesSelector(final CoreHubsConfiguration coreHubsConfiguration) {
@@ -149,7 +148,7 @@ public class VerticesSelector {
             for (final CnecRamBranchData branch : frenchCnecs) {
                 final BigDecimal cnecVertexFlow = computeCnecVertexProduct(selectedVertexData.getVertex(), branch, coreHubs);
                 if (cnecVertexFlow.compareTo(BigDecimal.ZERO) > 0) {
-                    final BigDecimal constrainedValueRam = BigDecimal.valueOf(branch.getRam0Core()).subtract(cnecVertexFlow);
+                    final BigDecimal constrainedValueRam = BigDecimal.valueOf(branch.ram()).subtract(cnecVertexFlow);
                     vertexRamsByCnec.add(new CnecVertexRamData(branch, selectedVertexData.getVertex(), constrainedValueRam));
                 }
             }
@@ -162,7 +161,7 @@ public class VerticesSelector {
                         );
                 selectedVertexData.setRamNorm(minRamCnec.ram());
             } else {
-                LOGGER.info("Vertex: {}, doesn't hav corresponding french Cnecs", selectedVertexData.getVertex().vertexId());
+                LOGGER.info("Vertex: {}, doesn't have corresponding french Cnecs", selectedVertexData.getVertex().vertexId());
             }
         }
         final List<SelectedVertexData> orderedList = importedVertices.stream()

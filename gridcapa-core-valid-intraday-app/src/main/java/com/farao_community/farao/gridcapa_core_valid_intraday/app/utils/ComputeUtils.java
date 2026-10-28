@@ -12,7 +12,6 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRam
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.function.Predicate;
 
 public final class ComputeUtils {
 
@@ -24,7 +23,6 @@ public final class ComputeUtils {
                                                       final CnecRamBranchData cnec,
                                                       final List<CoreHub> coreHubs) {
         return coreHubs.stream()
-                .filter(Predicate.not(CoreHub::isHvdcHub))
                 .map(CoreHub::clusterVerticeCode)
                 .map(code -> multiplyVertexAndCnecCoordinates(vertex, cnec, code))
                 .reduce(BigDecimal::add)
