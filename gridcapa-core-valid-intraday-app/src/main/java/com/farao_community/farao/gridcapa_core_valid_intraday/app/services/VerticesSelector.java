@@ -200,8 +200,14 @@ public class VerticesSelector {
                     .toList();
             final double minNp = vertexOrderedByNpHub.getFirst().getVertex().coordinates().get(coreHub.clusterVerticeCode());
             final double maxNp = vertexOrderedByNpHub.getLast().getVertex().coordinates().get(coreHub.clusterVerticeCode());
-            final double deltaNpHub = (maxNp - minNp) / (maxFrenchNp - minFrenchNp);
-            deltaNpHubMap.put(coreHub.clusterVerticeCode(), deltaNpHub);
+            final double divisor = maxFrenchNp - minFrenchNp;
+            if (divisor == 0.0) {
+                LOGGER.warn("avoiding division by ZERO in method getDeltaNpHubMap");
+                deltaNpHubMap.put(coreHub.clusterVerticeCode(), 1d);
+            } else {
+                final double deltaNpHub = (maxNp - minNp) / divisor;
+                deltaNpHubMap.put(coreHub.clusterVerticeCode(), deltaNpHub);
+            }
         }
         return deltaNpHubMap;
     }
@@ -248,8 +254,14 @@ public class VerticesSelector {
                                             final Double minNormDistance,
                                             final Double maxNormDistance,
                                             final Double ponderation) {
-        final Double distanceNormNormalized = (selectedVertexData.getDistanceNorm() - minNormDistance) / (maxNormDistance - minNormDistance);
-        selectedVertexData.setDistanceNorm(distanceNormNormalized);
+
+        final double divisor = maxNormDistance - minNormDistance;
+        if (divisor == 0.0) {
+            selectedVertexData.setDistanceNorm(1d);
+        } else {
+            final Double distanceNormNormalized = (selectedVertexData.getDistanceNorm() - minNormDistance) / divisor;
+            selectedVertexData.setDistanceNorm(distanceNormNormalized);
+        }
         updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getDistanceNorm());
     }
 
