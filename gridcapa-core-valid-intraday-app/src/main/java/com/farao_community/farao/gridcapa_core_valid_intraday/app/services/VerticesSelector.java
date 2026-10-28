@@ -195,11 +195,11 @@ public class VerticesSelector {
         final double maxFrenchNp = frenchNps.getLast();
 
         for (final CoreHub coreHub : coreHubs) {
-            final List<SelectedVertexData> vertexOrdereByNpHub = importedVertices.stream()
+            final List<SelectedVertexData> vertexOrderedByNpHub = importedVertices.stream()
                     .sorted(comparingInt(vertex -> vertex.getVertex().coordinates().get(coreHub.clusterVerticeCode())))
                     .toList();
-            final double minNp = vertexOrdereByNpHub.getFirst().getVertex().coordinates().get(coreHub.clusterVerticeCode());
-            final double maxNp = vertexOrdereByNpHub.getLast().getVertex().coordinates().get(coreHub.clusterVerticeCode());
+            final double minNp = vertexOrderedByNpHub.getFirst().getVertex().coordinates().get(coreHub.clusterVerticeCode());
+            final double maxNp = vertexOrderedByNpHub.getLast().getVertex().coordinates().get(coreHub.clusterVerticeCode());
             final double deltaNpHub = (maxNp - minNp) / (maxFrenchNp - minFrenchNp);
             deltaNpHubMap.put(coreHub.clusterVerticeCode(), deltaNpHub);
         }
