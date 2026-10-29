@@ -196,10 +196,10 @@ public class VerticesSelector {
 
         for (final CoreHub coreHub : coreHubs) {
             final List<SelectedVertexData> vertexOrderedByNpHub = importedVertices.stream()
-                    .sorted(comparingInt(vertex -> vertex.getVertex().coordinates().get(coreHub.clusterVerticeCode())))
+                    .sorted(comparingInt(vertex -> getNpHub(coreHub, vertex)))
                     .toList();
-            final double minNp = vertexOrderedByNpHub.getFirst().getVertex().coordinates().get(coreHub.clusterVerticeCode());
-            final double maxNp = vertexOrderedByNpHub.getLast().getVertex().coordinates().get(coreHub.clusterVerticeCode());
+            final double minNp = getNpHub(coreHub, vertexOrderedByNpHub.getFirst());
+            final double maxNp = getNpHub(coreHub, vertexOrderedByNpHub.getLast());
             final double divisor = maxFrenchNp - minFrenchNp;
             if (divisor == 0.0) {
                 LOGGER.warn("avoiding division by ZERO in method getDeltaNpHubMap");
@@ -210,6 +210,11 @@ public class VerticesSelector {
             }
         }
         return deltaNpHubMap;
+    }
+
+    private static Integer getNpHub(final CoreHub coreHub,
+                                      final SelectedVertexData vertex) {
+        return vertex.getVertex().coordinates().get(coreHub.clusterVerticeCode());
     }
 
     private Map<String, Double> calculateKHub(final List<CoreHub> coreHubs,
