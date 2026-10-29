@@ -269,8 +269,16 @@ public class VerticesSelector {
                                              final Double minNormDirection,
                                              final Double maxNormDirection,
                                              final Double ponderation) {
-        final Double directionNormNormalized = 1 - (selectedVertexData.getDirectionNorm() - minNormDirection) / (maxNormDirection - minNormDirection);
-        selectedVertexData.setDirectionNorm(directionNormNormalized);
+
+        final double divisor = maxNormDirection - minNormDirection;
+        if (divisor == 0.0) {
+            LOGGER.warn("avoiding division by ZERO in method updateDirectionNormAndScore");
+            selectedVertexData.setDirectionNorm(1d);
+        } else {
+            final Double directionNormNormalized = 1 - (selectedVertexData.getDirectionNorm() - minNormDirection) / divisor;
+            selectedVertexData.setDirectionNorm(directionNormNormalized);
+        }
+
         updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getDirectionNorm());
     }
 
@@ -356,8 +364,14 @@ public class VerticesSelector {
             normMarket += marketPos * marketPos;
             normVertex += vertexPosition * vertexPosition;
         }
-        final double cosinus = scalarProduct / (Math.sqrt(normMarket) * Math.sqrt(normVertex));
-        selectedVertexData.setDirectionNorm(cosinus);
+        final double divisor = Math.sqrt(normMarket) * Math.sqrt(normVertex);
+        if (divisor == 0.0) {
+            LOGGER.warn("avoiding division by ZERO in method vertexAndMarketAngleDistance");
+            selectedVertexData.setDirectionNorm(1d);
+        } else {
+            final double cosinus = scalarProduct / divisor;
+            selectedVertexData.setDirectionNorm(cosinus);
+        }
         return selectedVertexData;
     }
 }
