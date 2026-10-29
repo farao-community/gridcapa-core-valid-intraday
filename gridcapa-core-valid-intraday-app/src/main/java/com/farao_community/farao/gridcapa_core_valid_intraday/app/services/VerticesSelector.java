@@ -280,7 +280,7 @@ public class VerticesSelector {
             LOGGER.warn("avoiding division by ZERO in method updateDirectionNormAndScore");
             selectedVertexData.setDirectionNorm(1d);
         } else {
-            final Double directionNormNormalized = 1 - (selectedVertexData.getDirectionNorm() - minNormDirection) / divisor;
+            final Double directionNormNormalized = 1 - ((selectedVertexData.getDirectionNorm() - minNormDirection) / divisor);
             selectedVertexData.setDirectionNorm(directionNormNormalized);
         }
 
