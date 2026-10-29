@@ -14,6 +14,7 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRam
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecVertexRamData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.slf4j.Logger;
@@ -21,15 +22,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.computeCnecVertexProduct;
 import static java.util.Comparator.comparingDouble;
+import static java.util.Comparator.comparingInt;
+import static java.util.Comparator.naturalOrder;
 
 @Service
 public class VerticesSelector {
@@ -49,20 +55,20 @@ public class VerticesSelector {
      *
      * @param importedVertices  the list of projected vertices
      * @param marketPoints      the market points
-     * @param cnecRamBranchData the cnec ram branches
+     * @param cnecRamBranchData the CNEC ram branches
      * @param parameters        the application parameters
      * @return The ordered list of maxSelectedVertices vertices through ponderated selection
      */
-    public List<SelectedVertexData> selectionSynthesis(List<Vertex> importedVertices,
-                                                       ReferenceProgram marketPoints,
-                                                       List<CnecRamBranchData> cnecRamBranchData,
-                                                       CoreValidIntradayTaskParameters parameters) {
+    public List<SelectedVertexData> selectionSynthesis(final List<Vertex> importedVertices,
+                                                       final ReferenceProgram marketPoints,
+                                                       final List<CnecRamBranchData> cnecRamBranchData,
+                                                       final CoreValidIntradayTaskParameters parameters) {
 
         final List<SelectedVertexData> selectedVertexDatas = importedVertices.stream()
                 .map(SelectedVertexData::new)
                 .toList();
         final int ponderationClosest = parameters.getPonderationClosest();
-        orderByDistance(selectedVertexDatas, marketPoints, ponderationToQuotient(ponderationClosest));
+        orderByDistance(selectedVertexDatas, marketPoints, cnecRamBranchData, ponderationToQuotient(ponderationClosest), parameters.shouldCalculate());
         final int ponderationAngle = parameters.getPonderationAngle();
         orderByAngle(selectedVertexDatas, marketPoints, ponderationToQuotient(ponderationAngle));
         final int ponderationConstrained = parameters.getPonderationConstrained();
@@ -83,14 +89,22 @@ public class VerticesSelector {
      */
     public void orderByDistance(final List<SelectedVertexData> importedVertices,
                                 final ReferenceProgram referenceProgram,
-                                final Double ponderation) {
+                                final List<CnecRamBranchData> cnecRamBranchData,
+                                final Double ponderation,
+                                final boolean isCalculateDeltaNpHub) {
 
+        final Map<String, Double> deltaNpHubMap = isCalculateDeltaNpHub
+                ? getDeltaNpHubMap(coreHubs, importedVertices)
+                : gerDefaultDeltaNpHubMap();
+        final Map<String, Double> kHub = calculateKHub(coreHubs, cnecRamBranchData);
         List<SelectedVertexData> orderedList = importedVertices.stream()
-                .map(v -> vertexAndMarketDistance(referenceProgram, v))
+                .map(vertex -> vertexAndMarketDistance(referenceProgram, vertex, deltaNpHubMap, kHub))
                 .sorted(comparingDouble(SelectedVertexData::getDistanceNorm))
                 .toList();
 
-        updateVerticesScores(ponderation, orderedList);
+        final Double minNormDistance = orderedList.getFirst().getDistanceNorm();
+        final Double maxNormDistance = orderedList.getLast().getDistanceNorm();
+        importedVertices.forEach(vertex -> updateDistanceNormAndScore(vertex, minNormDistance, maxNormDistance, ponderation));
     }
 
     /**
@@ -109,7 +123,9 @@ public class VerticesSelector {
                 .sorted(comparingDouble(SelectedVertexData::getDirectionNorm))
                 .toList();
 
-        updateVerticesScores(ponderation, orderedList);
+        final Double minNormDirection = orderedList.getFirst().getDirectionNorm();
+        final Double maxNormDirection = orderedList.getLast().getDirectionNorm();
+        importedVertices.forEach(vertex -> updateDirectionNormAndScore(vertex, minNormDirection, maxNormDirection, ponderation));
     }
 
     /**
@@ -132,7 +148,7 @@ public class VerticesSelector {
             for (final CnecRamBranchData branch : frenchCnecs) {
                 final BigDecimal cnecVertexFlow = computeCnecVertexProduct(selectedVertexData.getVertex(), branch, coreHubs);
                 if (cnecVertexFlow.compareTo(BigDecimal.ZERO) > 0) {
-                    final BigDecimal constrainedValueRam = BigDecimal.valueOf(branch.getRam0Core()).subtract(cnecVertexFlow);
+                    final BigDecimal constrainedValueRam = BigDecimal.valueOf(branch.ram()).subtract(cnecVertexFlow);
                     vertexRamsByCnec.add(new CnecVertexRamData(branch, selectedVertexData.getVertex(), constrainedValueRam));
                 }
             }
@@ -145,21 +161,148 @@ public class VerticesSelector {
                         );
                 selectedVertexData.setRamNorm(minRamCnec.ram());
             } else {
-                LOGGER.info("Vertex: {}, doesn't hav corresponding french Cnecs", selectedVertexData.getVertex().vertexId());
+                LOGGER.info("Vertex: {}, doesn't have corresponding french CNECs", selectedVertexData.getVertex().vertexId());
             }
         }
         final List<SelectedVertexData> orderedList = importedVertices.stream()
                 .sorted(ORDER_BY_RAM_SELECTED_VERTEX)
                 .toList();
-        updateVerticesScores(ponderation, orderedList);
+        final BigDecimal minNormConstrained = orderedList.getFirst().getRamNorm();
+        final BigDecimal maxNormConstrained = orderedList.getLast().getRamNorm();
+        importedVertices.forEach(vertex -> updateConstrainedNormAndScore(vertex, minNormConstrained, maxNormConstrained, ponderation));
     }
 
-    private static void updateVerticesScores(final Double ponderation,
-                                             final List<SelectedVertexData> orderedList) {
-        for (int index = 0; index < orderedList.size(); index++) {
-            final SelectedVertexData vertex = orderedList.get(index);
-            vertex.setScore(index * ponderation + Optional.ofNullable(vertex.getScore()).orElse(0D));
+    private Map<String, Double> gerDefaultDeltaNpHubMap() {
+        return coreHubs.stream()
+                .collect(Collectors.toMap(CoreHub::clusterVerticeCode, ch -> 1d));
+    }
+
+    private Map<String, Double> getDeltaNpHubMap(final List<CoreHub> coreHubs,
+                                                 final List<SelectedVertexData> importedVertices) {
+
+        //per hub we want : (maxVerticeNpByHub - minVerticeNpByHub) / (maxVerticeNpbBFrenchHub - minVerticeNpByFrenchHub)
+        final Map<String, Double> deltaNpHubMap = new HashMap<>();
+        final String frenchVertexCode = coreHubs.stream()
+                .filter(coreHub -> coreHub.country() == Country.FR)
+                .map(CoreHub::clusterVerticeCode)
+                .findFirst()
+                .orElseThrow(() -> new CoreValidIntradayInvalidDataException("No French CoreHub configuration found during vertex selection! "));
+        final List<Integer> frenchNps = importedVertices.stream()
+                .map(vertex -> vertex.getVertex().coordinates().get(frenchVertexCode))
+                .sorted(naturalOrder())
+                .toList();
+        final double minFrenchNp = frenchNps.getFirst();
+        final double maxFrenchNp = frenchNps.getLast();
+
+        for (final CoreHub coreHub : coreHubs) {
+            final List<SelectedVertexData> vertexOrderedByNpHub = importedVertices.stream()
+                    .sorted(comparingInt(vertex -> getNpHub(coreHub, vertex)))
+                    .toList();
+            final double minNp = getNpHub(coreHub, vertexOrderedByNpHub.getFirst());
+            final double maxNp = getNpHub(coreHub, vertexOrderedByNpHub.getLast());
+            final double divisor = maxFrenchNp - minFrenchNp;
+            if (divisor == 0.0) {
+                LOGGER.warn("avoiding division by ZERO in method getDeltaNpHubMap");
+                deltaNpHubMap.put(coreHub.clusterVerticeCode(), 1d);
+            } else {
+                final double deltaNpHub = (maxNp - minNp) / divisor;
+                deltaNpHubMap.put(coreHub.clusterVerticeCode(), deltaNpHub);
+            }
         }
+        return deltaNpHubMap;
+    }
+
+    private static Integer getNpHub(final CoreHub coreHub,
+                                      final SelectedVertexData vertex) {
+        return vertex.getVertex().coordinates().get(coreHub.clusterVerticeCode());
+    }
+
+    private Map<String, Double> calculateKHub(final List<CoreHub> coreHubs,
+                                              final List<CnecRamBranchData> cnecRamBranchData) {
+        final List<CnecRamBranchData> frenchBaseCaseCnecs = cnecRamBranchData.stream()
+                .filter(CnecRamBranchData::isFrench)
+                .filter(CnecRamBranchData::isBaseCase)
+                .toList();
+        final Map<String, Double> deltaNpHubMap = new HashMap<>();
+        for (CoreHub hub : coreHubs) {
+            BigDecimal khubValue = frenchBaseCaseCnecs.stream()
+                    .map(cnec -> calculateFrenchHubPoderation(cnec, hub, coreHubs))
+                    .reduce(BigDecimal::add)
+                    .orElseThrow(() -> new CoreValidIntradayInvalidDataException("Impossible to compute kHub value for french CNECs "));
+
+            deltaNpHubMap.put(hub.clusterVerticeCode(), khubValue.doubleValue());
+        }
+        return deltaNpHubMap;
+    }
+
+    private BigDecimal calculateFrenchHubPoderation(final CnecRamBranchData cnec,
+                                                    final CoreHub hub,
+                                                    final List<CoreHub> coreHubs) {
+
+        BigDecimal hubPtdfValue = cnec.getPtdfValues().get(hub.clusterVerticeCode());
+        return coreHubs.stream()
+                .filter(h -> !hub.equals(h))
+                .map(CoreHub::clusterVerticeCode)
+                .map(code -> getAbsDifferencePtdfHubValues(cnec, code, hubPtdfValue))
+                .reduce(BigDecimal::add)
+                .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find ptdf values for CNEC %s", cnec.branchId())));
+
+    }
+
+    private static BigDecimal getAbsDifferencePtdfHubValues(final CnecRamBranchData cnec,
+                                                                     final String code,
+                                                                     final BigDecimal hubPtdfValue) {
+        return cnec.getPtdfValues().get(code).subtract(hubPtdfValue).abs();
+    }
+
+    private void updateDistanceNormAndScore(final SelectedVertexData selectedVertexData,
+                                            final Double minNormDistance,
+                                            final Double maxNormDistance,
+                                            final Double ponderation) {
+
+        final double divisor = maxNormDistance - minNormDistance;
+        if (divisor == 0.0) {
+            selectedVertexData.setDistanceNorm(1d);
+        } else {
+            final Double distanceNormNormalized = (selectedVertexData.getDistanceNorm() - minNormDistance) / divisor;
+            selectedVertexData.setDistanceNorm(distanceNormNormalized);
+        }
+        updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getDistanceNorm());
+    }
+
+    private void updateDirectionNormAndScore(final SelectedVertexData selectedVertexData,
+                                             final Double minNormDirection,
+                                             final Double maxNormDirection,
+                                             final Double ponderation) {
+
+        final double divisor = maxNormDirection - minNormDirection;
+        if (divisor == 0.0) {
+            LOGGER.warn("avoiding division by ZERO in method updateDirectionNormAndScore");
+            selectedVertexData.setDirectionNorm(1d);
+        } else {
+            final Double directionNormNormalized = 1 - ((selectedVertexData.getDirectionNorm() - minNormDirection) / divisor);
+            selectedVertexData.setDirectionNorm(directionNormNormalized);
+        }
+
+        updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getDirectionNorm());
+    }
+
+    private void updateConstrainedNormAndScore(final SelectedVertexData selectedVertexData,
+                                               final BigDecimal minNormRam,
+                                               final BigDecimal maxNormRam,
+                                               final Double ponderation) {
+
+        final BigDecimal numerator = selectedVertexData.getRamNorm().subtract(minNormRam);
+        final BigDecimal divisor = maxNormRam.subtract(minNormRam);
+        final BigDecimal ramNormNormalized = numerator.divide(divisor, RoundingMode.HALF_EVEN);
+        selectedVertexData.setRamNorm(ramNormNormalized);
+        updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getRamNorm().doubleValue());
+    }
+
+    private static void updateVerticeScore(final Double ponderation,
+                                           final SelectedVertexData selectedVertexData,
+                                           final Double normScore) {
+        selectedVertexData.setScore(normScore * ponderation + Optional.ofNullable(selectedVertexData.getScore()).orElse(0D));
     }
 
     private double ponderationToQuotient(final int ponderation) {
@@ -172,11 +315,13 @@ public class VerticesSelector {
      * @return the selectedVertexData and its distance from the market
      */
     private SelectedVertexData vertexAndMarketDistance(final ReferenceProgram referenceProgram,
-                                                       final SelectedVertexData selectedVertexData) {
+                                                       final SelectedVertexData selectedVertexData,
+                                                       final Map<String, Double> deltaNpHubMap,
+                                                       final Map<String, Double> kHub) {
 
         final Map<String, Integer> vertexPositions = selectedVertexData.getVertex().coordinates();
 
-        // global distance² = sum_over_hub(k_hub * [1D distance]²)
+        // global distance² = sum_over_hub(deltaNpHub * k_hub * [1D distance]²)
         double sumOfWeightedSquared = 0.0;
         for (final CoreHub hub : coreHubs) {
             final Double marketPos = referenceProgram.getGlobalNetPosition(new EICode(hub.country()));
@@ -189,7 +334,8 @@ public class VerticesSelector {
             }
 
             final double distanceIn1D = marketPos - vertexPos;
-            final double weightedDistance = hub.coefficient() * distanceIn1D * distanceIn1D;
+            final double ponderateByHubs = deltaNpHubMap.get(hub.clusterVerticeCode()) * kHub.get(hub.clusterVerticeCode());
+            final double weightedDistance = ponderateByHubs * distanceIn1D * distanceIn1D;
             sumOfWeightedSquared += weightedDistance;
         }
         selectedVertexData.setDistanceNorm(Math.sqrt(sumOfWeightedSquared));
@@ -223,8 +369,14 @@ public class VerticesSelector {
             normMarket += marketPos * marketPos;
             normVertex += vertexPosition * vertexPosition;
         }
-        final double cosinus = scalarProduct / (Math.sqrt(normMarket) * Math.sqrt(normVertex));
-        selectedVertexData.setDirectionNorm(cosinus);
+        final double divisor = Math.sqrt(normMarket) * Math.sqrt(normVertex);
+        if (divisor == 0.0) {
+            LOGGER.warn("avoiding division by ZERO in method vertexAndMarketAngleDistance");
+            selectedVertexData.setDirectionNorm(1d);
+        } else {
+            final double cosinus = scalarProduct / divisor;
+            selectedVertexData.setDirectionNorm(cosinus);
+        }
         return selectedVertexData;
     }
 }
