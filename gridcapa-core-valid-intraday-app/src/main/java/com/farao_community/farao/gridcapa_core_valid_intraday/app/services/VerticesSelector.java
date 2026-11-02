@@ -15,7 +15,6 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecVer
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.computeCnecVertexProduct;
+import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.getEICodeFromHub;
 import static java.util.Comparator.comparingDouble;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
@@ -329,7 +329,7 @@ public class VerticesSelector {
         // global distance² = sum_over_hub(deltaNpHub * k_hub * [1D distance]²)
         double sumOfWeightedSquared = 0.0;
         for (final CoreHub hub : coreHubs) {
-            final Double marketPos = referenceProgram.getGlobalNetPosition(new EICode(hub.country()));
+            final Double marketPos = referenceProgram.getGlobalNetPosition(getEICodeFromHub(hub));
             final Integer vertexPos = vertexPositions.get(hub.clusterVerticeCode());
 
             if (vertexPos == null) {
@@ -362,7 +362,7 @@ public class VerticesSelector {
         double normVertex = 0.0;
         double normMarket = 0.0;
         for (final CoreHub hub : coreHubs) {
-            final Double marketPos = referenceProgram.getGlobalNetPosition(new EICode(hub.country()));
+            final Double marketPos = referenceProgram.getGlobalNetPosition(getEICodeFromHub(hub));
             final Integer vertexPosition = vertexPositions.get(hub.clusterVerticeCode());
 
             if (vertexPosition == null) {

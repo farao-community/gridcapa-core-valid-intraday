@@ -9,6 +9,8 @@ package com.farao_community.farao.gridcapa_core_valid_intraday.app.utils;
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.HvdcToEiCodeEnum;
+import com.powsybl.openrao.commons.EICode;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,6 +19,14 @@ public final class ComputeUtils {
 
     private ComputeUtils() {
         // utility class
+    }
+
+    public static EICode getEICodeFromHub(CoreHub hub) {
+        if (hub.isHvdcHub()) {
+            return HvdcToEiCodeEnum.valueOf(hub.clusterVerticeCode()).getEICode();
+        } else {
+            return new EICode(hub.country());
+        }
     }
 
     public static BigDecimal computeCnecVertexProduct(final Vertex vertex,
