@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class VerticesSelectorTest {
     private static final double PONDERATION = 0.33;
     private final VerticesSelector selector = new VerticesSelector(new TestUtils.TestCoreHubConf());
+    private static final List<SelectedVertexData> SINGLE_VERTEX = mapVerticesToSelectedVerticesData(List.of(new Vertex(1,  Map.of("AA", 1300, "BB", -1600, "CC", 1300))));
 
     @Test
     void selectionSynthesisTest() {
@@ -114,6 +115,12 @@ class VerticesSelectorTest {
         assertThat(selectedVertices.get(4).getScore()).isNotNull()
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
+    }
+
+    @Test
+    void divideByZeroForDistanceTest() {
+        selector.orderByDistance(SINGLE_VERTEX, getTestRefProg(), getTestCnecRamSelectedVertices(), PONDERATION, true);
+        assertThat(SINGLE_VERTEX.getFirst().getDistanceNorm()).isEqualTo(1d);
     }
 
     @Test
@@ -204,6 +211,12 @@ class VerticesSelectorTest {
     }
 
     @Test
+    void divideByZeroForConstrainedTest() {
+        selector.orderByConstrainedValue(SINGLE_VERTEX, getTestCnecRamSelectedVertices(), PONDERATION);
+        assertThat(SINGLE_VERTEX.getFirst().getRamNorm()).isEqualTo(BigDecimal.ONE);
+    }
+
+    @Test
     void shouldOrderByAngle() {
         final List<SelectedVertexData> selectedVertices = mapVerticesToSelectedVerticesData(getTestVertices());
         selector.orderByAngle(selectedVertices, getTestRefProg(), PONDERATION);
@@ -261,6 +274,12 @@ class VerticesSelectorTest {
 
         assertThat(angleOnlySelection.get(0).getScore()).isNotNull();
         assertThat(angleOnlySelection.get(1).getScore()).isNotNull();
+    }
+
+    @Test
+    void divideByZeroForAngleTest() {
+        selector.orderByAngle(SINGLE_VERTEX, getTestRefProg(), PONDERATION);
+        assertThat(SINGLE_VERTEX.getFirst().getDirectionNorm()).isEqualTo(1d);
     }
 
     private ReferenceProgram getTestRefProg() {

@@ -294,8 +294,13 @@ public class VerticesSelector {
 
         final BigDecimal numerator = selectedVertexData.getRamNorm().subtract(minNormRam);
         final BigDecimal divisor = maxNormRam.subtract(minNormRam);
-        final BigDecimal ramNormNormalized = numerator.divide(divisor, RoundingMode.HALF_EVEN);
-        selectedVertexData.setRamNorm(ramNormNormalized);
+        if (divisor.compareTo(BigDecimal.ZERO) == 0) {
+            LOGGER.warn("avoiding division by ZERO in method updateConstrainedNormAndScore");
+            selectedVertexData.setRamNorm(BigDecimal.ONE);
+        } else {
+            final BigDecimal ramNormNormalized = numerator.divide(divisor, RoundingMode.HALF_EVEN);
+            selectedVertexData.setRamNorm(ramNormNormalized);
+        }
         updateVerticeScore(ponderation, selectedVertexData, selectedVertexData.getRamNorm().doubleValue());
     }
 
