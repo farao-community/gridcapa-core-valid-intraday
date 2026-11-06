@@ -1,9 +1,6 @@
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.domain;
 
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
-import org.hibernate.usertype.StaticUserTypeSupport;
-
-import java.util.ArrayList;
 
 public class StudyPointResult {
     private final Vertex vertex;

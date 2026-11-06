@@ -14,7 +14,6 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecVer
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

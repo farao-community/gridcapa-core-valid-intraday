@@ -34,8 +34,8 @@ public class ShiftService {
     private final MinioAdapter minioAdapter;
     private final List<CoreHub> coreHubs;
 
-    public StudyPointService(MinioAdapter minioAdapter,
-                             CoreHubsConfiguration coreHubsConfiguration) {
+    public StudyPointService(final MinioAdapter minioAdapter,
+                             final CoreHubsConfiguration coreHubsConfiguration) {
         this.minioAdapter = minioAdapter;
         this.coreHubs = Collections.unmodifiableList(coreHubsConfiguration.getCoreHubs());
     }
@@ -110,10 +110,10 @@ public class ShiftService {
         return initGenerators;
     }
 
-    private void resetInitialPminPmax(Network network,
-                                      ZonalData<Scalable> scalableZonalData,
-                                      Map<String, InitGenerator> initGenerators) {
-        //CoreAreasId.getCountriesId()
+    private void resetInitialPminPmax(final Network network,
+                                      final ZonalData<Scalable> scalableZonalData,
+                                      final Map<String, InitGenerator> initGenerators) {
+
         coreHubs.stream()
                 .map(ComputeUtils::getEICodeFromHub)
                 .map(EICode::getAreaCode)

@@ -19,7 +19,6 @@ import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.openrao.commons.EICode;
-import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
