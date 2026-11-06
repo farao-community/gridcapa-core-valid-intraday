@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.getInvalidDataExceptionSupplier;
+
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
  */
@@ -79,7 +81,7 @@ public final class AggregatedScheduleImporter {
         }
         return totalQuantityByPosition.values().stream()
                 .max(Comparator.comparing(BigDecimal::abs))
-                .orElseThrow(() -> new CoreValidIntradayInvalidDataException("No quantities found."));
+                .orElseThrow(getInvalidDataExceptionSupplier("No quantities found."));
     }
 
     private static List<Point> findPointsForTargetHour(final TimeSeries ts, final OffsetDateTime targetProcessDateTime) {

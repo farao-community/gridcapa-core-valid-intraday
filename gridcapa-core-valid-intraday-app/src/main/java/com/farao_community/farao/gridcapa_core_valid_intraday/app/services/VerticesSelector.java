@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.computeCnecVertexProduct;
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.getEICodeFromHub;
+import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.getInvalidDataExceptionSupplier;
 import static java.util.Comparator.comparingDouble;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
@@ -157,7 +158,7 @@ public class VerticesSelector {
                 final CnecVertexRamData minRamCnec = vertexRamsByCnec.stream()
                         .min(ORDER_BY_RAM)
                         .orElseThrow(
-                                () -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find worse CNEC for selectedVertexData id %s", selectedVertexData.getVertex().vertexId()))
+                                getInvalidDataExceptionSupplier(String.format("Impossible to find worse CNEC for selectedVertexData id %s", selectedVertexData.getVertex().vertexId()))
                         );
                 selectedVertexData.setRamNorm(minRamCnec.ram());
             } else {
@@ -186,7 +187,7 @@ public class VerticesSelector {
                 .filter(coreHub -> coreHub.country() == Country.FR)
                 .map(CoreHub::clusterVerticeCode)
                 .findFirst()
-                .orElseThrow(() -> new CoreValidIntradayInvalidDataException("No French CoreHub configuration found during vertex selection! "));
+                .orElseThrow(getInvalidDataExceptionSupplier("No French CoreHub configuration found during vertex selection! "));
         final List<Integer> frenchNps = importedVertices.stream()
                 .map(vertex -> vertex.getVertex().coordinates().get(frenchVertexCode))
                 .sorted(naturalOrder())
@@ -228,7 +229,7 @@ public class VerticesSelector {
             BigDecimal khubValue = frenchBaseCaseCnecs.stream()
                     .map(cnec -> calculateFrenchHubPoderation(cnec, hub, coreHubs))
                     .reduce(BigDecimal::add)
-                    .orElseThrow(() -> new CoreValidIntradayInvalidDataException("Impossible to compute kHub value for french CNECs"));
+                    .orElseThrow(getInvalidDataExceptionSupplier("Impossible to compute kHub value for french CNECs"));
 
             deltaNpHubMap.put(hub.clusterVerticeCode(), khubValue.doubleValue());
         }
@@ -245,7 +246,7 @@ public class VerticesSelector {
                 .map(CoreHub::clusterVerticeCode)
                 .map(code -> getAbsDifferencePtdfHubValues(cnec, code, hubPtdfValue))
                 .reduce(BigDecimal::add)
-                .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find PTDF values for CNEC %s", cnec.branchId())));
+                .orElseThrow(getInvalidDataExceptionSupplier(String.format("Impossible to find PTDF values for CNEC %s", cnec.branchId())));
 
     }
 
