@@ -1,10 +1,15 @@
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services;
 
+import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
+import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayRequest;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.ShiftStudyPointData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.StudyPointResult;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils;
+import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
+import com.farao_community.farao.rao_runner.starter.AsynchronousRaoRunnerClient;
 import com.powsybl.glsk.commons.CountryEICode;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
@@ -16,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +30,17 @@ import java.util.Objects;
 @Service
 public class ShiftService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShiftService.class);
+
+    private static final double DEFAULT_PMAX = 9999.0;
+    private static final double DEFAULT_PMIN = -9999.0;
+    private final MinioAdapter minioAdapter;
+    private final List<CoreHub> coreHubs;
+
+    public StudyPointService(MinioAdapter minioAdapter, CoreHubsConfiguration coreHubsConfiguration,) {
+        this.minioAdapter = minioAdapter;
+        this.coreHubs = Collections.unmodifiableList(coreHubsConfiguration.getCoreHubs());
+    }
+
 
     public RaoRequest computeStudyPointShift(final Vertex vertex,
                                              final ShiftStudyPointData shiftStudyPointData,
@@ -71,8 +88,11 @@ public class ShiftService {
 
     private Map<String, InitGenerator> setPminPmaxToDefaultValue(Network network, ZonalData<Scalable> scalableZonalData) {
         Map<String, InitGenerator> initGenerators = new HashMap<>();
-        CoreAreasId.getCountriesId().stream()
-                .map(zone -> new CountryEICode(Country.valueOf(zone)).getCode())
+
+        coreHubs.stream()
+                .map(coreHub -> ComputeUtils.)
+//        CoreAreasId.getCountriesId().stream()
+//                .map(zone -> new CountryEICode(Country.valueOf(zone)).getCode())
                 .map(scalableZonalData::getData)
                 .filter(Objects::nonNull)
                 .flatMap(scalable -> scalable.filterInjections(network).stream()
