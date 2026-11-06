@@ -44,7 +44,8 @@ public final class TestUtils {
                 new TaskParameterDto("PONDERATION_CONSTRAINED", "INT", "34", "1515"),
                 new TaskParameterDto("RAM_MARGIN", "INT", "15", "213"),
                 new TaskParameterDto("MERGE_ANGLE", "INT", "1", "23"),
-                new TaskParameterDto("FR_CNEC_COUNT_LIMIT", "INT", "7", "14")
+                new TaskParameterDto("FR_CNEC_COUNT_LIMIT", "INT", "7", "14"),
+                new TaskParameterDto("IS_CALCULATE_DELTA_NP_HUB", "BOOLEAN", "true", "false")
         );
     }
 
@@ -132,28 +133,28 @@ public final class TestUtils {
     }
 
     public static List<CnecRamBranchData> getTestCnecRam1() {
-        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 15, true, false, Map.of("AA", BigDecimal.valueOf(.1), "BB", BigDecimal.valueOf(0.1), "CC", BigDecimal.valueOf(.1)));
-        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 16, false, true, Map.of("AA", BigDecimal.valueOf(.101), "BB", BigDecimal.valueOf(0.101), "CC", BigDecimal.valueOf(.1)));
-        final CnecRamBranchData cnec3 = new CnecRamBranchData("id3", 3450, 257, 14, false, true, Map.of("AA", BigDecimal.valueOf(.101), "BB", BigDecimal.valueOf(0.101), "CC", BigDecimal.valueOf(.1)));
-        final CnecRamBranchData cnec4 = new CnecRamBranchData("id4", 1450, 157, 360, true, false, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
-        final CnecRamBranchData cnec5 = new CnecRamBranchData("id5", 3450, 257, 365, false, true, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
-        final CnecRamBranchData cnec6 = new CnecRamBranchData("id6", 3450, 257, 360, false, true, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
-        final CnecRamBranchData cnec7 = new CnecRamBranchData("id7", 1450, 157, 360, false, false, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
-        final CnecRamBranchData cnec8 = new CnecRamBranchData("id8", 3450, 257, 365, true, true, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 15, true, false, true, Map.of("AA", BigDecimal.valueOf(.1), "BB", BigDecimal.valueOf(0.1), "CC", BigDecimal.valueOf(.1)));
+        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 16, false, true, true, Map.of("AA", BigDecimal.valueOf(.101), "BB", BigDecimal.valueOf(0.101), "CC", BigDecimal.valueOf(.1)));
+        final CnecRamBranchData cnec3 = new CnecRamBranchData("id3", 3450, 257, 14, false, true, true, Map.of("AA", BigDecimal.valueOf(.101), "BB", BigDecimal.valueOf(0.101), "CC", BigDecimal.valueOf(.1)));
+        final CnecRamBranchData cnec4 = new CnecRamBranchData("id4", 1450, 157, 360, true, false, true, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec5 = new CnecRamBranchData("id5", 3450, 257, 365, false, true, true, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec6 = new CnecRamBranchData("id6", 3450, 257, 360, false, true, true, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec7 = new CnecRamBranchData("id7", 1450, 157, 360, false, false, false, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
+        final CnecRamBranchData cnec8 = new CnecRamBranchData("id8", 3450, 257, 365, true, true, false, Map.of("AA", BigDecimal.valueOf(.9), "BB", BigDecimal.valueOf(0.9), "CC", BigDecimal.valueOf(.9)));
 
         return List.of(cnec1, cnec2, cnec3, cnec4, cnec5, cnec6, cnec7, cnec8);
     }
 
     public static List<CnecRamBranchData> getTestCnecRam2() {
-        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1000, true, false, Map.of("AA", BigDecimal.valueOf(.1), "BB", BigDecimal.valueOf(0.2), "CC", BigDecimal.valueOf(.1)));
-        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 700, false, true, Map.of("AA", BigDecimal.valueOf(.101), "BB", BigDecimal.valueOf(0.201), "CC", BigDecimal.valueOf(.1)));
+        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1000, true, false, true, Map.of("AA", BigDecimal.valueOf(.1), "BB", BigDecimal.valueOf(0.2), "CC", BigDecimal.valueOf(.1)));
+        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 700, false, true, true, Map.of("AA", BigDecimal.valueOf(.101), "BB", BigDecimal.valueOf(0.201), "CC", BigDecimal.valueOf(.1)));
 
         return List.of(cnec1, cnec2);
     }
 
     public static List<CnecRamBranchData> getTestCnecRamSelectedVertices() {
-        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1400, true, true, Map.of("AA", BigDecimal.valueOf(.3345), "BB", BigDecimal.valueOf(0.156), "CC", BigDecimal.valueOf(.78)));
-        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 1400, true, true, Map.of("AA", BigDecimal.valueOf(.345), "BB", BigDecimal.valueOf(0.256), "CC", BigDecimal.valueOf(.78)));
+        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1400, true, true, true, Map.of("AA", BigDecimal.valueOf(.3345), "BB", BigDecimal.valueOf(0.156), "CC", BigDecimal.valueOf(.78)));
+        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 1400, true, true, true, Map.of("AA", BigDecimal.valueOf(.345), "BB", BigDecimal.valueOf(0.256), "CC", BigDecimal.valueOf(.78)));
 
         return List.of(cnec1, cnec2);
     }

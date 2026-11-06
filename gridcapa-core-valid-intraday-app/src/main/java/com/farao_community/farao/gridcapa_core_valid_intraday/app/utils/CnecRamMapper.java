@@ -22,6 +22,7 @@ import static com.farao_community.gridcapa_core_valid_intraday.xsd.f645.BranchSt
 public final class CnecRamMapper {
 
     private static final String FRENCH_TSO_ORIGIN = "FR";
+    private static final String BASECASE = "BASECASE";
 
     private CnecRamMapper() {
         // utility class
@@ -54,6 +55,7 @@ public final class CnecRamMapper {
                                      getIntValue(cb.getRAM()),
                                      constraintResult.getDomainLimit().isRegion(),
                                      cb.getTsoOrigin().equals(FRENCH_TSO_ORIGIN),
+                                     cb.getOutage().getName().equals(BASECASE),
                                      ptdfs);
     }
 

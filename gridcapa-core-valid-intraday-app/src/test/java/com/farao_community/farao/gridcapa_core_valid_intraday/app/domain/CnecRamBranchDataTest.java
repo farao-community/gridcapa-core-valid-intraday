@@ -24,7 +24,8 @@ class CnecRamBranchDataTest {
         Map<String, BigDecimal> ptdfs = Map.of("AA", BigDecimal.valueOf(0.00123), "BB", BigDecimal.valueOf(0.00456), "CC", BigDecimal.valueOf(0.00789));
         final boolean isLimiting = true;
         final boolean isFrench = true;
-        CnecRamBranchData cnecRamBranchData = new CnecRamBranchData(TEST_ID, RAM_0_CORE, AMR, RAM, isLimiting, isFrench, ptdfs);
+        final boolean isBaseCase = true;
+        CnecRamBranchData cnecRamBranchData = new CnecRamBranchData(TEST_ID, RAM_0_CORE, AMR, RAM, isLimiting, isFrench, isBaseCase, ptdfs);
         Assertions.assertThat(cnecRamBranchData).isNotNull();
         Assertions.assertThat(cnecRamBranchData.branchId())
                 .isEqualTo(TEST_ID);
@@ -37,6 +38,7 @@ class CnecRamBranchDataTest {
         Assertions.assertThat(cnecRamBranchData.ram()).isEqualTo(RAM);
         Assertions.assertThat(cnecRamBranchData.isFrench()).isTrue();
         Assertions.assertThat(cnecRamBranchData.isLimiting()).isTrue();
+        Assertions.assertThat(cnecRamBranchData.isBaseCase()).isTrue();
         Assertions.assertThat(cnecRamBranchData.getPtdfValues())
                 .isEqualTo(cnecRamBranchData.ptdfValues())
                 .isEqualTo(ptdfs);
