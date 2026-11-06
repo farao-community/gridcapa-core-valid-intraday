@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.computeCnecVertexProduct;
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.getEICodeFromHub;
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.dataErrorWithMessage;
+import static com.google.common.base.Predicates.and;
 import static java.util.Comparator.comparingDouble;
 import static java.util.Comparator.comparingInt;
 import static java.util.Comparator.naturalOrder;
@@ -46,6 +47,8 @@ public class VerticesSelector {
     private static final Comparator<CnecVertexRamData> ORDER_BY_RAM = Comparator.comparing(CnecVertexRamData::ram);
     private static final Comparator<SelectedVertexData> VERTEX_SCORE_COMPARATOR = Comparator.comparingDouble(SelectedVertexData::getScore);
     private static final Comparator<SelectedVertexData> ORDER_BY_PONDERATION = VERTEX_SCORE_COMPARATOR.thenComparingInt(v -> v.getVertex().vertexId());
+    private static final double MAX_DELTA = 1d;
+    private static final double DEFAULT_NP_HUB_DELTA = 1d;
     private final List<CoreHub> coreHubs;
 
     public VerticesSelector(final CoreHubsConfiguration coreHubsConfiguration) {
@@ -175,7 +178,7 @@ public class VerticesSelector {
 
     private Map<String, Double> gerDefaultDeltaNpHubMap() {
         return coreHubs.stream()
-                .collect(Collectors.toMap(CoreHub::clusterVerticeCode, ch -> 1d));
+                .collect(Collectors.toMap(CoreHub::clusterVerticeCode, ch -> DEFAULT_NP_HUB_DELTA));
     }
 
     private Map<String, Double> getDeltaNpHubMap(final List<CoreHub> coreHubs,
@@ -204,7 +207,7 @@ public class VerticesSelector {
             final double divisor = maxFrenchNp - minFrenchNp;
             if (divisor == 0.0) {
                 LOGGER.warn("avoiding division by ZERO in method getDeltaNpHubMap");
-                deltaNpHubMap.put(coreHub.clusterVerticeCode(), 1d);
+                deltaNpHubMap.put(coreHub.clusterVerticeCode(), MAX_DELTA);
             } else {
                 final double deltaNpHub = (maxNp - minNp) / divisor;
                 deltaNpHubMap.put(coreHub.clusterVerticeCode(), deltaNpHub);
@@ -214,15 +217,14 @@ public class VerticesSelector {
     }
 
     private static Integer getNpHub(final CoreHub coreHub,
-                                      final SelectedVertexData vertex) {
+                                    final SelectedVertexData vertex) {
         return vertex.getVertex().coordinates().get(coreHub.clusterVerticeCode());
     }
 
     private Map<String, Double> calculateKHub(final List<CoreHub> coreHubs,
                                               final List<CnecRamBranchData> cnecRamBranchData) {
         final List<CnecRamBranchData> frenchBaseCaseCnecs = cnecRamBranchData.stream()
-                .filter(CnecRamBranchData::isFrench)
-                .filter(CnecRamBranchData::isBaseCase)
+                .filter(and(CnecRamBranchData::isFrench, CnecRamBranchData::isBaseCase))
                 .toList();
         final Map<String, Double> deltaNpHubMap = new HashMap<>();
         for (final CoreHub hub : coreHubs) {
@@ -263,7 +265,7 @@ public class VerticesSelector {
 
         final double normDistanceIntervalSize = maxNormDistance - minNormDistance;
         if (normDistanceIntervalSize == 0.0) {
-            selectedVertexData.setDistanceNorm(1d);
+            selectedVertexData.setDistanceNorm(MAX_DELTA);
         } else {
             final Double distanceNormNormalized = (selectedVertexData.getDistanceNorm() - minNormDistance) / normDistanceIntervalSize;
             selectedVertexData.setDistanceNorm(distanceNormNormalized);
@@ -279,7 +281,7 @@ public class VerticesSelector {
         final double normDistanceIntervalSize = maxNormDirection - minNormDirection;
         if (normDistanceIntervalSize == 0.0) {
             LOGGER.warn("avoiding division by ZERO in method updateDirectionNormAndScore");
-            selectedVertexData.setDirectionNorm(1d);
+            selectedVertexData.setDirectionNorm(MAX_DELTA);
         } else {
             final Double directionNormNormalized = 1 - ((selectedVertexData.getDirectionNorm() - minNormDirection) / normDistanceIntervalSize);
             selectedVertexData.setDirectionNorm(directionNormNormalized);
@@ -378,7 +380,7 @@ public class VerticesSelector {
         final double normDistanceIntervalSize = Math.sqrt(normMarket) * Math.sqrt(normVertex);
         if (normDistanceIntervalSize == 0.0) {
             LOGGER.warn("avoiding division by ZERO in method vertexAndMarketAngleDistance");
-            selectedVertexData.setDirectionNorm(1d);
+            selectedVertexData.setDirectionNorm(MAX_DELTA);
         } else {
             final double cosinus = scalarProduct / normDistanceIntervalSize;
             selectedVertexData.setDirectionNorm(cosinus);
