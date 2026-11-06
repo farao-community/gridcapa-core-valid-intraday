@@ -31,7 +31,10 @@ import org.springframework.stereotype.Component;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.getGlobalNetPostionsByEICode;
 
 /**
  * @author Marc Schwitzguebel {@literal <marc.schwitzguebel_externe at rte-france.com>}
@@ -81,9 +84,10 @@ public class CoreValidIntradayHandler {
         }
         //select vertices
         final List<CnecRamBranchData> cnecRamBranchData = CnecRamMapper.mapCnecRamToBranches(flowBasedDomainCnecRam);
-        final List<Vertex> prefilteredVertices = prefilterVertices.prefilterVertices(targetProcessDateTime, marketPoints, network, importedVertices, coreValidIntradayTaskParameters);
+        final Map<String, Double> globalNetPostions = getGlobalNetPostionsByEICode(marketPoints, coreHubsConfiguration.getCoreHubs());
+        final List<Vertex> prefilteredVertices = prefilterVertices.prefilterVertices(targetProcessDateTime, globalNetPostions, network, importedVertices, coreValidIntradayTaskParameters);
         businessLogger.info("Prefiltered Vertices count: {}", prefilteredVertices.size());
-        final List<SelectedVertexData> ponderatedSelection = verticesSelector.selectionSynthesis(prefilteredVertices, marketPoints, cnecRamBranchData, coreValidIntradayTaskParameters);
+        final List<SelectedVertexData> ponderatedSelection = verticesSelector.selectionSynthesis(prefilteredVertices, globalNetPostions, cnecRamBranchData, coreValidIntradayTaskParameters);
         final String logVerticesPonderated = logVertices(ponderatedSelection);
         businessLogger.info("Selected Vertices are : {}", logVerticesPonderated);
         //TODO calculate IVA stuff

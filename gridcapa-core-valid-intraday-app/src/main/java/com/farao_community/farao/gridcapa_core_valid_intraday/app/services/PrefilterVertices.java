@@ -47,14 +47,14 @@ public class PrefilterVertices {
     }
 
     public List<Vertex> prefilterVertices(final OffsetDateTime targetProcessDateTime,
-                                          final ReferenceProgram marketPoints,
+                                          final Map<String, Double> globalNetPostions,
                                           final Network network,
                                           final List<Vertex> importedVertices,
                                           final CoreValidIntradayTaskParameters parameters) {
         List<Vertex> prefilteredVertices = importedVertices;
         final int maxSelectedVertices = parameters.getMaxSelectedVertices();
         if (parameters.isHistoricFilterActive()) {
-            prefilteredVertices = historicPositionsFilter(targetProcessDateTime, marketPoints, importedVertices);
+            prefilteredVertices = historicPositionsFilter(targetProcessDateTime, globalNetPostions, importedVertices);
             if (isListSmallerThanMax(prefilteredVertices, maxSelectedVertices)) {
                 return importedVertices;
             }
@@ -69,9 +69,9 @@ public class PrefilterVertices {
     }
 
     private List<Vertex> historicPositionsFilter(final OffsetDateTime targetProcessDateTime,
-                                                 final ReferenceProgram marketPoints,
+                                                 final Map<String, Double> globalNetPostions,
                                                  final List<Vertex> projectedVertices) {
-        final Map<CoreHub, NetPositionHistory> nphByCoreHub = getAndUpdateNetPositionHistory(targetProcessDateTime, marketPoints);
+        final Map<CoreHub, NetPositionHistory> nphByCoreHub = getAndUpdateNetPositionHistory(targetProcessDateTime, globalNetPostions);
         return projectedVertices.stream()
                 .filter(vertex -> isVertexInNpBounds(vertex, nphByCoreHub))
                 .toList();
@@ -117,21 +117,21 @@ public class PrefilterVertices {
     }
 
     private Map<CoreHub, NetPositionHistory> getAndUpdateNetPositionHistory(final OffsetDateTime targetProcessDateTime,
-                                                                            final ReferenceProgram marketPoints) {
+                                                                            final Map<String, Double> globalNetPostions) {
         final Set<NetPositionHistory> npHistory = netPositionHistoryService.getNpHistoryForTimestamp(targetProcessDateTime);
         final Map<CoreHub, NetPositionHistory> coreHubNphs = mapCoreHubsToNetPositionHistories(npHistory);
         final Set<NetPositionHistory> npHistoryToSave = coreHubNphs.entrySet()
                 .stream()
-                .map(entry -> updateMarketPositionValues(marketPoints, entry.getKey(), entry.getValue()))
+                .map(entry -> updateMarketPositionValues(globalNetPostions, entry.getKey(), entry.getValue()))
                 .collect(Collectors.toSet());
         netPositionHistoryService.saveAll(npHistoryToSave);
         return coreHubNphs;
     }
 
-    private static NetPositionHistory updateMarketPositionValues(final ReferenceProgram marketPoints,
+    private static NetPositionHistory updateMarketPositionValues(final Map<String, Double> globalNetPostions,
                                                                  final CoreHub coreHub,
                                                                  final NetPositionHistory netPositionHistory) {
-        final double marketPos = marketPoints.getGlobalNetPosition(new EICode(coreHub.country()));
+        final double marketPos = globalNetPostions.get(new EICode(coreHub.country()).getAreaCode());
         if (netPositionHistory.getMaximumNetPosition() < marketPos) {
             netPositionHistory.setMaximumNetPosition(marketPos);
         }

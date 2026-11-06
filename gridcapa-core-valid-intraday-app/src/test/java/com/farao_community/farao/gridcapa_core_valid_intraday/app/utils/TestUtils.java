@@ -109,19 +109,19 @@ public final class TestUtils {
     }
 
     public static List<Vertex> getTestVertices() {
-        return List.of(new Vertex(1, Map.of("AA", -301, "BB", 600, "CC", -300)),
-                       new Vertex(2, Map.of("AA", 300, "BB", -600, "CC", -300)),
-                       new Vertex(3, Map.of("AA", 300, "BB", 600, "CC", -300)),
-                       new Vertex(4, Map.of("AA", -350, "BB", 600, "CC", -300)),
-                       new Vertex(5, Map.of("AA", -299, "BB", 600, "CC", -300)));
+        return List.of(new Vertex(1, Map.of("FR", -301, "BE", 600, "DE_AL", -300)),
+                       new Vertex(2, Map.of("FR", 300, "BE", -600, "DE_AL", -300)),
+                       new Vertex(3, Map.of("FR", 300, "BE", 600, "DE_AL", -300)),
+                       new Vertex(4, Map.of("FR", -350, "BE", 600, "DE_AL", -300)),
+                       new Vertex(5, Map.of("FR", -299, "BE", 600, "DE_AL", -300)));
     }
 
     public static List<Vertex> getTestVertices2() {
-        return List.of(new Vertex(1, Map.of("AA", -500, "BB", 400, "CC", 300)),
-                       new Vertex(2, Map.of("AA", 1300, "BB", -1600, "CC", 1300)),
-                       new Vertex(3, Map.of("AA", 200, "BB", 100, "CC", 50)),
-                       new Vertex(4, Map.of("AA", -350, "BB", 600, "CC", 300)),
-                       new Vertex(5, Map.of("AA", -299, "BB", 600, "CC", 300)));
+        return List.of(new Vertex(1, Map.of("FR", -500, "BE", 400, "DE_AL", 300)),
+                       new Vertex(2, Map.of("FR", 1300, "BE", -1600, "DE_AL", 1300)),
+                       new Vertex(3, Map.of("FR", 200, "BE", 100, "DE_AL", 50)),
+                       new Vertex(4, Map.of("FR", -350, "BE", 600, "DE_AL", 300)),
+                       new Vertex(5, Map.of("FR", -299, "BE", 600, "DE_AL", 300)));
     }
 
     public static List<Vertex> getTestVertices3() {
@@ -153,8 +153,8 @@ public final class TestUtils {
     }
 
     public static List<CnecRamBranchData> getTestCnecRamSelectedVertices() {
-        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1400, true, true, true, Map.of("AA", BigDecimal.valueOf(.3345), "BB", BigDecimal.valueOf(0.156), "CC", BigDecimal.valueOf(.78)));
-        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 1400, true, true, true, Map.of("AA", BigDecimal.valueOf(.345), "BB", BigDecimal.valueOf(0.256), "CC", BigDecimal.valueOf(.78)));
+        final CnecRamBranchData cnec1 = new CnecRamBranchData("id1", 1450, 157, 1400, true, true, true, Map.of("FR", BigDecimal.valueOf(.3345), "BE", BigDecimal.valueOf(0.156), "DE_AL", BigDecimal.valueOf(.78)));
+        final CnecRamBranchData cnec2 = new CnecRamBranchData("id2", 3450, 257, 1400, true, true, true, Map.of("FR", BigDecimal.valueOf(.345), "BE", BigDecimal.valueOf(0.256), "DE_AL", BigDecimal.valueOf(.78)));
 
         return List.of(cnec1, cnec2);
     }
@@ -174,6 +174,21 @@ public final class TestUtils {
                     new CoreHub("Test1", "ram1", "fb1", "FR-CORE", "AA", false, false, 1, Country.FR),
                     new CoreHub("Test2", "ram2", "fb2", "DE-CORE", "BB", false, false, 1, Country.DE),
                     new CoreHub("Test3", "ram3", "fb3", "BE-CORE", "CC", false, false, 1, Country.BE)
+            );
+        }
+    }
+
+    public static class TestCoreHubReducedRealConf extends CoreHubsConfiguration {
+        public TestCoreHubReducedRealConf() {
+            // test class
+        }
+
+        @Override
+        public List<CoreHub> getCoreHubs() {
+            return List.of(
+                    new CoreHub("Test1", "ram1", "fb1", "FR-CORE", "FR", false, false, 1, Country.FR),
+                    new CoreHub("Test2", "ram2", "fb2", "DE-CORE", "BE", false, false, 1, Country.BE),
+                    new CoreHub("Test3", "ram3", "fb3", "BE-CORE", "DE_AL", true, false, 1, Country.DE)
             );
         }
     }

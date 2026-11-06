@@ -9,13 +9,11 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.StudyPo
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils;
 import com.farao_community.farao.minio_adapter.starter.MinioAdapter;
 import com.farao_community.farao.rao_runner.api.resource.RaoRequest;
-import com.farao_community.farao.rao_runner.starter.AsynchronousRaoRunnerClient;
-import com.powsybl.glsk.commons.CountryEICode;
 import com.powsybl.glsk.commons.ZonalData;
 import com.powsybl.iidm.modification.scalable.Scalable;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.commons.EICode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,8 @@ public class ShiftService {
     private final MinioAdapter minioAdapter;
     private final List<CoreHub> coreHubs;
 
-    public StudyPointService(MinioAdapter minioAdapter, CoreHubsConfiguration coreHubsConfiguration,) {
+    public StudyPointService(MinioAdapter minioAdapter,
+                             CoreHubsConfiguration coreHubsConfiguration) {
         this.minioAdapter = minioAdapter;
         this.coreHubs = Collections.unmodifiableList(coreHubsConfiguration.getCoreHubs());
     }
@@ -50,7 +49,7 @@ public class ShiftService {
         final StudyPointResult studyPointResult = new StudyPointResult(vertex);
         final Network network = shiftStudyPointData.network();
         final ZonalData<Scalable> scalableZonalData = shiftStudyPointData.scalableZonalData();
-        final Map<String, Double> coreNetPositions = shiftStudyPointData.coreNetPositions();
+        final Map<String, Double> coreNetPositions = shiftStudyPointData.netPositions();
         final String jsonCracUrl = shiftStudyPointData.jsonCracUrl();
         final String raoParametersUrl = shiftStudyPointData.raoParametersUrl();
         final String initialVariant = network.getVariantManager().getWorkingVariantId();
@@ -60,24 +59,24 @@ public class ShiftService {
         RaoRequest raoRequest = null;
         try {
 
-            Map<String, InitGenerator> initGenerators = setPminPmaxToDefaultValue(network, scalableZonalData);
+            final Map<String, InitGenerator> initGenerators = setPminPmaxToDefaultValue(network, scalableZonalData);
             NetPositionsHandler.shiftNetPositionToStudyPoint(network, studyPoint, scalableZonalData, coreNetPositions);
             resetInitialPminPmax(network, scalableZonalData, initGenerators);
-            String shiftedCgmUrl = fileExporter.saveShiftedCgm(network, studyPoint);
+            final String shiftedCgmUrl = fileExporter.saveShiftedCgm(network, studyPoint);
             studyPoint.getStudyPointResult().setShiftedCgmUrl(shiftedCgmUrl);
-            String raoDirPath = String.format("%s/artifacts/RAO-%s-%s/", minioAdapter.getProperties().getBasePath(), timestamp.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'_'HH-mm")), studyPoint.getVerticeId());
+            final String raoDirPath = String.format("%s/artifacts/RAO-%s-%s/", minioAdapter.getProperties().getBasePath(), timestamp.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'_'HH-mm")), studyPoint.getVerticeId());
             // For rao logs dispatcher, the rao request should correspond to the core valid request
             raoRequest = new RaoRequest.RaoRequestBuilder()
-                    .withId(coreValidRequesttId)
-                    .withRunId(coreValidRunId)
+                    .withId(coreValidIntradayRequest.getId())
+                    .withRunId(coreValidIntradayRequest.getCurrentRunId())
                     .withNetworkFileUrl(shiftedCgmUrl)
                     .withCracFileUrl(jsonCracUrl)
                     .withRaoParametersFileUrl(raoParametersUrl)
                     .withResultsDestination(raoDirPath)
                     .build();
 
-        }catch (Exception e) {
-            LOGGER.error("Error during study point {} computation", vertexId, e);
+        } catch (Exception e) {
+            LOGGER.error("Error during study point shift computation on vertex {}", vertexId, e);
             studyPointResult.setStatus(StudyPointResult.Status.ERROR);
         } finally {
             network.getVariantManager().setWorkingVariant(initialVariant);
@@ -86,13 +85,13 @@ public class ShiftService {
         return raoRequest;
     }
 
-    private Map<String, InitGenerator> setPminPmaxToDefaultValue(Network network, ZonalData<Scalable> scalableZonalData) {
-        Map<String, InitGenerator> initGenerators = new HashMap<>();
+    private Map<String, InitGenerator> setPminPmaxToDefaultValue(final Network network,
+                                                                 final ZonalData<Scalable> scalableZonalData) {
+        final Map<String, InitGenerator> initGenerators = new HashMap<>();
 
         coreHubs.stream()
-                .map(coreHub -> ComputeUtils.)
-//        CoreAreasId.getCountriesId().stream()
-//                .map(zone -> new CountryEICode(Country.valueOf(zone)).getCode())
+                .map(ComputeUtils::getEICodeFromHub)
+                .map(EICode::getAreaCode)
                 .map(scalableZonalData::getData)
                 .filter(Objects::nonNull)
                 .flatMap(scalable -> scalable.filterInjections(network).stream()
@@ -102,9 +101,7 @@ public class ShiftService {
                     if (Double.isNaN(generator.getTargetP())) {
                         generator.setTargetP(0.);
                     }
-                    InitGenerator initGenerator = new InitGenerator();
-                    initGenerator.setpMin(generator.getMinP());
-                    initGenerator.setpMax(generator.getMaxP());
+                    final InitGenerator initGenerator = new InitGenerator(generator.getMinP(), generator.getMaxP());
                     initGenerators.put(generator.getId(), initGenerator);
                     generator.setMinP(DEFAULT_PMIN);
                     generator.setMaxP(DEFAULT_PMAX);
@@ -113,25 +110,31 @@ public class ShiftService {
         return initGenerators;
     }
 
-    private void resetInitialPminPmax(Network network, ZonalData<Scalable> scalableZonalData, Map<String, InitGenerator> initGenerators) {
-        CoreAreasId.getCountriesId().forEach(zone -> {
-            String zoneEiCode = new CountryEICode(Country.valueOf(zone)).getCode();
-            Scalable scalable = scalableZonalData.getData(zoneEiCode);
-            if (scalable != null) {
-                List<Generator> generators = scalable.filterInjections(network).stream()
-                        .filter(Generator.class::isInstance)
-                        .map(Generator.class::cast)
-                        .toList();
+    private void resetInitialPminPmax(Network network,
+                                      ZonalData<Scalable> scalableZonalData,
+                                      Map<String, InitGenerator> initGenerators) {
+        //CoreAreasId.getCountriesId()
+        coreHubs.stream()
+                .map(ComputeUtils::getEICodeFromHub)
+                .map(EICode::getAreaCode)
+                .forEach(zoneEiCode -> {
+                    Scalable scalable = scalableZonalData.getData(zoneEiCode);
+                    if (scalable != null) {
+                        List<Generator> generators = scalable.filterInjections(network).stream()
+                                .filter(Generator.class::isInstance)
+                                .map(Generator.class::cast)
+                                .toList();
 
-                generators.forEach(generator -> {
-                    generator.setMaxP(Math.max(generator.getTargetP(), initGenerators.get(generator.getId()).getpMax()));
-                    generator.setMinP(Math.min(generator.getTargetP(), initGenerators.get(generator.getId()).getpMin()));
+                        generators.forEach(generator -> {
+                            generator.setMaxP(Math.max(generator.getTargetP(), initGenerators.get(generator.getId()).pMax()));
+                            generator.setMinP(Math.min(generator.getTargetP(), initGenerators.get(generator.getId()).pMin()));
+                        });
+                    }
                 });
-            }
-        });
         LOGGER.info("Pmax and Pmin are reset to initial values for network {}", network.getNameOrId());
     }
 
-    private record InitGenerator(double pMin, double pMax) {}
+    private record InitGenerator(double pMin, double pMax) {
+    }
 
 }

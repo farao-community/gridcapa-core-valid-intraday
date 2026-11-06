@@ -58,13 +58,13 @@ public class VerticesSelector {
     /**
      *
      * @param importedVertices  the list of projected vertices
-     * @param marketPoints      the market points
+     * @param globalNetPostions the market net positions
      * @param cnecRamBranchData the CNEC ram branches
      * @param parameters        the application parameters
      * @return The ordered list of maxSelectedVertices vertices through ponderated selection
      */
     public List<SelectedVertexData> selectionSynthesis(final List<Vertex> importedVertices,
-                                                       final ReferenceProgram marketPoints,
+                                                       final Map<String, Double> globalNetPostions,
                                                        final List<CnecRamBranchData> cnecRamBranchData,
                                                        final CoreValidIntradayTaskParameters parameters) {
 
@@ -72,9 +72,9 @@ public class VerticesSelector {
                 .map(SelectedVertexData::new)
                 .toList();
         final int ponderationClosest = parameters.getPonderationClosest();
-        orderByDistance(selectedVertexDatas, marketPoints, cnecRamBranchData, ponderationToQuotient(ponderationClosest), parameters.shouldCalculate());
+        orderByDistance(selectedVertexDatas, globalNetPostions, cnecRamBranchData, ponderationToQuotient(ponderationClosest), parameters.shouldCalculate());
         final int ponderationAngle = parameters.getPonderationAngle();
-        orderByAngle(selectedVertexDatas, marketPoints, ponderationToQuotient(ponderationAngle));
+        orderByAngle(selectedVertexDatas, globalNetPostions, ponderationToQuotient(ponderationAngle));
         final int ponderationConstrained = parameters.getPonderationConstrained();
         orderByConstrainedValue(selectedVertexDatas, cnecRamBranchData, ponderationToQuotient(ponderationConstrained));
         return selectedVertexDatas.stream()
@@ -87,12 +87,12 @@ public class VerticesSelector {
     /**
      * Scores the vertices based on distance
      *
-     * @param importedVertices all considered vertices
-     * @param referenceProgram contains the market positions
-     * @param ponderation      the distance ponderation for scoring
+     * @param importedVertices  all considered vertices
+     * @param globalNetPostions contains the market positions
+     * @param ponderation       the distance ponderation for scoring
      */
     public void orderByDistance(final List<SelectedVertexData> importedVertices,
-                                final ReferenceProgram referenceProgram,
+                                final Map<String, Double> globalNetPostions,
                                 final List<CnecRamBranchData> cnecRamBranchData,
                                 final Double ponderation,
                                 final boolean isCalculateDeltaNpHub) {
@@ -102,7 +102,7 @@ public class VerticesSelector {
                 : gerDefaultDeltaNpHubMap();
         final Map<String, Double> kHub = calculateKHub(coreHubs, cnecRamBranchData);
         List<SelectedVertexData> orderedList = importedVertices.stream()
-                .map(vertex -> vertexAndMarketDistance(referenceProgram, vertex, deltaNpHubMap, kHub))
+                .map(vertex -> vertexAndMarketDistance(globalNetPostions, vertex, deltaNpHubMap, kHub))
                 .sorted(comparingDouble(SelectedVertexData::getDistanceNorm))
                 .toList();
 
@@ -114,16 +114,16 @@ public class VerticesSelector {
     /**
      * Scores the vertices based on angle
      *
-     * @param importedVertices all considered vertices
-     * @param referenceProgram contains the market positions
-     * @param ponderation      the angle ponderation for scoring
+     * @param importedVertices  all considered vertices
+     * @param globalNetPostions contains the market positions
+     * @param ponderation       the angle ponderation for scoring
      */
     public void orderByAngle(final List<SelectedVertexData> importedVertices,
-                             final ReferenceProgram referenceProgram,
+                             final Map<String, Double> globalNetPostions,
                              final Double ponderation) {
 
         List<SelectedVertexData> orderedList = importedVertices.stream()
-                .map(v -> vertexAndMarketAngleDistance(referenceProgram, v))
+                .map(v -> vertexAndMarketAngleDistance(globalNetPostions, v))
                 .sorted(comparingDouble(SelectedVertexData::getDirectionNorm))
                 .toList();
 
@@ -318,11 +318,11 @@ public class VerticesSelector {
     }
 
     /**
-     * @param referenceProgram   contains the market positions
+     * @param globalNetPostions  contains the market positions
      * @param selectedVertexData the considered selectedVertexData
      * @return the selectedVertexData and its distance from the market
      */
-    private SelectedVertexData vertexAndMarketDistance(final ReferenceProgram referenceProgram,
+    private SelectedVertexData vertexAndMarketDistance(final Map<String, Double> globalNetPostions,
                                                        final SelectedVertexData selectedVertexData,
                                                        final Map<String, Double> deltaNpHubMap,
                                                        final Map<String, Double> kHub) {
@@ -332,7 +332,7 @@ public class VerticesSelector {
         // global distance² = sum_over_hub(deltaNpHub * k_hub * [1D distance]²)
         double sumOfWeightedSquared = 0.0;
         for (final CoreHub hub : coreHubs) {
-            final Double marketPos = referenceProgram.getGlobalNetPosition(getEICodeFromHub(hub));
+            final Double marketPos = globalNetPostions.get(getEICodeFromHub(hub).getAreaCode());
             final Integer vertexPos = vertexPositions.get(hub.clusterVerticeCode());
 
             if (vertexPos == null) {
@@ -351,11 +351,11 @@ public class VerticesSelector {
     }
 
     /**
-     * @param referenceProgram   contains the market positions
+     * @param globalNetPostions  contains the market positions
      * @param selectedVertexData the considered selectedVertexData
      * @return the selectedVertexData and its distance from the market by direction and angle (uses cosinus)
      */
-    private SelectedVertexData vertexAndMarketAngleDistance(final ReferenceProgram referenceProgram,
+    private SelectedVertexData vertexAndMarketAngleDistance(final Map<String, Double> globalNetPostions,
                                                             final SelectedVertexData selectedVertexData) {
 
         final Map<String, Integer> vertexPositions = selectedVertexData.getVertex().coordinates();
@@ -365,7 +365,7 @@ public class VerticesSelector {
         double normVertex = 0.0;
         double normMarket = 0.0;
         for (final CoreHub hub : coreHubs) {
-            final Double marketPos = referenceProgram.getGlobalNetPosition(getEICodeFromHub(hub));
+            final Double marketPos = globalNetPostions.get(getEICodeFromHub(hub).getAreaCode());
             final Integer vertexPosition = vertexPositions.get(hub.clusterVerticeCode());
 
             if (vertexPosition == null) {

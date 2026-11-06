@@ -8,7 +8,7 @@ import com.powsybl.openrao.data.crac.io.fbconstraint.FbConstraintCreationContext
 import java.util.Map;
 
 public record ShiftStudyPointData(Network network,
-                                  Map<String, Double> coreNetPositions,
+                                  Map<String, Double> netPositions,
                                   ZonalData<Scalable> scalableZonalData,
                                   FbConstraintCreationContext fbConstraintCreationContext,
                                   String jsonCracUrl,

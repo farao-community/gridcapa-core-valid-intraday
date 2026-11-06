@@ -12,10 +12,13 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.Core
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.HvdcToEiCode;
 import com.powsybl.openrao.commons.EICode;
+import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public final class ComputeUtils {
 
@@ -23,7 +26,7 @@ public final class ComputeUtils {
         // utility class
     }
 
-    public static EICode getEICodeFromHub(CoreHub hub) {
+    public static EICode getEICodeFromHub(final CoreHub hub) {
         if (hub.isHvdcHub()) {
             return HvdcToEiCode.valueOf(hub.clusterVerticeCode()).getEICode();
         } else {
@@ -52,5 +55,14 @@ public final class ComputeUtils {
 
     public static Supplier<CoreValidIntradayInvalidDataException> dataErrorWithMessage(final String message, final Object... args) {
         return () -> new CoreValidIntradayInvalidDataException(message.formatted(args));
+    }
+
+    public static Map<String, Double> getGlobalNetPostionsByEICode(final ReferenceProgram referenceProgram, final List<CoreHub> coreHubs) {
+        return coreHubs.stream()
+                .map(ComputeUtils::getEICodeFromHub)
+                .collect(Collectors.toMap(
+                        EICode::getAreaCode,
+                        referenceProgram::getGlobalNetPosition
+                ));
     }
 }
