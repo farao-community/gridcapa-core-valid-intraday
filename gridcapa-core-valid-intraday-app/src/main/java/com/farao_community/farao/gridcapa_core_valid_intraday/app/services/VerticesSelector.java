@@ -228,7 +228,7 @@ public class VerticesSelector {
             BigDecimal khubValue = frenchBaseCaseCnecs.stream()
                     .map(cnec -> calculateFrenchHubPoderation(cnec, hub, coreHubs))
                     .reduce(BigDecimal::add)
-                    .orElseThrow(() -> new CoreValidIntradayInvalidDataException("Impossible to compute kHub value for french CNECs "));
+                    .orElseThrow(() -> new CoreValidIntradayInvalidDataException("Impossible to compute kHub value for french CNECs"));
 
             deltaNpHubMap.put(hub.clusterVerticeCode(), khubValue.doubleValue());
         }
@@ -245,7 +245,7 @@ public class VerticesSelector {
                 .map(CoreHub::clusterVerticeCode)
                 .map(code -> getAbsDifferencePtdfHubValues(cnec, code, hubPtdfValue))
                 .reduce(BigDecimal::add)
-                .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find ptdf values for CNEC %s", cnec.branchId())));
+                .orElseThrow(() -> new CoreValidIntradayInvalidDataException(String.format("Impossible to find PTDF values for CNEC %s", cnec.branchId())));
 
     }
 
