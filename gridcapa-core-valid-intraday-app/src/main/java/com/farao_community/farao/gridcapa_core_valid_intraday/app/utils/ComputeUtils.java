@@ -12,7 +12,6 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.Core
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.HvdcToEiCodeEnum;
 import com.powsybl.openrao.commons.EICode;
-import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -52,6 +51,6 @@ public final class ComputeUtils {
     }
 
     public static Supplier<CoreValidIntradayInvalidDataException> getInvalidDataExceptionSupplier(final String message) {
-        return getInvalidDataExceptionSupplier(message);
+        return () -> new CoreValidIntradayInvalidDataException(message);
     }
 }
