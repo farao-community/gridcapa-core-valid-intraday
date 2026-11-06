@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.TestUtils.getIdsFromSelectedVertexData;
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.TestUtils.getTestCnecRamSelectedVertices;
@@ -88,33 +89,13 @@ class VerticesSelectorTest {
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
 
-        assertThat(selectedVertices.get(0).getDirectionNorm()).isNull();
-        assertThat(selectedVertices.get(1).getDirectionNorm()).isNull();
-        assertThat(selectedVertices.get(2).getDirectionNorm()).isNull();
-        assertThat(selectedVertices.get(3).getDirectionNorm()).isNull();
-        assertThat(selectedVertices.get(4).getDirectionNorm()).isNull();
-
-        assertThat(selectedVertices.get(0).getRamNorm()).isNull();
-        assertThat(selectedVertices.get(1).getRamNorm()).isNull();
-        assertThat(selectedVertices.get(2).getRamNorm()).isNull();
-        assertThat(selectedVertices.get(3).getRamNorm()).isNull();
-        assertThat(selectedVertices.get(4).getRamNorm()).isNull();
-
-        assertThat(selectedVertices.get(0).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(1).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(2).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(3).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(4).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
+        IntStream.of(0, 4).forEach(i -> {
+            assertThat(selectedVertices.get(i).getDirectionNorm()).isNull();
+            assertThat(selectedVertices.get(i).getRamNorm()).isNull();
+            assertThat(selectedVertices.get(i).getScore()).isNotNull()
+                    .isLessThanOrEqualTo(1)
+                    .isGreaterThanOrEqualTo(0);
+        });
     }
 
     @Test
@@ -139,33 +120,13 @@ class VerticesSelectorTest {
         assertThat(selectedVertices.get(2).getDistanceNorm())
                 .isLessThanOrEqualTo(selectedVertices.get(1).getDistanceNorm());
 
-        assertThat(selectedVertices.get(0).getDirectionNorm()).isNull();
-        assertThat(selectedVertices.get(1).getDirectionNorm()).isNull();
-        assertThat(selectedVertices.get(2).getDirectionNorm()).isNull();
-        assertThat(selectedVertices.get(3).getDirectionNorm()).isNull();
-        assertThat(selectedVertices.get(4).getDirectionNorm()).isNull();
-
-        assertThat(selectedVertices.get(0).getRamNorm()).isNull();
-        assertThat(selectedVertices.get(1).getRamNorm()).isNull();
-        assertThat(selectedVertices.get(2).getRamNorm()).isNull();
-        assertThat(selectedVertices.get(3).getRamNorm()).isNull();
-        assertThat(selectedVertices.get(4).getRamNorm()).isNull();
-
-        assertThat(selectedVertices.get(0).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(1).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(2).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(3).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(4).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
+        IntStream.of(0, 4).forEach(i -> {
+            assertThat(selectedVertices.get(i).getDirectionNorm()).isNull();
+            assertThat(selectedVertices.get(i).getRamNorm()).isNull();
+            assertThat(selectedVertices.get(i).getScore()).isNotNull()
+                    .isLessThanOrEqualTo(1)
+                    .isGreaterThanOrEqualTo(0);
+        });
     }
 
     @Test
@@ -192,21 +153,11 @@ class VerticesSelectorTest {
                 .isGreaterThanOrEqualTo(BigDecimal.ZERO)
                 .isLessThanOrEqualTo(selectedVertices.get(2).getRamNorm());
 
-        assertThat(selectedVertices.get(0).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(1).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(2).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(3).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(4).getScore())
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
+        IntStream.of(0, 4).forEach(i ->
+            assertThat(selectedVertices.get(i).getScore()).isNotNull()
+                    .isLessThanOrEqualTo(1)
+                    .isGreaterThanOrEqualTo(0)
+        );
 
     }
 
@@ -240,21 +191,11 @@ class VerticesSelectorTest {
                 .isLessThanOrEqualTo(1)
                 .isGreaterThanOrEqualTo(0);
 
-        assertThat(selectedVertices.get(0).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(1).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(2).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(3).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
-        assertThat(selectedVertices.get(4).getScore()).isNotNull()
-                .isLessThanOrEqualTo(1)
-                .isGreaterThanOrEqualTo(0);
+        IntStream.of(0, 4).forEach(i ->
+            assertThat(selectedVertices.get(i).getScore()).isNotNull()
+                    .isLessThanOrEqualTo(1)
+                    .isGreaterThanOrEqualTo(0)
+        );
 
         final List<SelectedVertexData> angleOnlySelection = mapVerticesToSelectedVerticesData(List.of(new Vertex(6, Map.of("AA", -600, "BB", 1200, "CC", -600)),
                                                                                                       new Vertex(7, Map.of("AA", -300, "BB", 600, "CC", 0))

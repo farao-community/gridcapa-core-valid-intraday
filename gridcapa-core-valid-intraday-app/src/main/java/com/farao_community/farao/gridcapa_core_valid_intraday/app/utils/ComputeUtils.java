@@ -10,7 +10,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
-import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.HvdcToEiCodeEnum;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.HvdcToEiCode;
 import com.powsybl.openrao.commons.EICode;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public final class ComputeUtils {
 
     public static EICode getEICodeFromHub(CoreHub hub) {
         if (hub.isHvdcHub()) {
-            return HvdcToEiCodeEnum.valueOf(hub.clusterVerticeCode()).getEICode();
+            return HvdcToEiCode.valueOf(hub.clusterVerticeCode()).getEICode();
         } else {
             return new EICode(hub.country());
         }
@@ -50,7 +50,7 @@ public final class ComputeUtils {
         return cnec.getPtdfValues().get(code).multiply(BigDecimal.valueOf(vertex.coordinates().get(code)));
     }
 
-    public static Supplier<CoreValidIntradayInvalidDataException> getInvalidDataExceptionSupplier(final String message) {
-        return () -> new CoreValidIntradayInvalidDataException(message);
+    public static Supplier<CoreValidIntradayInvalidDataException> dataErrorWithMessage(final String message, final Object... args) {
+        return () -> new CoreValidIntradayInvalidDataException(message.formatted(args));
     }
 }
