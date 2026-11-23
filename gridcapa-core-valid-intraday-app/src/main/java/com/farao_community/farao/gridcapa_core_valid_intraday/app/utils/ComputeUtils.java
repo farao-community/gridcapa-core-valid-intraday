@@ -11,6 +11,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.HvdcToEiCode;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 
@@ -34,6 +35,16 @@ public final class ComputeUtils {
         }
     }
 
+    public static EICode getEICodeFromClusterVerticeCode(final String clusterVerticeCode) {
+        //if hvdc clusterVerticeCode is i.e. DE_AL or BE_AL
+        if (clusterVerticeCode.length() > 2) {
+            return HvdcToEiCode.valueOf(clusterVerticeCode).getEICode();
+        } else {
+            // if not hvdc clusterVerticeCode == country code
+            return new EICode(Country.valueOf(clusterVerticeCode));
+        }
+    }
+
     public static BigDecimal computeCnecVertexProduct(final Vertex vertex,
                                                       final CnecRamBranchData cnec,
                                                       final List<CoreHub> coreHubs) {
@@ -53,11 +64,13 @@ public final class ComputeUtils {
         return cnec.getPtdfValues().get(code).multiply(BigDecimal.valueOf(vertex.coordinates().get(code)));
     }
 
-    public static Supplier<CoreValidIntradayInvalidDataException> dataErrorWithMessage(final String message, final Object... args) {
+    public static Supplier<CoreValidIntradayInvalidDataException> dataErrorWithMessage(final String message,
+                                                                                       final Object... args) {
         return () -> new CoreValidIntradayInvalidDataException(message.formatted(args));
     }
 
-    public static Map<String, Double> getGlobalNetPostionsByEICode(final ReferenceProgram referenceProgram, final List<CoreHub> coreHubs) {
+    public static Map<String, Double> getGlobalNetPostionsByEICode(final ReferenceProgram referenceProgram,
+                                                                   final List<CoreHub> coreHubs) {
         return coreHubs.stream()
                 .map(ComputeUtils::getEICodeFromHub)
                 .collect(Collectors.toMap(

@@ -11,6 +11,7 @@ import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHub;
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubUtils;
 import com.farao_community.farao.gridcapa_core_valid_commons.exception.CoreValidCommonsInvalidDataException;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 
@@ -85,18 +86,17 @@ public final class VerticesUtils {
         return new Vertex(vertex.vertexId(), coordinates);
     }
 
-    private static List<Vertex> importVertices(final Reader reader,
+    public static List<Vertex> importVertices(final Reader reader,
                                                final List<CoreHub> coreHubs) {
 
         try {
             final List<Vertex> vertices = new ArrayList<>();
-            final Iterable<CSVRecord> csvRecords = CSVFormat.RFC4180.builder()
+            final CSVFormat csvFormat = CSVFormat.RFC4180.builder()
                     .setHeader()
                     .setSkipHeaderRecord(true)
-                    .build()
-                    .parse(reader);
-
-            csvRecords.forEach(csvRecord -> {
+                    .get();
+            final CSVParser csvParser = CSVParser.builder().setReader(reader).setFormat(csvFormat).get();
+            csvParser.forEach(csvRecord -> {
                 final Map<String, Integer> positions = coreHubs.stream()
                         .collect(toMap(CoreHub::clusterVerticeCode,
                                        coreHub -> getCoordinate(csvRecord, coreHub)));

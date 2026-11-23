@@ -6,24 +6,32 @@
  */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app;
 
+import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_core_valid_commons.core_hub.CoreHubsConfiguration;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayRequest;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CoreValidIntradayTaskParameters;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.SelectedVertexData;
-import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.VertexToFrenchCnecs;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.ShiftStudyPointData;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.FileExporter;
+import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.dichotomy.DichotomyParallelization;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.CnecRamMapper;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.FileImporter;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.PrefilterVertices;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.VerticesSelector;
-import com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.DichotomyMethodFinder;
+import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import com.farao_community.gridcapa_core_valid_intraday.xsd.f645.FlowBasedDomainDocument;
+import com.powsybl.commons.report.ReportNode;
 import com.powsybl.glsk.api.GlskDocument;
+import com.powsybl.glsk.commons.ZonalData;
+import com.powsybl.iidm.modification.scalable.Scalable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.commons.EICode;
 import com.powsybl.openrao.data.crac.io.fbconstraint.FbConstraintCreationContext;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
+import com.powsybl.openrao.raoapi.parameters.RaoParameters;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
@@ -46,19 +54,25 @@ public class CoreValidIntradayHandler {
     private static final String RTE_EI_CODE = "10YFR-RTE------C";
 
     private final FileImporter fileImporter;
+    private final FileExporter fileExporter;
     private final PrefilterVertices prefilterVertices;
     private final VerticesSelector verticesSelector;
+    private final DichotomyParallelization dichotomyParallelization;
     private final CoreHubsConfiguration coreHubsConfiguration;
     private final Logger businessLogger;
 
     public CoreValidIntradayHandler(final FileImporter fileImporter,
+                                    final FileExporter fileExporter,
                                     final Logger businessLogger,
                                     final PrefilterVertices prefilterVertices,
                                     final VerticesSelector verticesSelector,
+                                    final DichotomyParallelization dichotomyParallelization,
                                     final CoreHubsConfiguration coreHubsConfiguration) {
         this.fileImporter = fileImporter;
+        this.fileExporter = fileExporter;
         this.prefilterVertices = prefilterVertices;
         this.verticesSelector = verticesSelector;
+        this.dichotomyParallelization = dichotomyParallelization;
         this.coreHubsConfiguration = coreHubsConfiguration;
         this.businessLogger = businessLogger;
     }
@@ -91,8 +105,22 @@ public class CoreValidIntradayHandler {
         final String logVerticesPonderated = logVertices(ponderatedSelection);
         businessLogger.info("Selected Vertices are : {}", logVerticesPonderated);
         //TODO calculate IVA stuff
-        final List<VertexToFrenchCnecs> frenchCnecsDefiningVertices = DichotomyMethodFinder.getFrenchCnecsDefiningVertices(getVerticesFromSelectedVertexData(ponderatedSelection), cnecRamBranchData, coreHubsConfiguration.getCoreHubs(), coreValidIntradayTaskParameters, businessLogger);
-
+        //        final List<VertexToFrenchCnecs> frenchCnecsDefiningVertices = DichotomyMethodFinder.getFrenchCnecsDefiningVertices(getVerticesFromSelectedVertexData(ponderatedSelection),
+        //                                                                                                                           cnecRamBranchData,
+        //                                                                                                                           coreHubsConfiguration.getCoreHubs(),
+        //                                                                                                                           coreValidIntradayTaskParameters,
+        //                                                                                                                           businessLogger);
+        final ShiftStudyPointData shiftStudyPointData = fillStudyPointData(coreValidIntradayRequest.getTimestamp(),
+                                                                           globalNetPostions,
+                                                                           glskDocument,
+                                                                           network,
+                                                                           fbConstraintCreationContext);
+        //save network to be able to have different copies per vertex
+        fileExporter.saveNetworkForTimestamp(network, coreValidIntradayRequest.getTimestamp());
+        //run parallel dichotomy on every chosen vertex
+        final List<Pair<Vertex, DichotomyResult<RaoSuccessResponse>>> raoResultByVertex = dichotomyParallelization.launchDichotomy(getVerticesFromSelectedVertexData(ponderatedSelection),
+                                                                                                                                   coreValidIntradayRequest,
+                                                                                                                                   shiftStudyPointData);
         //TODO output IVAs
         return coreValidIntradayRequest.getId();
     }
@@ -101,14 +129,26 @@ public class CoreValidIntradayHandler {
         MDC.put("gridcapa-task-id", coreValidIntradayRequest.getId());
     }
 
-    private String logVertices(List<SelectedVertexData> selectedVertexData) {
+    private String logVertices(final List<SelectedVertexData> selectedVertexData) {
         return selectedVertexData.stream()
                 .map(SelectedVertexData::toString).collect(Collectors.joining(", "));
     }
 
-    private List<Vertex> getVerticesFromSelectedVertexData(List<SelectedVertexData> selectedVertexData) {
+    private List<Vertex> getVerticesFromSelectedVertexData(final List<SelectedVertexData> selectedVertexData) {
         return selectedVertexData.stream()
                 .map(SelectedVertexData::getVertex)
                 .toList();
+    }
+
+    private ShiftStudyPointData fillStudyPointData(final OffsetDateTime timestamp,
+                                                   final Map<String, Double> globalNetPostions,
+                                                   final GlskDocument glskDocument,
+                                                   final Network network,
+                                                   final FbConstraintCreationContext cracCreationContext) {
+        final ZonalData<Scalable> scalableZonalData = glskDocument.getZonalScalable(network, timestamp.toInstant());
+        final String jsonCracUrl = fileExporter.saveCracInJsonFormat(cracCreationContext.getCrac(), timestamp);
+        final RaoParameters raoParameters = RaoParameters.load(ReportNode.NO_OP);
+        final String raoParametersUrl = fileExporter.saveRaoParametersAndGetUrl(raoParameters);
+        return new ShiftStudyPointData(globalNetPostions, scalableZonalData, cracCreationContext, jsonCracUrl, raoParametersUrl);
     }
 }

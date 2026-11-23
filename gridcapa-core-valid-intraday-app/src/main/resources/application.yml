@@ -20,7 +20,11 @@ core-valid-intraday-runner:
     summer-start-date: 21-06
     autumn-start-date: 23-09
     winter-start-date: 21-12
-
+  dichotomy:
+    max-iterations: 4
+    min-value: 0.0
+    max-value: 1.0
+    precision: 0.125
 core-valid-commons:
   core-hubs:
     - name: Autriche
