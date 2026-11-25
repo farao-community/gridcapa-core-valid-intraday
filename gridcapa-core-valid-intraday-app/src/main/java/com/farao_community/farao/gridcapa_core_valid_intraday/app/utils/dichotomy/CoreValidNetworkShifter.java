@@ -88,7 +88,7 @@ public class CoreValidNetworkShifter implements NetworkShifter {
                                               final Map<String, Double> coreNetPositions) {
         vertex.coordinates().forEach((clusterVerticeCode, netPosition) -> {
             try {
-                String zoneEiCode = getEICodeFromClusterVerticeCode(clusterVerticeCode).getAreaCode();
+                final String zoneEiCode = getEICodeFromClusterVerticeCode(clusterVerticeCode).getAreaCode();
                 final Double zoneNetPosition = coreNetPositions.getOrDefault(zoneEiCode, 0.);
                 double shift = (netPosition * stepValue) - zoneNetPosition;
                 LOGGER.info("Shift for zone {} with EICode {} : Study point {} | Ref prog {} | variation {}", clusterVerticeCode, zoneEiCode, netPosition, zoneNetPosition, shift);

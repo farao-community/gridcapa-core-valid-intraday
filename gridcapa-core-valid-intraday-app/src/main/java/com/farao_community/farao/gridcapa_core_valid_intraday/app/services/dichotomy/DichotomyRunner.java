@@ -89,7 +89,7 @@ public class DichotomyRunner {
     }
 
     private Network loadNetworkFromMinio(OffsetDateTime targetDateTime) {
-        String fileName = networkFormatter.format(targetDateTime);
+        final String fileName = networkFormatter.format(targetDateTime);
         try (InputStream xiidm = minioAdapter.getFile("XIIDM/" + fileName)) {
             return Network.read(fileName, xiidm);
         } catch (IOException e) {

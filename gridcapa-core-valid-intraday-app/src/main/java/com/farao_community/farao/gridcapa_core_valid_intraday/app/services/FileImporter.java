@@ -88,7 +88,7 @@ public class FileImporter {
         return importFile(aggregatedScheduleFile, is -> AggregatedScheduleImporter.calculateFrenchNetPositionFromScheduleMarketDocument(is, targetProcessDateTime));
     }
 
-    public Crac importCracFromJson(String cracUrl, Network network) {
+    public Crac importCracFromJson(final String cracUrl, final Network network) {
         try (InputStream is = urlValidationService.openUrlStream(cracUrl)) {
             return Crac.read(getFilenameFromUrl(cracUrl), is, network);
         } catch (IOException e) {
@@ -96,7 +96,7 @@ public class FileImporter {
         }
     }
 
-    public RaoResult importRaoResult(String raoResultUrl, Crac crac) {
+    public RaoResult importRaoResult(final String raoResultUrl, final Crac crac) {
         try (InputStream is = urlValidationService.openUrlStream(raoResultUrl)) {
             return new RaoResultJsonImporter().importData(is, crac);
         } catch (IOException e) {

@@ -45,11 +45,11 @@ public class FileExporter {
 
     private final MinioAdapter minioAdapter;
 
-    public FileExporter(MinioAdapter minioAdapter) {
+    public FileExporter(final MinioAdapter minioAdapter) {
         this.minioAdapter = minioAdapter;
     }
 
-    public void saveNetworkForTimestamp(Network network, OffsetDateTime targetDateTime) {
+    public void saveNetworkForTimestamp(final Network network, final OffsetDateTime targetDateTime) {
         try (final InputStream xiidm = getNetworkInputStreamInXiidmFormat(network)) {
             minioAdapter.uploadArtifactForTimestamp(XIIDM + MINIO_SEPARATOR + NETWORK_FORMATTER.format(targetDateTime), xiidm, TARGET_PROCESS, "", targetDateTime);
         } catch (IOException e) {
@@ -98,11 +98,11 @@ public class FileExporter {
         return minioAdapter.generatePreSignedUrl(cracPath);
     }
 
-    private String removeIllegalCharacter(String url) {
+    private String removeIllegalCharacter(final String url) {
         return url.replace(":", "");
     }
 
-    public String makeDestinationMinioPath(OffsetDateTime offsetDateTime, String fileType) {
+    public String makeDestinationMinioPath(final OffsetDateTime offsetDateTime, final String fileType) {
         final ZonedDateTime targetDateTime = offsetDateTime.atZoneSameInstant(ZoneId.of(ZONE_ID));
         return TARGET_PROCESS + MINIO_SEPARATOR
                + targetDateTime.getYear() + MINIO_SEPARATOR

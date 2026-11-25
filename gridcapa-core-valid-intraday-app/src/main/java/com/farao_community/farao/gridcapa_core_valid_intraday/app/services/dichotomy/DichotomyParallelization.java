@@ -39,8 +39,8 @@ public class DichotomyParallelization {
                                                                                    final ShiftStudyPointData shiftStudyPointData) {
 
         businessLogger.info("[START] - Starting all dichotomies");
-        List<Pair<Vertex, Future<DichotomyResult<RaoSuccessResponse>>>> futures = new ArrayList<>();
-        List<Pair<Vertex, DichotomyResult<RaoSuccessResponse>>> results = new ArrayList<>();
+        final List<Pair<Vertex, Future<DichotomyResult<RaoSuccessResponse>>>> futures = new ArrayList<>();
+        final List<Pair<Vertex, DichotomyResult<RaoSuccessResponse>>> results = new ArrayList<>();
         vertices.forEach(vertex -> futures.add(Pair.of(vertex, worker.runDichotomyForOneVertex(vertex,
                                                                                                    coreValidIntradayRequest,
                                                                                                    shiftStudyPointData)))
@@ -57,7 +57,7 @@ public class DichotomyParallelization {
         return results;
     }
 
-    private DichotomyResult<RaoSuccessResponse> waitAndGet(Pair<Vertex, Future<DichotomyResult<RaoSuccessResponse>>> dichotomy) throws InterruptedException {
+    private DichotomyResult<RaoSuccessResponse> waitAndGet(final Pair<Vertex, Future<DichotomyResult<RaoSuccessResponse>>> dichotomy) throws InterruptedException {
         try {
             return dichotomy.getValue().get();
         } catch (ExecutionException e) {

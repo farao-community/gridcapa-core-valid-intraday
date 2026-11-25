@@ -24,7 +24,7 @@ public class AsyncConfiguration {
 
     @Bean(name = "threadPoolTaskExecutor")
     public Executor asyncExecutor() {
-        CoreValidForkJoinWorkerThreadFactory factory = new CoreValidForkJoinWorkerThreadFactory();
+        final CoreValidForkJoinWorkerThreadFactory factory = new CoreValidForkJoinWorkerThreadFactory();
         return new ForkJoinPool(Math.min(32767, Runtime.getRuntime().availableProcessors()), factory, null, false);
     }
 

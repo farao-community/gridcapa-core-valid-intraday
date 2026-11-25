@@ -53,29 +53,29 @@ public class RaoValidator implements NetworkValidator<RaoSuccessResponse> {
     @Override
     public DichotomyStepResult<RaoSuccessResponse> validateNetwork(final Network network,
                                                                    final DichotomyStepResult<RaoSuccessResponse> lastDichotomyStepResult) throws ValidationException, RaoFailureException, RaoInterruptionException {
-        String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
-        String scaledNetworkName = network.getNameOrId() + ".xiidm";
-        String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", coreValidIntradayRequest.getTimestamp());
-        RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, "CORE/VALID/" + scaledNetworkDirPath);
+        final String scaledNetworkDirPath = generateScaledNetworkDirPath(network);
+        final String scaledNetworkName = network.getNameOrId() + ".xiidm";
+        final String networkPresignedUrl = fileExporter.saveNetworkInArtifact(network, scaledNetworkDirPath + scaledNetworkName, "", coreValidIntradayRequest.getTimestamp());
+        final RaoRequest raoRequest = buildRaoRequest(networkPresignedUrl, "CORE/VALID/" + scaledNetworkDirPath);
         try {
             LOGGER.info("RAO request sent: {}", raoRequest);
-            AbstractRaoResponse abstractRaoResponse = raoRunnerClient.runRao(raoRequest);
+            final AbstractRaoResponse abstractRaoResponse = raoRunnerClient.runRao(raoRequest);
             LOGGER.info("RAO response received: {}", abstractRaoResponse);
             if (abstractRaoResponse.isRaoFailed()) {
-                RaoFailureResponse failureResponse = (RaoFailureResponse) abstractRaoResponse;
+                final RaoFailureResponse failureResponse = (RaoFailureResponse) abstractRaoResponse;
                 throw new ValidationException(failureResponse.getErrorMessage());
             }
 
-            RaoSuccessResponse raoResponse = (RaoSuccessResponse) abstractRaoResponse;
-            RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
+            final RaoSuccessResponse raoResponse = (RaoSuccessResponse) abstractRaoResponse;
+            final RaoResult raoResult = fileImporter.importRaoResult(raoResponse.getRaoResultFileUrl(), fileImporter.importCracFromJson(raoResponse.getCracFileUrl(), network));
             return DichotomyStepResult.fromNetworkValidationResult(raoResult, raoResponse);
         } catch (RuntimeException e) {
             throw new ValidationException("RAO run failed", e);
         }
     }
 
-    private RaoRequest buildRaoRequest(String networkPresignedUrl,
-                                       String scaledNetworkDirPath) {
+    private RaoRequest buildRaoRequest(final String networkPresignedUrl,
+                                       final String scaledNetworkDirPath) {
         return new RaoRequest.RaoRequestBuilder()
                 .withId(coreValidIntradayRequest.getId())
                 .withRunId(coreValidIntradayRequest.getCurrentRunId())
@@ -86,9 +86,9 @@ public class RaoValidator implements NetworkValidator<RaoSuccessResponse> {
                 .build();
     }
 
-    private String generateScaledNetworkDirPath(Network network) {
-        String basePath = fileExporter.makeDestinationMinioPath(coreValidIntradayRequest.getTimestamp(), ARTIFACTS);
-        String variantName = network.getVariantManager().getWorkingVariantId();
+    private String generateScaledNetworkDirPath(final Network network) {
+        final String basePath = fileExporter.makeDestinationMinioPath(coreValidIntradayRequest.getTimestamp(), ARTIFACTS);
+        final String variantName = network.getVariantManager().getWorkingVariantId();
         return String.format("%s/%s-%s/", basePath, ++variantCounter, variantName);
     }
 }
