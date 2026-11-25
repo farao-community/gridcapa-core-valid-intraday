@@ -37,9 +37,9 @@ class CoreValidNetworkShifterTest {
     @Test
     void  shiftNetworkTest() throws GlskLimitationException, ShiftingException {
         final OffsetDateTime offsetDateTime = OffsetDateTime.of(2019, 1, 8, 2, 0, 0, 0, ZoneOffset.UTC);
-        TestUtils.TestCoreHubReducedRealConf coreHubConf = new TestUtils.TestCoreHubReducedRealConf();
-        Vertex vertex = new Vertex(1, Map.of("FR", 1200, "BE", 2600, "DE", 3500));
-        ShiftStudyPointData shiftStudyPointData = mock(ShiftStudyPointData.class);
+        final TestUtils.TestCoreHubReducedRealConf coreHubConf = new TestUtils.TestCoreHubReducedRealConf();
+        final Vertex vertex = TestUtils.getSingleVertex();
+        final ShiftStudyPointData shiftStudyPointData = mock(ShiftStudyPointData.class);
         final GlskDocument glskDocument = GlskDocumentImporters.importGlsk(Objects.requireNonNull(getClass().getResourceAsStream("/shift/glsk_proportional_12nodes_hvdc.xml")));
         when(shiftStudyPointData.netPositions()).thenReturn(Map.of("10YFR-RTE------C", 2000.0, "10YBE----------2", 6000.0, "10YCB-GERMANY--8", 8000.0));
 

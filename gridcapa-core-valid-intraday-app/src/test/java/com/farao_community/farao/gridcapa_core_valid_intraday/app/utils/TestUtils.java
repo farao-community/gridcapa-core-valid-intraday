@@ -108,6 +108,10 @@ public final class TestUtils {
         return nph;
     }
 
+    public static Vertex getSingleVertex() {
+        return new Vertex(1, Map.of("FR", 1200, "BE", 2600, "DE", 3500));
+    }
+
     public static List<Vertex> getTestVertices() {
         return List.of(new Vertex(1, Map.of("FR", -301, "BE", 600, "DE_AL", -300)),
                        new Vertex(2, Map.of("FR", 300, "BE", -600, "DE_AL", -300)),
