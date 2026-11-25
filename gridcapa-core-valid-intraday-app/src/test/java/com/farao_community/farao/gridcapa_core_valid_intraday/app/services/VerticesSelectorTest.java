@@ -51,13 +51,11 @@ class VerticesSelectorTest {
 
         assertThat(getIdsFromSelectedVertexData(rankedVertices2))
                 .isNotEmpty()
-                .hasSize(4)
-                .containsExactly(5, 4, 1, 3);
+                .hasSize(2)
+                .containsExactly(5, 4);
         //order: 1, 5, 4, 3
         assertThat(rankedVertices2.get(0).getScore()).isEqualTo(0.29345274782792496);
         assertThat(rankedVertices2.get(1).getScore()).isEqualTo(0.29769793065334316);
-        assertThat(rankedVertices2.get(2).getScore()).isEqualTo(0.35735771200225264);
-        assertThat(rankedVertices2.get(3).getScore()).isEqualTo(0.515945068920629);
     }
 
     @Test

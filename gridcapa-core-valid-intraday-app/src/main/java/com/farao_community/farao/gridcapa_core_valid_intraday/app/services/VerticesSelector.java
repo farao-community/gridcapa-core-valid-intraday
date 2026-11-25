@@ -78,8 +78,7 @@ public class VerticesSelector {
         orderByConstrainedValue(selectedVertexDatas, cnecRamBranchData, ponderationToQuotient(ponderationConstrained));
         return selectedVertexDatas.stream()
                 .sorted(ORDER_BY_PONDERATION)
-                // We will take twice the limit because later we need more vertices than the limit and will apply the limit again
-                .limit(parameters.getMaxSelectedVertices() * 2L)
+                .limit(parameters.getMaxSelectedVertices())
                 .toList();
     }
 
