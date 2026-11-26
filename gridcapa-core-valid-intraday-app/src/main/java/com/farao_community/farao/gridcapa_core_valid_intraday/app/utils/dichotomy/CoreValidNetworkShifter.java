@@ -25,7 +25,6 @@ import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
 import com.powsybl.loadflow.LoadFlowRunParameters;
 import com.powsybl.openrao.commons.EICode;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,7 +128,7 @@ public class CoreValidNetworkShifter implements NetworkShifter {
         return initGenerators;
     }
 
-    private static @NotNull Function<Scalable, Stream<? extends Generator>> getGeneratorStream(final Network network) {
+    private static Function<Scalable, Stream<? extends Generator>> getGeneratorStream(final Network network) {
         return scalable -> scalable.filterInjections(network).stream()
                 .filter(Generator.class::isInstance)
                 .map(Generator.class::cast);
