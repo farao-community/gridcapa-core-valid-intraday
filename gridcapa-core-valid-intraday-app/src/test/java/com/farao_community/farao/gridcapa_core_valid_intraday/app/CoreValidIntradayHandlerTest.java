@@ -13,6 +13,7 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.services.FileI
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,7 +44,7 @@ class CoreValidIntradayHandlerTest {
         when(request.getTimestamp()).thenReturn(OffsetDateTime.now());
     }
 
-    //@Test
+    @Test
     void handleCoreValidIntradayRequestTestImportOcappiThenException() {
         when(request.getOcappiMarketPoint()).thenReturn(new CoreValidIntradayFileResource("test_file_name", "test_file_url"));
         when(fileImporter.importReferenceProgram(Mockito.any(), Mockito.any())).thenReturn(new ReferenceProgram(List.of()));
@@ -57,7 +58,7 @@ class CoreValidIntradayHandlerTest {
         verify(fileImporter).importAggregatedScheduleFile(Mockito.any(), Mockito.any());
     }
 
-    //@Test
+    @Test
     void handleCoreValidIntradayRequestTestImportRefProgThenException() {
         Assertions.assertThatExceptionOfType(CoreValidIntradayInvalidDataException.class).isThrownBy(() -> coreValidIntradayHandler.handleCoreValidIntradayRequest(request));
         verify(fileImporter).importCnecRamFile(Mockito.any());

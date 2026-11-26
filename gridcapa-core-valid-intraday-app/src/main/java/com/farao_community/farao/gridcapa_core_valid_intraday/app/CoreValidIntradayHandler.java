@@ -84,7 +84,7 @@ public class CoreValidIntradayHandler {
         final CoreValidIntradayTaskParameters coreValidIntradayTaskParameters = new CoreValidIntradayTaskParameters(coreValidIntradayRequest.getTaskParameterList());
         final String jsonString = coreValidIntradayTaskParameters.toJsonString();
         businessLogger.info("Starting computation of request id: {}, for timestamp: {}, task parameters are: {}", coreValidIntradayRequest.getId(), formattedTimestamp, jsonString);
-        //TODO import stuff
+        //imports
         final FlowBasedDomainDocument flowBasedDomainCnecRam = fileImporter.importCnecRamFile(coreValidIntradayRequest.getCnecRam());
         final List<Vertex> importedVertices = fileImporter.importVertices(coreValidIntradayRequest.getVertices());
         final Network network = fileImporter.importNetwork(coreValidIntradayRequest.getCgm());
@@ -105,11 +105,6 @@ public class CoreValidIntradayHandler {
         final String logVerticesPonderated = logVertices(ponderatedSelection);
         businessLogger.info("Selected Vertices are : {}", logVerticesPonderated);
         //TODO calculate IVA stuff
-        //        final List<VertexToFrenchCnecs> frenchCnecsDefiningVertices = DichotomyMethodFinder.getFrenchCnecsDefiningVertices(getVerticesFromSelectedVertexData(ponderatedSelection),
-        //                                                                                                                           cnecRamBranchData,
-        //                                                                                                                           coreHubsConfiguration.getCoreHubs(),
-        //                                                                                                                           coreValidIntradayTaskParameters,
-        //                                                                                                                           businessLogger);
         final ShiftStudyPointData shiftStudyPointData = fillStudyPointData(coreValidIntradayRequest.getTimestamp(),
                                                                            globalNetPostions,
                                                                            glskDocument,

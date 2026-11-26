@@ -54,14 +54,16 @@ class ComputeUtilsTest {
         final CoreHub coreHub = mock(CoreHub.class);
         when(coreHub.clusterVerticeCode()).thenReturn("unknown");
         when(coreHub.isHvdcHub()).thenReturn(true);
-        assertThatThrownBy(() -> ComputeUtils.getEICodeFromHub(coreHub));
+        assertThatThrownBy(() -> ComputeUtils.getEICodeFromHub(coreHub))
+                .doesNotThrowAnyExceptionExcept(IllegalArgumentException.class);
     }
 
     @Test
     void getEICodeFromUnknownCountryHubTest() {
         final CoreHub coreHub = mock(CoreHub.class);
         when(coreHub.isHvdcHub()).thenReturn(false);
-        assertThatThrownBy(() -> ComputeUtils.getEICodeFromHub(coreHub));
+        assertThatThrownBy(() -> ComputeUtils.getEICodeFromHub(coreHub))
+                .doesNotThrowAnyExceptionExcept(NullPointerException.class);
     }
 
     @Test
@@ -78,12 +80,14 @@ class ComputeUtilsTest {
 
     @Test
     void getEICodeFromClusterVerticeCodeUnknownCountry() {
-        assertThatThrownBy(() -> ComputeUtils.getEICodeFromClusterVerticeCode("ZZ"));
+        assertThatThrownBy(() -> ComputeUtils.getEICodeFromClusterVerticeCode("ZZ"))
+                .doesNotThrowAnyExceptionExcept(IllegalArgumentException.class);
     }
 
     @Test
     void getEICodeFromClusterVerticeCodeUnknownHvdc() {
-        assertThatThrownBy(() -> ComputeUtils.getEICodeFromClusterVerticeCode("AAAA"));
+        assertThatThrownBy(() -> ComputeUtils.getEICodeFromClusterVerticeCode("AAAA"))
+                .doesNotThrowAnyExceptionExcept(IllegalArgumentException.class);
     }
 
     @Test
@@ -91,7 +95,8 @@ class ComputeUtilsTest {
         final CoreHubsConfiguration hubs = new TestUtils.TestCoreHubConf();
         final Vertex vertex = new Vertex(1, Map.of("ZZ1", 10000, "ZZ2", 1000, "ZZ3", 100));
         final CnecRamBranchData cnec = new CnecRamBranchData("id1", 1450, 157, 15, true, false, true, Map.of("ZZ1", BigDecimal.valueOf(.2), "ZZ2", BigDecimal.valueOf(0.3), "ZZ3", BigDecimal.valueOf(.4)));
-        Assertions.assertThatThrownBy(() -> ComputeUtils.computeCnecVertexProduct(vertex, cnec, hubs.getCoreHubs()));
+        Assertions.assertThatThrownBy(() -> ComputeUtils.computeCnecVertexProduct(vertex, cnec, hubs.getCoreHubs()))
+                .doesNotThrowAnyExceptionExcept(NullPointerException.class);
     }
 
     @Test
@@ -110,8 +115,8 @@ class ComputeUtilsTest {
         final List<CoreHub> coreHubs = hubs.getCoreHubs();
         final Map<String, Double> globalNetPostionsByEICode = ComputeUtils.getGlobalNetPostionsByEICode(referenceProgram, coreHubs);
         assertThat(globalNetPostionsByEICode).hasSize(coreHubs.size());
-        assertThat(globalNetPostionsByEICode.get(FRANCE_EI_CODE)).isEqualTo(125.0);
-        assertThat(globalNetPostionsByEICode.get(DE_HVDC_EI_CODE)).isEqualTo(125.0);
+        assertThat(globalNetPostionsByEICode).containsEntry(FRANCE_EI_CODE, 125.0);
+        assertThat(globalNetPostionsByEICode).containsEntry(DE_HVDC_EI_CODE, 125.0);
         assertThat(globalNetPostionsByEICode.get("ANYTHING")).isNull();
     }
 }

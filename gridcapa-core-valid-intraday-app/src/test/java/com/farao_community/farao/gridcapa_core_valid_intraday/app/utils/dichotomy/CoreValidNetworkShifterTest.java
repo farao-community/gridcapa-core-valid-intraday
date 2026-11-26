@@ -28,7 +28,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.offset;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -57,17 +56,17 @@ class CoreValidNetworkShifterTest {
         variantManager.setWorkingVariant(scaledBy1);
         coreValidNetworkShifter.shiftNetwork(1.0, network);
         final Optional<Double> sumAfterFirstShift = network.getGeneratorStream().map(Generator::getTargetP).reduce(Double::sum);
-        assertThat(sumBeforeShift.isPresent()).isTrue();
-        assertThat(sumAfterFirstShift.isPresent()).isTrue();
-        assertThat(sumAfterFirstShift.get()).isEqualTo(sumBeforeShift.get() - 8700.0, offset(0.001));
+        assertThat(sumBeforeShift).isPresent();
+        assertThat(sumAfterFirstShift).isPresent();
+        assertThat(sumAfterFirstShift).contains(sumBeforeShift.get() - 8700.0);
 
         final String scaledBy05 = workingVariantId + "-ScaledBy-0-5";
         variantManager.cloneVariant(workingVariantId, scaledBy05);
         variantManager.setWorkingVariant(scaledBy05);
         coreValidNetworkShifter.shiftNetwork(0.5, network);
         final Optional<Double> sumAfterSecondShift = network.getGeneratorStream().map(Generator::getTargetP).reduce(Double::sum);
-        assertThat(sumAfterSecondShift.isPresent()).isTrue();
-        assertThat(sumAfterSecondShift.get()).isEqualTo(sumBeforeShift.get() - 12350.0, offset(0.001));
+        assertThat(sumAfterSecondShift).isPresent();
+        assertThat(sumAfterSecondShift).contains(sumBeforeShift.get() - 12350.0);
 
     }
 

@@ -14,8 +14,6 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.raoapi.json.JsonRaoParameters;
 import com.powsybl.openrao.raoapi.parameters.RaoParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -32,7 +30,6 @@ import java.util.Properties;
 @Service
 public class FileExporter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileExporter.class);
     public static final String ARTIFACTS_S = "artifacts/%s";
     private static final String RAO_PARAMETERS_FILE_NAME = "raoParameters.json";
     private static final DateTimeFormatter NETWORK_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm_'network.xiidm'");

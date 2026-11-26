@@ -63,7 +63,7 @@ class RaoValidatorTest {
     }
 
     @Test
-    void validateNetworkTestKo1() throws ValidationException, RaoInterruptionException, RaoFailureException {
+    void validateNetworkTestKo1() {
         final OffsetDateTime timestamp = OffsetDateTime.of(2019, 1, 8, 2, 0, 0, 0, ZoneOffset.UTC);
         when(coreValidIntradayRequest.getTimestamp()).thenReturn(timestamp);
         when(coreValidIntradayRequest.getId()).thenReturn("id_123");

@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.gridcapa_core_valid_intraday.app.services.dichotomy;
 
-import com.farao_community.farao.dichotomy.api.index.Index;
 import com.farao_community.farao.dichotomy.api.results.DichotomyResult;
 import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.resource.CoreValidIntradayRequest;
@@ -14,7 +13,6 @@ import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.ShiftSt
 import com.farao_community.farao.rao_runner.api.resource.RaoSuccessResponse;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -24,6 +22,7 @@ import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.T
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -45,8 +44,8 @@ class DichotomyParallelizationTest {
         final List<Vertex> testVertices = getTestVertices();
         final List<Pair<Vertex, DichotomyResult<RaoSuccessResponse>>> results = dichotomyParallelization.launchDichotomy(testVertices, request, shiftStudyPointData);
 
-        verify(worker, Mockito.times(testVertices.size())).runDichotomyForOneVertex(any(), any(), any());
-        assertThat(results.size()).isEqualTo(testVertices.size());
+        verify(worker, times(testVertices.size())).runDichotomyForOneVertex(any(), any(), any());
+        assertThat(results).hasSameSizeAs(testVertices);
         results.forEach(
                 result -> {
                     assertThat(result.getValue().isRaoFailed()).isTrue();
@@ -62,7 +61,6 @@ class DichotomyParallelizationTest {
         final CoreValidIntradayRequest request = mock(CoreValidIntradayRequest.class);
         final ShiftStudyPointData shiftStudyPointData = mock(ShiftStudyPointData.class);
 
-        final Index<RaoSuccessResponse> index = mock(Index.class);
         final DichotomyResult<RaoSuccessResponse> dichotomyResult = mock(DichotomyResult.class);
 
         when(worker.runDichotomyForOneVertex(any(Vertex.class), any(CoreValidIntradayRequest.class), any(ShiftStudyPointData.class)))
@@ -72,8 +70,8 @@ class DichotomyParallelizationTest {
         final List<Vertex> testVertices = getTestVertices();
         final List<Pair<Vertex, DichotomyResult<RaoSuccessResponse>>> results = dichotomyParallelization.launchDichotomy(testVertices, request, shiftStudyPointData);
 
-        verify(worker, Mockito.times(testVertices.size())).runDichotomyForOneVertex(any(), any(), any());
-        assertThat(results.size()).isEqualTo(testVertices.size());
+        verify(worker, times(testVertices.size())).runDichotomyForOneVertex(any(), any(), any());
+        assertThat(results).hasSameSizeAs(testVertices);
         results.forEach(
                 result -> {
                     assertThat(result.getValue().isRaoFailed()).isFalse();

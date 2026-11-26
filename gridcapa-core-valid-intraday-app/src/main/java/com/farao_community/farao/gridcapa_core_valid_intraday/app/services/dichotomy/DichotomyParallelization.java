@@ -42,8 +42,8 @@ public class DichotomyParallelization {
         final List<Pair<Vertex, Future<DichotomyResult<RaoSuccessResponse>>>> futures = new ArrayList<>();
         final List<Pair<Vertex, DichotomyResult<RaoSuccessResponse>>> results = new ArrayList<>();
         vertices.forEach(vertex -> futures.add(Pair.of(vertex, worker.runDichotomyForOneVertex(vertex,
-                                                                                                   coreValidIntradayRequest,
-                                                                                                   shiftStudyPointData)))
+                                                                                               coreValidIntradayRequest,
+                                                                                               shiftStudyPointData)))
         );
         futures.forEach(future -> {
             try {
