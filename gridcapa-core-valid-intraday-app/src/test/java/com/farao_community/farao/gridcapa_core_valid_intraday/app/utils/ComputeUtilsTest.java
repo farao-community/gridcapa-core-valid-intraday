@@ -114,8 +114,8 @@ class ComputeUtilsTest {
         when(referenceProgram.getGlobalNetPosition(any(EICode.class))).thenReturn(125.0);
         final List<CoreHub> coreHubs = hubs.getCoreHubs();
         final Map<String, Double> globalNetPostionsByEICode = ComputeUtils.getGlobalNetPostionsByEICode(referenceProgram, coreHubs);
-        assertThat(globalNetPostionsByEICode).hasSize(coreHubs.size());
-        assertThat(globalNetPostionsByEICode).containsEntry(FRANCE_EI_CODE, 125.0)
+        assertThat(globalNetPostionsByEICode).hasSize(coreHubs.size())
+                .containsEntry(FRANCE_EI_CODE, 125.0)
                 .containsEntry(DE_HVDC_EI_CODE, 125.0);
         assertThat(globalNetPostionsByEICode.get("ANYTHING")).isNull();
     }
