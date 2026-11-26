@@ -57,16 +57,16 @@ class CoreValidNetworkShifterTest {
         coreValidNetworkShifter.shiftNetwork(1.0, network);
         final Optional<Double> sumAfterFirstShift = network.getGeneratorStream().map(Generator::getTargetP).reduce(Double::sum);
         assertThat(sumBeforeShift).isPresent();
-        assertThat(sumAfterFirstShift).isPresent();
-        assertThat(sumAfterFirstShift).contains(sumBeforeShift.get() - 8700.0);
+        assertThat(sumAfterFirstShift).isPresent()
+                .contains(sumBeforeShift.get() - 8700.0);
 
         final String scaledBy05 = workingVariantId + "-ScaledBy-0-5";
         variantManager.cloneVariant(workingVariantId, scaledBy05);
         variantManager.setWorkingVariant(scaledBy05);
         coreValidNetworkShifter.shiftNetwork(0.5, network);
         final Optional<Double> sumAfterSecondShift = network.getGeneratorStream().map(Generator::getTargetP).reduce(Double::sum);
-        assertThat(sumAfterSecondShift).isPresent();
-        assertThat(sumAfterSecondShift).contains(sumBeforeShift.get() - 12350.0);
+        assertThat(sumAfterSecondShift).isPresent()
+                .contains(sumBeforeShift.get() - 12350.0);
 
     }
 
