@@ -23,11 +23,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.net.URI;
-import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.TestUtils.createFileResource;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,7 +53,7 @@ class FileImporterTest {
 
     @Test
     void shouldImportReferenceProgramAndComputeGlobalNetPositions() {
-        final CoreValidIntradayFileResource refProgFile = createFileResource("refprog", getClass().getResource("/20210723-FID2-632-v2-10V1001C--00264T-to-10V1001C--00085T.xml"));
+        final CoreValidIntradayFileResource refProgFile = createFileResource("refprog", Objects.requireNonNull(getClass().getResource("/20210723-FID2-632-v2-10V1001C--00264T-to-10V1001C--00085T.xml")));
         final ReferenceProgram referenceProgram = fileImporter.importReferenceProgram(refProgFile, TEST_DATE_TIME);
         assertEquals(-50, referenceProgram.getGlobalNetPosition("10YFR-RTE------C"));
         assertEquals(-1325, referenceProgram.getGlobalNetPosition("10YCB-GERMANY--8"));
@@ -75,22 +78,22 @@ class FileImporterTest {
 
     @Test
     void shouldImportVerticesFromCoreHubSettings() {
-        final CoreValidIntradayFileResource verticesFile = createFileResource("vertex",  getClass().getResource("/fake-vertice.csv"));
+        final CoreValidIntradayFileResource verticesFile = createFileResource("vertex", Objects.requireNonNull(getClass().getResource("/fake-vertice.csv")));
         final List<Vertex> vertices = fileImporter.importVertices(verticesFile);
-        Assertions.assertThat(vertices)
+        assertThat(vertices)
                 .isNotNull()
                 .hasSize(4);
         final Vertex vertex = vertices.getFirst();
-        Assertions.assertThat(vertex.vertexId()).isEqualTo(1);
+        assertThat(vertex.vertexId()).isEqualTo(1);
         final Map<String, Integer> entries = Map.of(
-            "FR", 11,
-            "BE", 111,
-            "BE_AL", 0,
-            "DE", 1111,
-            "DE_AL", 0
+                "FR", 11,
+                "BE", 111,
+                "BE_AL", 0,
+                "DE", 1111,
+                "DE_AL", 0
         );
         final Map<String, Integer> positions = vertex.coordinates();
-        Assertions.assertThat(positions)
+        assertThat(positions)
                 .hasSize(5)
                 .containsExactlyInAnyOrderEntriesOf(entries);
     }
@@ -109,7 +112,7 @@ class FileImporterTest {
 
     @Test
     void importGlskTest() {
-        final CoreValidIntradayFileResource glskFile = createFileResource("glsk", getClass().getResource("/gsk-document-05.xml"));
+        final CoreValidIntradayFileResource glskFile = createFileResource("glsk", Objects.requireNonNull(getClass().getResource("/gsk-document-05.xml")));
         final GlskDocument glskDocument = fileImporter.importGlskFile(glskFile);
         assertEquals(1, ((UcteGlskDocument) glskDocument).getListGlskSeries().size());
         assertEquals(1, glskDocument.getGlskPoints("aaaaa").size());
@@ -118,14 +121,14 @@ class FileImporterTest {
     @Test
     void importMergedCnec() {
         final Network network = Network.read("20210723_0030.uct", getClass().getResourceAsStream("/20210723_0030.uct"));
-        final CoreValidIntradayFileResource crac = createFileResource("mergedCnec", getClass().getResource("/20210723-F666.xml"));
+        final CoreValidIntradayFileResource crac = createFileResource("mergedCnec", Objects.requireNonNull(getClass().getResource("/20210723-F666.xml")));
         final FbConstraintCreationContext fbConstraintCreationContext = fileImporter.importMergedCnec(crac, network, TEST_DATE_TIME);
         assertNotNull(fbConstraintCreationContext.getCrac());
     }
 
     @Test
     void importCnecRamFileTest() {
-        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", getClass().getResource("/20250921-0000-FID2-645-INIT_VIRG_REFBAL_PRES_FBPARAMS-v3.xml"));
+        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", Objects.requireNonNull(getClass().getResource("/20250921-0000-FID2-645-INIT_VIRG_REFBAL_PRES_FBPARAMS-v3.xml")));
         final FlowBasedDomainDocument flowBasedDomainDocument = fileImporter.importCnecRamFile(cnecRamFile);
         assertNotNull(flowBasedDomainDocument);
         assertEquals(1, flowBasedDomainDocument.getFlowBasedDomainTimeSeries().size());
@@ -134,7 +137,7 @@ class FileImporterTest {
 
     @Test
     void importCnecRamFileThrowExceptionWhenInvalidXmlFile() {
-        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", getClass().getResource("/cnecRam-invalid.xml"));
+        final CoreValidIntradayFileResource cnecRamFile = createFileResource("cnecRam", Objects.requireNonNull(getClass().getResource("/cnecRam-invalid.xml")));
         final CoreValidIntradayInvalidDataException exception = assertThrows(
                 CoreValidIntradayInvalidDataException.class,
                 () -> fileImporter.importCnecRamFile(cnecRamFile)
@@ -145,7 +148,7 @@ class FileImporterTest {
 
     @Test
     void importAggregatedScheduleFileTest() {
-        final CoreValidIntradayFileResource aggregatedScheduleFile = createFileResource("aggregatedSchedule", getClass().getResource("/DA_agregated_schedule_20251014_003.xml"));
+        final CoreValidIntradayFileResource aggregatedScheduleFile = createFileResource("aggregatedSchedule", Objects.requireNonNull(getClass().getResource("/DA_agregated_schedule_20251014_003.xml")));
 
         final BigDecimal frNetPositionForFirstTs = fileImporter.importAggregatedScheduleFile(aggregatedScheduleFile, OffsetDateTime.parse("2025-10-13T22:30Z"));
         final BigDecimal frNetPositionForSecondTs = fileImporter.importAggregatedScheduleFile(aggregatedScheduleFile, OffsetDateTime.parse("2025-10-13T23:30Z"));
@@ -158,7 +161,7 @@ class FileImporterTest {
 
     @Test
     void importAggregatedScheduleFileWithMultipleTimeSeriesTest() {
-        final CoreValidIntradayFileResource aggregatedScheduleMultipleTimeSeries = createFileResource("aggregatedSchedule", getClass().getResource("/DA_agregated_schedule_20251014_003_multiple_timeseries.xml"));
+        final CoreValidIntradayFileResource aggregatedScheduleMultipleTimeSeries = createFileResource("aggregatedSchedule", Objects.requireNonNull(getClass().getResource("/DA_agregated_schedule_20251014_003_multiple_timeseries.xml")));
         final BigDecimal frNetPositionForFirstTs = fileImporter.importAggregatedScheduleFile(aggregatedScheduleMultipleTimeSeries, OffsetDateTime.parse("2025-10-13T22:30Z"));
         final BigDecimal frNetPositionForSecondTs = fileImporter.importAggregatedScheduleFile(aggregatedScheduleMultipleTimeSeries, OffsetDateTime.parse("2025-10-13T23:30Z"));
 
@@ -167,7 +170,25 @@ class FileImporterTest {
 
     }
 
-    private CoreValidIntradayFileResource createFileResource(final String filename, final URL resource) {
-        return new CoreValidIntradayFileResource(filename, resource.toExternalForm());
+    @Test
+    void importNetworkTest() {
+        final CoreValidIntradayFileResource networkFile = createFileResource("network", Objects.requireNonNull(getClass().getResource("/20210723_0030.uct")));
+        final Network network = fileImporter.importNetwork(networkFile);
+        assertThat(network).isNotNull();
+    }
+
+    @Test
+    void getFileNameFromUrlTest() {
+        final String filename = "filename.txt";
+        final String filenameFromUrl = fileImporter.getFilenameFromUrl("http://my.test.domain/directory/" + filename);
+        assertThat(filenameFromUrl).isEqualTo(filename);
+    }
+
+    @Test
+    void getFileNameFromUrlTestKO() {
+        final String filename = "filename.txt";
+        assertThatThrownBy(() -> fileImporter.getFilenameFromUrl("invalidUrl/" + filename))
+                .hasMessage("URL is invalid: invalidUrl/filename.txt")
+                .doesNotThrowAnyExceptionExcept(CoreValidIntradayInvalidDataException.class);
     }
 }

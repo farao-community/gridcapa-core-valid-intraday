@@ -105,7 +105,7 @@ public class FileExporter {
                + targetDateTime.getYear() + MINIO_SEPARATOR
                + String.format("%02d", targetDateTime.getMonthValue()) + MINIO_SEPARATOR
                + String.format("%02d", targetDateTime.getDayOfMonth()) + MINIO_SEPARATOR
-               + String.format("%02d", targetDateTime.getHour()) + "_30" + MINIO_SEPARATOR
+               + String.format("%02d", targetDateTime.getHour()) + "_00" + MINIO_SEPARATOR
                + fileType + MINIO_SEPARATOR;
     }
 }

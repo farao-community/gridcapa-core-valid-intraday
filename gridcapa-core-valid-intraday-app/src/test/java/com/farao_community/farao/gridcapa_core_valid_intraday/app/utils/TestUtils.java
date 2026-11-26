@@ -202,4 +202,5 @@ public final class TestUtils {
                 .map(SelectedVertexData::new)
                 .toList();
     }
+
 }
