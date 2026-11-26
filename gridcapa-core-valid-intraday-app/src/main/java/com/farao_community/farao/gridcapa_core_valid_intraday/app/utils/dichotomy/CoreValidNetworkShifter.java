@@ -25,6 +25,7 @@ import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
 import com.powsybl.loadflow.LoadFlowRunParameters;
 import com.powsybl.openrao.commons.EICode;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static com.farao_community.farao.dichotomy.api.results.ReasonInvalid.BALANCE_LOADFLOW_DIVERGENCE;
 import static com.farao_community.farao.gridcapa_core_valid_intraday.app.utils.ComputeUtils.getEICodeFromClusterVerticeCode;
@@ -112,9 +115,7 @@ public class CoreValidNetworkShifter implements NetworkShifter {
                 .map(EICode::getAreaCode)
                 .map(scalableZonalData::getData)
                 .filter(Objects::nonNull)
-                .flatMap(scalable -> scalable.filterInjections(network).stream()
-                        .filter(Generator.class::isInstance)
-                        .map(Generator.class::cast))
+                .flatMap(getGeneratorStream(network))
                 .forEach(generator -> {
                     if (Double.isNaN(generator.getTargetP())) {
                         generator.setTargetP(0.);
@@ -128,6 +129,12 @@ public class CoreValidNetworkShifter implements NetworkShifter {
         return initGenerators;
     }
 
+    private static @NotNull Function<Scalable, Stream<? extends Generator>> getGeneratorStream(final Network network) {
+        return scalable -> scalable.filterInjections(network).stream()
+                .filter(Generator.class::isInstance)
+                .map(Generator.class::cast);
+    }
+
     private void resetInitialPminPmax(final Network network,
                                       final ZonalData<Scalable> scalableZonalData,
                                       final Map<String, InitGenerator> initGenerators) {
@@ -135,19 +142,20 @@ public class CoreValidNetworkShifter implements NetworkShifter {
         coreHubs.stream()
                 .map(ComputeUtils::getEICodeFromHub)
                 .map(EICode::getAreaCode)
-                .forEach(zoneEiCode -> {
-                    Scalable scalable = scalableZonalData.getData(zoneEiCode);
-                    if (scalable != null) {
-                        List<Generator> generators = scalable.filterInjections(network).stream()
-                                .filter(Generator.class::isInstance)
-                                .map(Generator.class::cast)
-                                .toList();
 
-                        generators.forEach(generator -> {
-                            generator.setMaxP(Math.max(generator.getTargetP(), initGenerators.get(generator.getId()).pMax()));
-                            generator.setMinP(Math.min(generator.getTargetP(), initGenerators.get(generator.getId()).pMin()));
-                        });
-                    }
+                .map(scalableZonalData::getData)
+                .filter(Objects::nonNull)
+                .forEach(scalable -> {
+                    List<Generator> generators = scalable.filterInjections(network).stream()
+                            .filter(Generator.class::isInstance)
+                            .map(Generator.class::cast)
+                            .toList();
+
+                    generators.forEach(generator -> {
+                        generator.setMaxP(Math.max(generator.getTargetP(), initGenerators.get(generator.getId()).pMax()));
+                        generator.setMinP(Math.min(generator.getTargetP(), initGenerators.get(generator.getId()).pMin()));
+                    });
+
                 });
         LOGGER.info("Generator Pmax and Pmin are reset to initial values for network {}", network.getNameOrId());
     }

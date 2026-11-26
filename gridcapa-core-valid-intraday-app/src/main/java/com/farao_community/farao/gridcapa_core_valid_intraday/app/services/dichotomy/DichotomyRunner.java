@@ -64,7 +64,6 @@ public class DichotomyRunner {
         final DichotomyEngine<RaoSuccessResponse> engine = buildDichotomyEngine(vertex,
                                                                                 coreValidIntradayRequest,
                                                                                 shiftStudyPointData);
-        //
         return engine.run(loadNetworkFromMinio(coreValidIntradayRequest.getTimestamp()));
     }
 

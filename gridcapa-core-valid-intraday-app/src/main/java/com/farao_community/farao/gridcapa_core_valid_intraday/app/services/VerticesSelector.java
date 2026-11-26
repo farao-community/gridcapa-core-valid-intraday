@@ -56,14 +56,14 @@ public class VerticesSelector {
 
     /**
      *
-     * @param importedVertices  the list of projected vertices
-     * @param globalNetPostions the market net positions
-     * @param cnecRamBranchData the CNEC ram branches
-     * @param parameters        the application parameters
+     * @param importedVertices   the list of projected vertices
+     * @param globalNetPositions the market net positions by country code
+     * @param cnecRamBranchData  the CNEC ram branches
+     * @param parameters         the application parameters
      * @return The ordered list of maxSelectedVertices vertices through ponderated selection
      */
     public List<SelectedVertexData> selectionSynthesis(final List<Vertex> importedVertices,
-                                                       final Map<String, Double> globalNetPostions,
+                                                       final Map<String, Double> globalNetPositions,
                                                        final List<CnecRamBranchData> cnecRamBranchData,
                                                        final CoreValidIntradayTaskParameters parameters) {
 
@@ -71,9 +71,9 @@ public class VerticesSelector {
                 .map(SelectedVertexData::new)
                 .toList();
         final int ponderationClosest = parameters.getPonderationClosest();
-        orderByDistance(selectedVertexDatas, globalNetPostions, cnecRamBranchData, ponderationToQuotient(ponderationClosest), parameters.shouldCalculate());
+        orderByDistance(selectedVertexDatas, globalNetPositions, cnecRamBranchData, ponderationToQuotient(ponderationClosest), parameters.shouldCalculate());
         final int ponderationAngle = parameters.getPonderationAngle();
-        orderByAngle(selectedVertexDatas, globalNetPostions, ponderationToQuotient(ponderationAngle));
+        orderByAngle(selectedVertexDatas, globalNetPositions, ponderationToQuotient(ponderationAngle));
         final int ponderationConstrained = parameters.getPonderationConstrained();
         orderByConstrainedValue(selectedVertexDatas, cnecRamBranchData, ponderationToQuotient(ponderationConstrained));
         return selectedVertexDatas.stream()
