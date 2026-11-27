@@ -141,7 +141,6 @@ public class CoreValidNetworkShifter implements NetworkShifter {
         coreHubs.stream()
                 .map(ComputeUtils::getEICodeFromHub)
                 .map(EICode::getAreaCode)
-
                 .map(scalableZonalData::getData)
                 .filter(Objects::nonNull)
                 .forEach(scalable -> {
@@ -151,8 +150,10 @@ public class CoreValidNetworkShifter implements NetworkShifter {
                             .toList();
 
                     generators.forEach(generator -> {
-                        generator.setMaxP(Math.max(generator.getTargetP(), initGenerators.get(generator.getId()).pMax()));
-                        generator.setMinP(Math.min(generator.getTargetP(), initGenerators.get(generator.getId()).pMin()));
+                        final double targetP = generator.getTargetP();
+                        final String generatorId = generator.getId();
+                        generator.setMaxP(Math.max(targetP, initGenerators.get(generatorId).pMax()));
+                        generator.setMinP(Math.min(targetP, initGenerators.get(generatorId).pMin()));
                     });
 
                 });
