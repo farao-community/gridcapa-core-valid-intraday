@@ -11,11 +11,15 @@ import com.farao_community.farao.gridcapa_core_valid_commons.vertex.Vertex;
 import com.farao_community.farao.gridcapa_core_valid_intraday.api.exception.CoreValidIntradayInvalidDataException;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.CnecRamBranchData;
 import com.farao_community.farao.gridcapa_core_valid_intraday.app.domain.HvdcToEiCode;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.openrao.commons.EICode;
+import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public final class ComputeUtils {
 
@@ -23,11 +27,21 @@ public final class ComputeUtils {
         // utility class
     }
 
-    public static EICode getEICodeFromHub(CoreHub hub) {
+    public static EICode getEICodeFromHub(final CoreHub hub) {
         if (hub.isHvdcHub()) {
             return HvdcToEiCode.valueOf(hub.clusterVerticeCode()).getEICode();
         } else {
             return new EICode(hub.country());
+        }
+    }
+
+    public static EICode getEICodeFromClusterVerticeCode(final String clusterVerticeCode) {
+        //if hvdc clusterVerticeCode is i.e. DE_AL or BE_AL
+        if (clusterVerticeCode.length() > 2) {
+            return HvdcToEiCode.valueOf(clusterVerticeCode).getEICode();
+        } else {
+            // if not hvdc clusterVerticeCode == country code
+            return new EICode(Country.valueOf(clusterVerticeCode));
         }
     }
 
@@ -50,7 +64,18 @@ public final class ComputeUtils {
         return cnec.getPtdfValues().get(code).multiply(BigDecimal.valueOf(vertex.coordinates().get(code)));
     }
 
-    public static Supplier<CoreValidIntradayInvalidDataException> dataErrorWithMessage(final String message, final Object... args) {
+    public static Supplier<CoreValidIntradayInvalidDataException> dataErrorWithMessage(final String message,
+                                                                                       final Object... args) {
         return () -> new CoreValidIntradayInvalidDataException(message.formatted(args));
+    }
+
+    public static Map<String, Double> getGlobalNetPostionsByEICode(final ReferenceProgram referenceProgram,
+                                                                   final List<CoreHub> coreHubs) {
+        return coreHubs.stream()
+                .map(ComputeUtils::getEICodeFromHub)
+                .collect(Collectors.toMap(
+                        EICode::getAreaCode,
+                        referenceProgram::getGlobalNetPosition
+                ));
     }
 }

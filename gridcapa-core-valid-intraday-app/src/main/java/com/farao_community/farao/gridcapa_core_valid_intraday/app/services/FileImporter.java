@@ -18,15 +18,19 @@ import com.farao_community.gridcapa_core_valid_intraday.xsd.f645.FlowBasedDomain
 import com.powsybl.glsk.api.GlskDocument;
 import com.powsybl.glsk.api.io.GlskDocumentImporters;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.openrao.data.crac.api.Crac;
 import com.powsybl.openrao.data.crac.api.parameters.CracCreationParameters;
 import com.powsybl.openrao.data.crac.io.fbconstraint.FbConstraintCreationContext;
 import com.powsybl.openrao.data.crac.io.fbconstraint.FbConstraintImporter;
 import com.powsybl.openrao.data.crac.io.fbconstraint.parameters.FbConstraintCracCreationParameters;
+import com.powsybl.openrao.data.raoresult.api.RaoResult;
+import com.powsybl.openrao.data.raoresult.io.json.RaoResultJsonImporter;
 import com.powsybl.openrao.data.refprog.referenceprogram.ReferenceProgram;
 import com.powsybl.openrao.data.refprog.refprogxmlimporter.RefProgImporter;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.MalformedURLException;
@@ -82,6 +86,22 @@ public class FileImporter {
 
     public BigDecimal importAggregatedScheduleFile(final CoreValidIntradayFileResource aggregatedScheduleFile, final OffsetDateTime targetProcessDateTime) {
         return importFile(aggregatedScheduleFile, is -> AggregatedScheduleImporter.calculateFrenchNetPositionFromScheduleMarketDocument(is, targetProcessDateTime));
+    }
+
+    public Crac importCracFromJson(final String cracUrl, final Network network) {
+        try (InputStream is = urlValidationService.openUrlStream(cracUrl)) {
+            return Crac.read(getFilenameFromUrl(cracUrl), is, network);
+        } catch (IOException e) {
+            throw new CoreValidIntradayInvalidDataException(String.format("Error importing CRAC from JSON from URL %s", cracUrl), e);
+        }
+    }
+
+    public RaoResult importRaoResult(final String raoResultUrl, final Crac crac) {
+        try (InputStream is = urlValidationService.openUrlStream(raoResultUrl)) {
+            return new RaoResultJsonImporter().importData(is, crac);
+        } catch (IOException e) {
+            throw new CoreValidIntradayInvalidDataException(String.format("Error importing RAO result from URL %s", raoResultUrl), e);
+        }
     }
 
     public <T> T importFile(final CoreValidIntradayFileResource file,
