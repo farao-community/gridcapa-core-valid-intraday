@@ -87,7 +87,7 @@ public final class VerticesUtils {
     }
 
     public static List<Vertex> importVertices(final Reader reader,
-                                               final List<CoreHub> coreHubs) {
+                                              final List<CoreHub> coreHubs) {
 
         try {
             final List<Vertex> vertices = new ArrayList<>();
@@ -146,8 +146,8 @@ public final class VerticesUtils {
     }
 
     public static BigDecimal f0Core(final Vertex vertex,
-                                     final FlowBasedDomainBranchData branchData,
-                                     final Map<String, String> fbToVertexCode) {
+                                    final FlowBasedDomainBranchData branchData,
+                                    final Map<String, String> fbToVertexCode) {
         //f0Core = ∑_over_hubs(PTDF*NP)
         return branchData
                 .getPtdfValues()
